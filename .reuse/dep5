@@ -1,0 +1,20 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: gif-tools
+Upstream-Contact: Igor Mironchik <igor.mironchik@gmail.com>
+Source: https://github.com/igormironchik/gif-tools
+
+Files: editor.png recorder.png src/shared/icon.ico src/editor/gif-editor.rc src/recorder/gif-recorder.rc src/editor/resources.qrc src/recorder/resources.qrc README.md .gitignore  .github/* .gitmodules
+Copyright: 2018-2024 Igor Mironchik <igor.mironchik@gmail.com>
+License: GPL-3.0-or-later
+
+Files: src/shared/icon/*
+Copyright: none
+License: GPL-3.0-or-later
+
+Files: src/editor/img/* src/recorder/img/*
+Copyright: 2007 Nuno Pinheiro <nuno@oxygen-icons.org>, 2007 David Vignoni <david@icon-king.com>, 2007 David Miller <miller@oxygen-icons.org>, Johann Ollivier Lapeyre <johann@oxygen-icons.org>, Kenneth Wimer <kwwii@bootsplash.org>, 2007 Riccardo Iaconelli <riccardo@oxygen-icons.org>
+License: LGPL-3.0-or-later
+
+Files: src/shared/img/Qt-logo-neon-transparent.png
+Copyright: 2023 The Qt Company Ltd and other contributors
+License: LGPL-3.0-or-later
