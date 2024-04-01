@@ -1,0 +1,3 @@
+[submodule "3rdparty/qgiflib"]
+	path = 3rdparty/qgiflib
+	url = https://github.com/igormironchik/qgiflib.git
