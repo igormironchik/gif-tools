@@ -40,6 +40,7 @@ set( CMAKE_CXX_STANDARD_REQUIRED ON )
 
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/qgiflib )
 
+set( BUILD_QGIFLIB_TESTS OFF CACHE INTERNAL "" FORCE )
 add_subdirectory( 3rdparty/qgiflib )
 
 add_subdirectory( src )
