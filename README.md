@@ -16,20 +16,9 @@
 
 # Screenshots
 
-<table>
-<tr>
-<td>
+| ![](editor.png) | ![](recorder.png) |
+| --- | --- |
 
-![](editor.png)
-
-</td>
-<td>
-
-![](recorder.png)
-
-</td>
-</tr>
-</table>
 
 # Known issues
 
