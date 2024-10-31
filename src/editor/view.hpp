@@ -1,14 +1,14 @@
 /*!
-	SPDX-FileCopyrightText: 2018-2024 Igor Mironchik <igor.mironchik@gmail.com>
-	SPDX-License-Identifier: GPL-3.0-or-later
+    SPDX-FileCopyrightText: 2018-2024 Igor Mironchik <igor.mironchik@gmail.com>
+    SPDX-License-Identifier: GPL-3.0-or-later
 */
 
 #ifndef GIF_EDITOR_VIEW_HPP_INCLUDED
 #define GIF_EDITOR_VIEW_HPP_INCLUDED
 
 // Qt include.
-#include <QWidget>
 #include <QScopedPointer>
+#include <QWidget>
 
 // gif-editor include.
 #include "frame.hpp"
@@ -16,9 +16,7 @@
 // qgiflib include.
 #include <qgiflib.hpp>
 
-
 class Tape;
-
 
 //
 // View
@@ -27,39 +25,38 @@ class Tape;
 class ViewPrivate;
 
 //! View with current frame and tape with frames.
-class View final
-	:	public QWidget
+class View final : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	explicit View( const QGifLib::Gif & data, QWidget * parent = nullptr );
-	~View() noexcept override;
+    explicit View(const QGifLib::Gif &data, QWidget *parent = nullptr);
+    ~View() noexcept override;
 
-	//! \return Tape.
-	Tape * tape() const;
-	//! \return Current frame.
-	Frame * currentFrame() const;
+    //! \return Tape.
+    Tape *tape() const;
+    //! \return Current frame.
+    Frame *currentFrame() const;
 
-	//! \return Crop rectangle.
-	QRect cropRect() const;
+    //! \return Crop rectangle.
+    QRect cropRect() const;
 
 public slots:
-	//! Start crop.
-	void startCrop();
-	//! Stop crop.
-	void stopCrop();
-	//! Scroll to frame.
-	void scrollTo( int idx );
+    //! Start crop.
+    void startCrop();
+    //! Stop crop.
+    void stopCrop();
+    //! Scroll to frame.
+    void scrollTo(int idx);
 
 private slots:
-	//! Frame selected.
-	void frameSelected( int idx );
+    //! Frame selected.
+    void frameSelected(int idx);
 
 private:
-	Q_DISABLE_COPY( View )
+    Q_DISABLE_COPY(View)
 
-	QScopedPointer< ViewPrivate > d;
+    QScopedPointer<ViewPrivate> m_d;
 }; // class View
 
 #endif // GIF_EDITOR_VIEW_HPP_INCLUDED

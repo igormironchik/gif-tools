@@ -1,14 +1,13 @@
 /*!
-	SPDX-FileCopyrightText: 2018-2024 Igor Mironchik <igor.mironchik@gmail.com>
-	SPDX-License-Identifier: GPL-3.0-or-later
+    SPDX-FileCopyrightText: 2018-2024 Igor Mironchik <igor.mironchik@gmail.com>
+    SPDX-License-Identifier: GPL-3.0-or-later
 */
 
 #pragma once
 
 // Qt include.
-#include <QThread>
 #include <QScopedPointer>
-
+#include <QThread>
 
 //
 // EventMonitor
@@ -17,8 +16,7 @@
 struct EventMonitorPrivate;
 
 //! Mosue events monitor.
-class EventMonitor final
-	:	public QThread
+class EventMonitor final : public QThread
 {
     Q_OBJECT
 
@@ -28,17 +26,17 @@ signals:
 
 public:
     EventMonitor();
-	~EventMonitor() override;
+    ~EventMonitor() override;
 
-	void stopListening();
+    void stopListening();
 
 protected:
     void run() override;
 
 private:
-	friend struct EventMonitorPrivate;
+    friend struct EventMonitorPrivate;
 
-	Q_DISABLE_COPY( EventMonitor )
+    Q_DISABLE_COPY(EventMonitor)
 
-	QScopedPointer< EventMonitorPrivate > d;
+    QScopedPointer<EventMonitorPrivate> m_d;
 }; // class EventMonitor

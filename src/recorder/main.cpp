@@ -1,47 +1,46 @@
 /*!
-	SPDX-FileCopyrightText: 2018-2024 Igor Mironchik <igor.mironchik@gmail.com>
-	SPDX-License-Identifier: GPL-3.0-or-later
+    SPDX-FileCopyrightText: 2018-2024 Igor Mironchik <igor.mironchik@gmail.com>
+    SPDX-License-Identifier: GPL-3.0-or-later
 */
 
 // Qt include.
 #include <QApplication>
 
 // GIF recorder include.
-#include "mainwindow.hpp"
 #include "event_monitor.hpp"
+#include "mainwindow.hpp"
 
 // gif-widgets include.
 #include "utils.hpp"
 
-
-int main( int argc, char ** argv )
+int main(int argc, char **argv)
 {
-	QApplication app( argc, argv );
-	
-	initSharedResources();
+    QApplication app(argc, argv);
 
-	QIcon appIcon( QStringLiteral( ":/icon/icon_256x256.png" ) );
-	appIcon.addFile( QStringLiteral( ":/icon/icon_128x128.png" ) );
-	appIcon.addFile( QStringLiteral( ":/icon/icon_64x64.png" ) );
-	appIcon.addFile( QStringLiteral( ":/icon/icon_48x48.png" ) );
-	appIcon.addFile( QStringLiteral( ":/icon/icon_32x32.png" ) );
-	appIcon.addFile( QStringLiteral( ":/icon/icon_22x22.png" ) );
-	appIcon.addFile( QStringLiteral( ":/icon/icon_16x16.png" ) );
-	app.setWindowIcon( appIcon );
+    initSharedResources();
 
-	EventMonitor m;
+    QIcon appIcon(QStringLiteral(":/icon/icon_256x256.png"));
+    appIcon.addFile(QStringLiteral(":/icon/icon_128x128.png"));
+    appIcon.addFile(QStringLiteral(":/icon/icon_64x64.png"));
+    appIcon.addFile(QStringLiteral(":/icon/icon_48x48.png"));
+    appIcon.addFile(QStringLiteral(":/icon/icon_32x32.png"));
+    appIcon.addFile(QStringLiteral(":/icon/icon_22x22.png"));
+    appIcon.addFile(QStringLiteral(":/icon/icon_16x16.png"));
+    app.setWindowIcon(appIcon);
 
-	MainWindow w( &m );
-	w.resize( 800, 600 );
-	w.show();
+    EventMonitor m;
 
-	m.start();
+    MainWindow w(&m);
+    w.resize(800, 600);
+    w.show();
 
-	const auto ret = QApplication::exec();
+    m.start();
 
-	m.stopListening();
-	m.quit();
-	m.wait();
+    const auto ret = QApplication::exec();
 
-	return ret;
+    m.stopListening();
+    m.quit();
+    m.wait();
+
+    return ret;
 }
