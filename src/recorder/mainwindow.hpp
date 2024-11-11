@@ -164,6 +164,7 @@ private:
     bool m_recording = false;
     bool m_busy = false;
     bool m_isMouseButtonPressed = false;
+    bool m_skipQuitEvent = false;
     QTemporaryDir m_dir;
     QStringList m_frames;
     qsizetype m_counter = 0;

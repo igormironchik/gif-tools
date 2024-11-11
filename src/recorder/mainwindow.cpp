@@ -289,7 +289,7 @@ void CloseButton::leaveEvent(QEvent *event)
 //
 
 MainWindow::MainWindow(EventMonitor *eventMonitor)
-    : QWidget(nullptr, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint)
+    : QWidget(nullptr, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool)
 {
     setAttribute(Qt::WA_TranslucentBackground);
 
@@ -334,7 +334,7 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     connect(m_settingsButton, &QToolButton::clicked, this, &MainWindow::onSettings);
     m_closeButton = new CloseButton(m_title);
     layout->addWidget(m_closeButton);
-    connect(m_closeButton, &CloseButton::clicked, this, &QWidget::close);
+    connect(m_closeButton, &CloseButton::clicked, qApp, &QApplication::quit);
     vlayout->addWidget(m_title);
     m_recordArea = new QWidget(m_c);
     m_recordArea->setAttribute(Qt::WA_TranslucentBackground);
@@ -395,6 +395,8 @@ void MainWindow::onRecord()
 
         const auto dirs = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
         const auto defaultDir = dirs.first();
+
+        m_skipQuitEvent = true;
 
         auto fileName = QFileDialog::getSaveFileName(this, tr("Save As"), defaultDir, tr("GIF (*.gif)"));
 
@@ -737,16 +739,21 @@ void MainWindow::save(const QString &fileName)
 void MainWindow::closeEvent(QCloseEvent *e)
 {
     if (m_busy) {
-        const auto btn = QMessageBox::question(this, tr("GIF recorder is busy..."), tr("GIF recorder is busy.\nDo you want to terminate the application?"));
+        const auto btn = QMessageBox::question(this, tr("GIF recorder is busy..."),
+                                               tr("GIF recorder is busy.\nDo you want to terminate the application?"));
 
         if (btn == QMessageBox::Yes) {
             exit(-1);
         } else {
             e->ignore();
         }
+    } else if (m_skipQuitEvent) {
+        e->ignore();
     } else {
         e->accept();
     }
+
+    m_skipQuitEvent = false;
 }
 
 void MainWindow::onWritePercent(int percent)
