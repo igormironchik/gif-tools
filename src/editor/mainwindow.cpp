@@ -255,6 +255,7 @@ public:
 
         if (m_frames.count()) {
             m_view->tape()->setCurrentFrame(1);
+            m_view->scrollTo(1);
         }
 
         m_crop->setEnabled(true);
