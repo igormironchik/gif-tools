@@ -21,7 +21,8 @@ public:
     BusyIndicatorPrivate(BusyIndicator *parent)
         : m_outerRadius(10)
         , m_innerRadius(static_cast<int>(m_outerRadius * 0.6))
-        , m_size(m_outerRadius * 2, m_outerRadius * 2)
+        , m_size(m_outerRadius * 2,
+                 m_outerRadius * 2)
         , m_running(true)
         , m_animation(nullptr)
         , m_q(parent)

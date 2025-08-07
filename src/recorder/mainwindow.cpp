@@ -42,7 +42,10 @@
 // ResizeHandle
 //
 
-ResizeHandle::ResizeHandle(Orientation o, bool withMove, QWidget *parent, MainWindow *obj)
+ResizeHandle::ResizeHandle(Orientation o,
+                           bool withMove,
+                           QWidget *parent,
+                           MainWindow *obj)
     : QFrame(parent)
     , m_obj(obj)
     , m_orient(o)
@@ -173,7 +176,8 @@ void ResizeHandle::handleMouseMove(QMouseEvent *e)
 // Title
 //
 
-TitleWidget::TitleWidget(QWidget *parent, MainWindow *obj)
+TitleWidget::TitleWidget(QWidget *parent,
+                         MainWindow *obj)
     : QFrame(parent)
     , m_obj(obj)
 {
@@ -289,7 +293,8 @@ void CloseButton::leaveEvent(QEvent *event)
 //
 
 MainWindow::MainWindow(EventMonitor *eventMonitor)
-    : QWidget(nullptr, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool)
+    : QWidget(nullptr,
+              Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool)
 {
     setAttribute(Qt::WA_TranslucentBackground);
 
@@ -454,7 +459,8 @@ QImage qimageFromXImage(XImage *xi)
         format = QImage::Format_RGB16;
     }
 
-    QImage image = QImage(reinterpret_cast<uchar *>(xi->data), xi->width, xi->height, xi->bytes_per_line, format).copy();
+    QImage image =
+        QImage(reinterpret_cast<uchar *>(xi->data), xi->width, xi->height, xi->bytes_per_line, format).copy();
 
     if ((QSysInfo::ByteOrder == QSysInfo::LittleEndian && xi->byte_order == MSBFirst)
         || (QSysInfo::ByteOrder == QSysInfo::BigEndian && xi->byte_order == LSBFirst)) {
@@ -470,7 +476,10 @@ QImage qimageFromXImage(XImage *xi)
                 uint *p = reinterpret_cast<uint *>(image.scanLine(i));
                 uint *end = p + image.width();
                 while (p < end) {
-                    *p = ((*p << 24) & 0xff000000) | ((*p << 8) & 0x00ff0000) | ((*p >> 8) & 0x0000ff00) | ((*p >> 24) & 0x000000ff);
+                    *p = ((*p << 24) & 0xff000000)
+                        | ((*p << 8) & 0x00ff0000)
+                        | ((*p >> 8) & 0x0000ff00)
+                        | ((*p >> 24) & 0x000000ff);
                     ++p;
                 }
             }
@@ -492,7 +501,11 @@ QImage qimageFromXImage(XImage *xi)
 
 #endif // Q_OS_LINUX
 
-std::tuple<QImage, QRect, QPoint> grabMouseCursor(const QRect &r, const QImage &i)
+std::tuple<QImage,
+           QRect,
+           QPoint>
+grabMouseCursor(const QRect &r,
+                const QImage &i)
 {
     QImage cursorImage;
     QPoint cursorPos(-1, -1);
@@ -509,7 +522,8 @@ std::tuple<QImage, QRect, QPoint> grabMouseCursor(const QRect &r, const QImage &
 
     XFixesCursorImage *cursor = XFixesGetCursorImage(display);
 
-    cursorPos = r.intersects({QPoint(cursor->x - cursor->xhot, cursor->y - cursor->yhot), QSize(cursor->width, cursor->height)})
+    cursorPos =
+        r.intersects({QPoint(cursor->x - cursor->xhot, cursor->y - cursor->yhot), QSize(cursor->width, cursor->height)})
         ? QPoint(cursor->x - cursor->xhot - r.x(), cursor->y - cursor->yhot - r.y())
         : QPoint(-1, -1);
 
@@ -675,7 +689,10 @@ namespace /* anonymous */
 class WriteGIF final : public QRunnable
 {
 public:
-    WriteGIF(MainWindow *progressReceiver, const QStringList &frames, const QVector<int> &delays, const QString &fileName)
+    WriteGIF(MainWindow *progressReceiver,
+             const QStringList &frames,
+             const QVector<int> &delays,
+             const QString &fileName)
         : m_frames(frames)
         , m_delays(delays)
         , m_fileName(fileName)
@@ -739,7 +756,8 @@ void MainWindow::save(const QString &fileName)
 void MainWindow::closeEvent(QCloseEvent *e)
 {
     if (m_busy) {
-        const auto btn = QMessageBox::question(this, tr("GIF recorder is busy..."),
+        const auto btn = QMessageBox::question(this,
+                                               tr("GIF recorder is busy..."),
                                                tr("GIF recorder is busy.\nDo you want to terminate the application?"));
 
         if (btn == QMessageBox::Yes) {

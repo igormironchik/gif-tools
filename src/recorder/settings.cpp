@@ -14,7 +14,10 @@
 // Settings
 //
 
-Settings::Settings(int fpsValue, bool grabCursorValue, bool drawMouseClicks, QWidget *parent)
+Settings::Settings(int fpsValue,
+                   bool grabCursorValue,
+                   bool drawMouseClicks,
+                   QWidget *parent)
     : QDialog(parent)
 {
     m_ui.setupUi(this);

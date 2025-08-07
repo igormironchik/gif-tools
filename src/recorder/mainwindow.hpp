@@ -29,9 +29,17 @@ class ResizeHandle : public QFrame
     Q_OBJECT
 
 public:
-    enum Orientation { Horizontal = 0, Vertical, TopLeftBotomRight, BottomLeftTopRight };
+    enum Orientation {
+        Horizontal = 0,
+        Vertical,
+        TopLeftBotomRight,
+        BottomLeftTopRight
+    };
 
-    ResizeHandle(Orientation o, bool withMove, QWidget *parent, MainWindow *obj);
+    ResizeHandle(Orientation o,
+                 bool withMove,
+                 QWidget *parent,
+                 MainWindow *obj);
     ~ResizeHandle() override = default;
 
     QSize minimumSizeHint() const override;
@@ -65,7 +73,8 @@ class TitleWidget : public QFrame
     Q_OBJECT
 
 public:
-    TitleWidget(QWidget *parent, MainWindow *obj);
+    TitleWidget(QWidget *parent,
+                MainWindow *obj);
     ~TitleWidget() override = default;
 
 protected:

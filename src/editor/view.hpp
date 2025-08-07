@@ -30,7 +30,8 @@ class View final : public QWidget
     Q_OBJECT
 
 public:
-    explicit View(const QGifLib::Gif &data, QWidget *parent = nullptr);
+    explicit View(const QGifLib::Gif &data,
+                  QWidget *parent = nullptr);
     ~View() noexcept override;
 
     //! \return Tape.

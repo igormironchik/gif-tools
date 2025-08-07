@@ -38,7 +38,8 @@ private slots:
     //! Quit.
     void quit();
     //! Frame checked/unchecked.
-    void frameChecked(int idx, bool on);
+    void frameChecked(int idx,
+                      bool on);
     //! Crop.
     void crop(bool on);
     //! Cancel edit.

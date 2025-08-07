@@ -26,7 +26,8 @@ public:
     ~LicenseDialog() override;
 
     //! Add license.
-    void addLicense(const QString &title, const QString &license);
+    void addLicense(const QString &title,
+                    const QString &license);
 
 protected:
     void showEvent(QShowEvent *event) override;

@@ -28,7 +28,10 @@ namespace /* anonymous */
 class Anchor : public QWidget
 {
 public:
-    Anchor(QWidget *parent, const QString &name, QLabel *label, QScrollArea *scroll)
+    Anchor(QWidget *parent,
+           const QString &name,
+           QLabel *label,
+           QScrollArea *scroll)
         : QWidget(parent)
         , m_label(label)
         , m_scroll(scroll)
@@ -81,7 +84,8 @@ protected:
         QPainter p(this);
         p.setRenderHint(QPainter::Antialiasing);
 
-        p.setPen(QPen(m_highlighted ? palette().color(QPalette::LinkVisited) : palette().color(QPalette::Highlight), 2.0));
+        p.setPen(
+            QPen(m_highlighted ? palette().color(QPalette::LinkVisited) : palette().color(QPalette::Highlight), 2.0));
         p.setBrush(palette().color(QPalette::Button));
 
         QPainterPath pt;
@@ -181,7 +185,8 @@ LicenseDialog::~LicenseDialog()
 {
 }
 
-void LicenseDialog::addLicense(const QString &title, const QString &license)
+void LicenseDialog::addLicense(const QString &title,
+                               const QString &license)
 {
     const bool first = (m_d->m_l->count() == 0);
 
@@ -194,7 +199,10 @@ void LicenseDialog::addLicense(const QString &title, const QString &license)
     QLabel *label = new QLabel(m_d->m_w);
     label->setText(license);
     label->setWordWrap(true);
-    label->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard | Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
+    label->setTextInteractionFlags(Qt::TextSelectableByMouse
+                                   | Qt::TextSelectableByKeyboard
+                                   | Qt::LinksAccessibleByMouse
+                                   | Qt::LinksAccessibleByKeyboard);
     label->setOpenExternalLinks(true);
 
     m_d->m_l->addWidget(label);

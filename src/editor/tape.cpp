@@ -69,8 +69,11 @@ int Tape::count() const
 
 void Tape::addFrame(const ImageRef &img)
 {
-    m_d->m_frames.append(new FrameOnTape(img, count() + 1, height() - m_d->m_layout->contentsMargins().bottom()
-                                         - m_d->m_layout->contentsMargins().top(), this));
+    m_d->m_frames.append(
+        new FrameOnTape(img,
+                        count() + 1,
+                        height() - m_d->m_layout->contentsMargins().bottom() - m_d->m_layout->contentsMargins().top(),
+                        this));
     connect(m_d->m_frames.back(), &FrameOnTape::checkTillEnd, this, &Tape::checkTillEnd);
     m_d->m_layout->addWidget(m_d->m_frames.back());
 
@@ -191,7 +194,8 @@ void Tape::removeUnchecked()
     }
 }
 
-void Tape::checkTillEnd(int idx, bool on)
+void Tape::checkTillEnd(int idx,
+                        bool on)
 {
     for (int i = idx; i <= count(); ++i) {
         frame(i)->setChecked(on);
@@ -201,8 +205,9 @@ void Tape::checkTillEnd(int idx, bool on)
 int Tape::xOfFrame(int idx) const
 {
     if (idx >= 1 && idx <= count()) {
-        return m_d->m_layout->contentsMargins().left() + (idx - 1) * m_d->m_currentFrame->width()
-                + (idx - 1) * m_d->m_layout->spacing();
+        return m_d->m_layout->contentsMargins().left()
+            + (idx - 1) * m_d->m_currentFrame->width()
+            + (idx - 1) * m_d->m_layout->spacing();
     } else {
         return -1;
     }

@@ -21,7 +21,9 @@
 class FramePrivate
 {
 public:
-    FramePrivate(const ImageRef &img, Frame::ResizeMode mode, Frame *parent)
+    FramePrivate(const ImageRef &img,
+                 Frame::ResizeMode mode,
+                 Frame *parent)
         : m_image(img)
         , m_mode(mode)
         , m_dirty(false)
@@ -55,7 +57,11 @@ public:
 class ThumbnailCreator final : public QRunnable
 {
 public:
-    ThumbnailCreator(QImage img, int width, int height, int desiredHeight, Frame::ResizeMode mode)
+    ThumbnailCreator(QImage img,
+                     int width,
+                     int height,
+                     int desiredHeight,
+                     Frame::ResizeMode mode)
         : m_img(img)
         , m_width(width)
         , m_height(height)
@@ -73,7 +79,8 @@ public:
     void run() override
     {
         if (m_img.width() > m_width || m_img.height() > m_height) {
-            m_thumbnail = m_img.scaledToHeight(m_desiredHeight > 0 ? m_desiredHeight : m_height, Qt::SmoothTransformation);
+            m_thumbnail =
+                m_img.scaledToHeight(m_desiredHeight > 0 ? m_desiredHeight : m_height, Qt::SmoothTransformation);
         } else {
             m_thumbnail = m_img;
         }
@@ -134,9 +141,14 @@ void FramePrivate::resized(int height)
 // Frame
 //
 
-Frame::Frame(const ImageRef &img, ResizeMode mode, QWidget *parent, int height)
+Frame::Frame(const ImageRef &img,
+             ResizeMode mode,
+             QWidget *parent,
+             int height)
     : QWidget(parent)
-    , m_d(new FramePrivate(img, mode, this))
+    , m_d(new FramePrivate(img,
+                           mode,
+                           this))
 {
     switch (mode) {
     case ResizeMode::FitToSize:
@@ -225,8 +237,8 @@ void Frame::paintEvent(QPaintEvent *)
 
 void Frame::resizeEvent(QResizeEvent *e)
 {
-    if (m_d->m_mode == ResizeMode::FitToSize ||
-        (m_d->m_mode == ResizeMode::FitToHeight && e->size().height() != m_d->m_thumbnail.height())) {
+    if (m_d->m_mode == ResizeMode::FitToSize
+        || (m_d->m_mode == ResizeMode::FitToHeight && e->size().height() != m_d->m_thumbnail.height())) {
         m_d->m_dirty = true;
     }
 

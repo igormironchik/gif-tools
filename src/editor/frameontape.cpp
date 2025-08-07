@@ -22,7 +22,10 @@
 class FrameOnTapePrivate
 {
 public:
-    FrameOnTapePrivate(const ImageRef &img, int counter, int height, FrameOnTape *parent)
+    FrameOnTapePrivate(const ImageRef &img,
+                       int counter,
+                       int height,
+                       FrameOnTape *parent)
         : m_counter(counter)
         , m_current(false)
         , m_label(new QLabel(parent))
@@ -73,17 +76,24 @@ void FrameOnTapePrivate::setCurrent(bool on)
 // FrameOnTape
 //
 
-FrameOnTape::FrameOnTape(const ImageRef &img, int counter, int height, QWidget *parent)
+FrameOnTape::FrameOnTape(const ImageRef &img,
+                         int counter,
+                         int height,
+                         QWidget *parent)
     : QFrame(parent)
-    , m_d(new FrameOnTapePrivate(img, counter, height, this))
+    , m_d(new FrameOnTapePrivate(img,
+                                 counter,
+                                 height,
+                                 this))
 {
     setLineWidth(2);
     m_d->setCurrent(false);
 
-    m_d->m_frame = new Frame(img,
-                           Frame::ResizeMode::FitToHeight,
-                           parent,
-                           height - qMax(m_d->m_label->sizeHint().height(), m_d->m_checkBox->sizeHint().height()) - frameWidth() * 2);
+    m_d->m_frame = new Frame(
+        img,
+        Frame::ResizeMode::FitToHeight,
+        parent,
+        height - qMax(m_d->m_label->sizeHint().height(), m_d->m_checkBox->sizeHint().height()) - frameWidth() * 2);
 
     m_d->m_vlayout->addWidget(m_d->m_frame);
 
@@ -170,7 +180,8 @@ void FrameOnTape::contextMenuEvent(QContextMenuEvent *e)
 
     if (!m_d->m_frame->image().m_isEmpty) {
         menu.addAction(QIcon(QStringLiteral(":/img/document-save-as.png")), tr("Save this frame"), [this]() {
-            auto fileName = QFileDialog::getSaveFileName(this, tr("Choose file to save to..."), QString(), tr("PNG (*.png)"));
+            auto fileName =
+                QFileDialog::getSaveFileName(this, tr("Choose file to save to..."), QString(), tr("PNG (*.png)"));
 
             if (!fileName.isEmpty()) {
                 if (!fileName.endsWith(QStringLiteral(".png"), Qt::CaseInsensitive)) {

@@ -32,7 +32,8 @@ signals:
     //! Current frame changed.
     void currentFrameChanged(int idx);
     //! Frame checked/unchecked.
-    void checkStateChanged(int idx, bool checked);
+    void checkStateChanged(int idx,
+                           bool checked);
 
 public:
     Tape(QWidget *parent = nullptr);
@@ -61,7 +62,8 @@ public:
 
 private slots:
     //! Check/uncheck till end action activated.
-    void checkTillEnd(int idx, bool on);
+    void checkTillEnd(int idx,
+                      bool on);
 
 private:
     Q_DISABLE_COPY(Tape)

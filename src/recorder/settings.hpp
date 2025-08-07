@@ -21,7 +21,10 @@ class Settings : public QDialog
     Q_OBJECT
 
 public:
-    Settings(int fpsValue, bool grabCursorValue, bool drawMouseClicks, QWidget *parent);
+    Settings(int fpsValue,
+             bool grabCursorValue,
+             bool drawMouseClicks,
+             QWidget *parent);
     ~Settings() override = default;
 
     int fps() const;

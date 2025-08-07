@@ -31,7 +31,8 @@ struct EventMonitorPrivate {
     XRecordContext m_context;
     XRecordRange *m_range = nullptr;
 
-    static void callback(XPointer ptr, XRecordInterceptData *data);
+    static void callback(XPointer ptr,
+                         XRecordInterceptData *data);
     void handleRecordEvent(XRecordInterceptData *data);
     bool filterWheelEvent(int detail);
 #endif
@@ -39,7 +40,8 @@ struct EventMonitorPrivate {
 
 #ifdef Q_OS_LINUX
 
-void EventMonitorPrivate::callback(XPointer ptr, XRecordInterceptData *data)
+void EventMonitorPrivate::callback(XPointer ptr,
+                                   XRecordInterceptData *data)
 {
     ((EventMonitorPrivate *)ptr)->handleRecordEvent(data);
 }

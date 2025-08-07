@@ -28,12 +28,17 @@ signals:
     //! Clicked.
     void clicked(int idx);
     //! Checked.
-    void checked(int idx, bool on);
+    void checked(int idx,
+                 bool on);
     //! Check/uncheck till end action activated.
-    void checkTillEnd(int idx, bool on);
+    void checkTillEnd(int idx,
+                      bool on);
 
 public:
-    FrameOnTape(const ImageRef &img, int counter, int height, QWidget *parent = nullptr);
+    FrameOnTape(const ImageRef &img,
+                int counter,
+                int height,
+                QWidget *parent = nullptr);
     ~FrameOnTape() noexcept override;
 
     //! \return Image.
