@@ -108,8 +108,8 @@ FrameOnTape::FrameOnTape(const ImageRef &img,
 
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 
-    connect(m_d->m_checkBox, &QCheckBox::stateChanged, this, [this](int state) {
-        emit this->checked(this->m_d->m_counter, state != 0);
+    connect(m_d->m_checkBox, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState state) {
+        emit this->checked(this->m_d->m_counter, state != Qt::Unchecked);
     });
     connect(m_d->m_frame, &Frame::clicked, this, [this]() {
         this->m_d->setCurrent(true);
