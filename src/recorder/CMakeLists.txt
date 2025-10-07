@@ -18,7 +18,10 @@ set(SRC main.cpp
 	settings.cpp
 	settings.ui
 	event_monitor.hpp
-    event_monitor.cpp)
+    event_monitor.cpp
+    sizedlg.hpp
+    sizedlg.cpp
+    sizedlg.ui)
 
 qt6_add_resources(SRC resources.qrc)
 

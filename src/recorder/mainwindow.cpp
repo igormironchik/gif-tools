@@ -7,6 +7,7 @@
 #include "mainwindow.hpp"
 #include "event_monitor.hpp"
 #include "settings.hpp"
+#include "sizedlg.hpp"
 
 // qgiflib include.
 #include <qgiflib.hpp>
@@ -17,6 +18,7 @@
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QHBoxLayout>
+#include <QMenu>
 #include <QMessageBox>
 #include <QMetaMethod>
 #include <QMouseEvent>
@@ -228,6 +230,16 @@ void TitleWidget::handleMouseMove(QMouseEvent *e)
     QApplication::processEvents();
 }
 
+void TitleWidget::contextMenuEvent(QContextMenuEvent *e)
+{
+    QMenu menu(this);
+    menu.addAction(tr("Resize Grab Area"), this, &TitleWidget::resizeRequested);
+
+    menu.exec(e->globalPos());
+
+    e->accept();
+}
+
 //
 // CloseButton
 //
@@ -362,6 +374,7 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
 
     connect(eventMonitor, &EventMonitor::buttonPress, this, &MainWindow::onMousePressed);
     connect(eventMonitor, &EventMonitor::buttonRelease, this, &MainWindow::onMouseReleased);
+    connect(m_title, &TitleWidget::resizeRequested, this, &MainWindow::onResizeRequested);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *e)
@@ -443,6 +456,15 @@ void MainWindow::onMousePressed()
 void MainWindow::onMouseReleased()
 {
     m_isMouseButtonPressed = false;
+}
+
+void MainWindow::onResizeRequested()
+{
+    SizeDlg dlg(m_recordArea->width(), m_recordArea->height(), this);
+
+    if (dlg.exec() == QDialog::Accepted) {
+        resize(dlg.requestedWidth() + 5 + 5 , dlg.requestedHeight() + m_title->height() + 5 + 1 + 5);
+    }
 }
 
 namespace /* anonymous */

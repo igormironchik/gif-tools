@@ -72,6 +72,9 @@ class TitleWidget : public QFrame
 {
     Q_OBJECT
 
+signals:
+    void resizeRequested();
+
 public:
     TitleWidget(QWidget *parent,
                 MainWindow *obj);
@@ -81,6 +84,7 @@ protected:
     void mousePressEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
     void mouseMoveEvent(QMouseEvent *e) override;
+    void contextMenuEvent(QContextMenuEvent *e) override;
 
 private:
     void handleMouseMove(QMouseEvent *e);
@@ -149,6 +153,7 @@ private slots:
     void onTimer();
     void onMousePressed();
     void onMouseReleased();
+    void onResizeRequested();
 
 private:
     void makeFrame();
