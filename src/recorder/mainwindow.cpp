@@ -42,7 +42,7 @@
 #endif
 
 static const QColor s_lightBlueColor = QColor(40, 158, 196);
-static const int s_handleRadius = 15;
+static const int s_handleRadius = 9;
 
 //
 // Title
@@ -179,6 +179,7 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     , m_progress(new QProgressBar(m_title))
 {
     setAttribute(Qt::WA_TranslucentBackground, true);
+    setWindowState(Qt::WindowFullScreen);
 
     const auto screenSize = qApp->primaryScreen()->size();
     const auto width = screenSize.width() / 4;
