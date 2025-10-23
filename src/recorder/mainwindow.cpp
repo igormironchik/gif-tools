@@ -169,8 +169,7 @@ void CloseButton::leaveEvent(QEvent *event)
 //
 
 MainWindow::MainWindow(EventMonitor *eventMonitor)
-    : QWidget(nullptr,
-              Qt::FramelessWindowHint | Qt::ExpandedClientAreaHint)
+    : QWidget(nullptr, Qt::FramelessWindowHint)
     , m_title(new TitleWidget(this))
     , m_recordButton(new QToolButton(m_title))
     , m_settingsButton(new QToolButton(m_title))
@@ -876,6 +875,16 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *e)
     if (e->button() == Qt::LeftButton && m_current) {
         m_current = Unknown;
         m_rect = m_rect.normalized();
+
+        auto mask = QBitmap(size());
+        mask.fill(Qt::color1);
+
+        QPainter p(&mask);
+        p.setPen(Qt::NoPen);
+        p.setBrush(Qt::color0);
+        p.drawRect(m_rect);
+
+        setMask(mask);
 
         update();
     }

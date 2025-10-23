@@ -32,7 +32,7 @@ int main(int argc,
     EventMonitor m;
 
     MainWindow w(&m);
-    w.show();
+    w.showMaximized();
 
     m.start();
 
