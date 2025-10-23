@@ -17,52 +17,6 @@
 #include <QToolButton>
 #include <QWidget>
 
-class MainWindow;
-
-//
-// ResizeHandle
-//
-
-//! Resize handle.
-class ResizeHandle : public QFrame
-{
-    Q_OBJECT
-
-public:
-    enum Orientation {
-        Horizontal = 0,
-        Vertical,
-        TopLeftBotomRight,
-        BottomLeftTopRight
-    };
-
-    ResizeHandle(Orientation o,
-                 bool withMove,
-                 QWidget *parent,
-                 MainWindow *obj);
-    ~ResizeHandle() override = default;
-
-    QSize minimumSizeHint() const override;
-    QSize sizeHint() const override;
-
-protected:
-    void mousePressEvent(QMouseEvent *e) override;
-    void mouseReleaseEvent(QMouseEvent *e) override;
-    void mouseMoveEvent(QMouseEvent *e) override;
-
-private:
-    void handleMouseMove(QMouseEvent *e);
-
-private:
-    Q_DISABLE_COPY(ResizeHandle)
-
-    MainWindow *m_obj = nullptr;
-    Orientation m_orient = Orientation::Horizontal;
-    bool m_leftButtonPressed = false;
-    bool m_withMove = false;
-    QPointF m_pos = {0.0, 0.0};
-}; // class ResizeHandle
-
 //
 // Title
 //
@@ -76,8 +30,7 @@ signals:
     void resizeRequested();
 
 public:
-    TitleWidget(QWidget *parent,
-                MainWindow *obj);
+    TitleWidget(QWidget *parent);
     ~TitleWidget() override = default;
 
 protected:
@@ -92,7 +45,6 @@ private:
 private:
     Q_DISABLE_COPY(TitleWidget)
 
-    MainWindow *m_obj = nullptr;
     bool m_leftButtonPressed = false;
     QPointF m_pos = {0.0, 0.0};
 }; // class TitleWidget
@@ -144,8 +96,11 @@ public slots:
     void onWritePercent(int percent);
 
 protected:
-    void resizeEvent(QResizeEvent *e) override;
     void closeEvent(QCloseEvent *e) override;
+    void paintEvent(QPaintEvent *e) override;
+    void mousePressEvent(QMouseEvent *e) override;
+    void mouseMoveEvent(QMouseEvent *e) override;
+    void mouseReleaseEvent(QMouseEvent *e) override;
 
 private slots:
     void onSettings();
@@ -156,22 +111,32 @@ private slots:
     void onResizeRequested();
 
 private:
+    enum Orientation {
+        Unknown = 0,
+        Left,
+        Right,
+        Top,
+        Bottom,
+        TopLeft,
+        BottomRight,
+        BottomLeft,
+        TopRight
+    };
+
     void makeFrame();
     void save(const QString &fileName);
+    Orientation orientationUnder(const QPoint &p) const;
 
 private:
     Q_DISABLE_COPY(MainWindow)
 
     TitleWidget *m_title = nullptr;
-    QWidget *m_recordArea = nullptr;
-    QWidget *m_c = nullptr;
     QToolButton *m_recordButton = nullptr;
     QToolButton *m_settingsButton = nullptr;
     CloseButton *m_closeButton = nullptr;
     QTimer *m_timer = nullptr;
     QLabel *m_msg = nullptr;
     QProgressBar *m_progress = nullptr;
-    QBitmap m_mask;
     int m_fps = 24;
     bool m_grabCursor = true;
     bool m_drawMouseClick = true;
@@ -184,4 +149,15 @@ private:
     qsizetype m_counter = 0;
     QElapsedTimer m_elapsed;
     QVector<int> m_delays;
+    QRect m_rect;
+    Orientation m_current = Unknown;
+    QPointF m_pos;
+    QRegion m_topLeft;
+    QRegion m_top;
+    QRegion m_topRight;
+    QRegion m_left;
+    QRegion m_right;
+    QRegion m_bottomLeft;
+    QRegion m_bottom;
+    QRegion m_bottomRight;
 }; // class MainWindow
