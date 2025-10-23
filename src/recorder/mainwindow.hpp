@@ -127,6 +127,7 @@ private:
     void makeFrame();
     void save(const QString &fileName);
     Orientation orientationUnder(const QPoint &p) const;
+    void makeAndSetMask();
 
 private:
     Q_DISABLE_COPY(MainWindow)

@@ -169,7 +169,7 @@ void CloseButton::leaveEvent(QEvent *event)
 //
 
 MainWindow::MainWindow(EventMonitor *eventMonitor)
-    : QWidget(nullptr, Qt::FramelessWindowHint)
+    : QWidget(nullptr, Qt::Window | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint | Qt::ExpandedClientAreaHint | Qt::WindowStaysOnTopHint)
     , m_title(new TitleWidget(this))
     , m_recordButton(new QToolButton(m_title))
     , m_settingsButton(new QToolButton(m_title))
@@ -186,9 +186,9 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     const auto x = (screenSize.width() - width) / 2;
     const auto y = (screenSize.height() - height) / 2;
 
-    m_rect = QRect(x, y, width, height);
-
     resize(screenSize);
+
+    m_rect = QRect(x, y, width, height);
 
     auto layout = new QHBoxLayout(m_title);
     layout->setContentsMargins(5, 5, 5, 5);
@@ -207,7 +207,8 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     connect(m_settingsButton, &QToolButton::clicked, this, &MainWindow::onSettings);
     layout->addWidget(m_closeButton);
 
-    m_title->move(screenSize.width() / 2 - m_title->sizeHint().width() / 2, s_handleRadius);
+    m_title->setMinimumWidth(width);
+    m_title->move(screenSize.width() / 2 - width / 2, s_handleRadius);
 
     connect(m_closeButton, &CloseButton::clicked, qApp, &QApplication::quit);
     connect(m_timer, &QTimer::timeout, this, &MainWindow::onTimer);
@@ -255,6 +256,7 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     m_topRight = QRegion(mask);
 
     setMouseTracking(true);
+    makeAndSetMask();
 }
 
 void MainWindow::onSettings()
@@ -271,14 +273,13 @@ void MainWindow::onSettings()
 void MainWindow::onRecord()
 {
     if (m_recording) {
+        m_skipQuitEvent = false;
         m_recordButton->setText(tr("Record"));
         m_settingsButton->setEnabled(true);
         m_timer->stop();
 
         const auto dirs = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
         const auto defaultDir = dirs.first();
-
-        m_skipQuitEvent = true;
 
         auto fileName = QFileDialog::getSaveFileName(this, tr("Save As"), defaultDir, tr("GIF (*.gif)"));
 
@@ -296,6 +297,7 @@ void MainWindow::onRecord()
         m_elapsed.invalidate();
         m_delays.clear();
     } else {
+        m_skipQuitEvent = true;
         m_recordButton->setText(tr("Stop"));
         m_settingsButton->setEnabled(false);
         m_timer->start(1000 / m_fps);
@@ -534,8 +536,8 @@ void MainWindow::makeFrame()
     m_delays.push_back(m_elapsed.elapsed());
     m_elapsed.restart();
 
-    const auto p = mapToGlobal(QPoint(m_rect.x() + 1, m_rect.y() + 1));
-    const auto s = QSize(m_rect.width() - 2, m_rect.height() - 2);
+    const auto p = mapToGlobal(QPoint(m_rect.x(), m_rect.y()));
+    const auto s = QSize(m_rect.width(), m_rect.height());
 
     auto qimg = QApplication::primaryScreen()->grabWindow(0, p.x(), p.y(), s.width(), s.height()).toImage();
 
@@ -656,8 +658,6 @@ void MainWindow::closeEvent(QCloseEvent *e)
     } else {
         e->accept();
     }
-
-    m_skipQuitEvent = false;
 }
 
 void MainWindow::paintEvent(QPaintEvent *e)
@@ -870,21 +870,26 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
     e->accept();
 }
 
+void MainWindow::makeAndSetMask()
+{
+    auto mask = QBitmap(size());
+    mask.fill(Qt::color1);
+
+    QPainter p(&mask);
+    p.setPen(Qt::NoPen);
+    p.setBrush(Qt::color0);
+    p.drawRect(m_rect);
+
+    setMask(mask);
+}
+
 void MainWindow::mouseReleaseEvent(QMouseEvent *e)
 {
     if (e->button() == Qt::LeftButton && m_current) {
         m_current = Unknown;
         m_rect = m_rect.normalized();
 
-        auto mask = QBitmap(size());
-        mask.fill(Qt::color1);
-
-        QPainter p(&mask);
-        p.setPen(Qt::NoPen);
-        p.setBrush(Qt::color0);
-        p.drawRect(m_rect);
-
-        setMask(mask);
+        makeAndSetMask();
 
         update();
     }
