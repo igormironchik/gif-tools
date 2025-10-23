@@ -120,7 +120,8 @@ private:
         TopLeft,
         BottomRight,
         BottomLeft,
-        TopRight
+        TopRight,
+        Move
     };
 
     void makeFrame();
@@ -151,6 +152,7 @@ private:
     QVector<int> m_delays;
     QRect m_rect;
     Orientation m_current = Unknown;
+    Orientation m_cursor = Unknown;
     QPointF m_pos;
     QRegion m_topLeft;
     QRegion m_top;

@@ -184,7 +184,7 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     const auto screenSize = qApp->primaryScreen()->size();
     const auto width = screenSize.width() / 4;
     const auto height = screenSize.height() / 5;
-    const auto x = (screenSize.width() - width)  / 2;
+    const auto x = (screenSize.width() - width) / 2;
     const auto y = (screenSize.height() - height) / 2;
 
     m_rect = QRect(x, y, width, height);
@@ -664,6 +664,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
 void MainWindow::paintEvent(QPaintEvent *e)
 {
     QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing, true);
     QPainterPath path;
     path.addRect(rect());
     path.addRect(m_rect);
@@ -685,21 +686,48 @@ void MainWindow::paintEvent(QPaintEvent *e)
 
     if (m_current == Unknown) {
         // left
-        p.drawPie(QRectF(QPointF(m_rect.x() - s_handleRadius, m_rect.y() + m_rect.height() / 2 - s_handleRadius), QSizeF(s_handleRadius * 2, s_handleRadius * 2)), 90 * 16, 180 * 16);
+        p.drawPie(QRectF(QPointF(m_rect.x() - s_handleRadius, m_rect.y() + m_rect.height() / 2 - s_handleRadius),
+                         QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                  90 * 16,
+                  180 * 16);
         // right
-        p.drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() - s_handleRadius, m_rect.y() + m_rect.height() / 2 - s_handleRadius), QSizeF(s_handleRadius * 2, s_handleRadius * 2)), 90 * 16, -180 * 16);
+        p.drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() - s_handleRadius,
+                                 m_rect.y() + m_rect.height() / 2 - s_handleRadius),
+                         QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                  90 * 16,
+                  -180 * 16);
         // top
-        p.drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() / 2 - s_handleRadius, m_rect.y() - s_handleRadius), QSizeF(s_handleRadius * 2, s_handleRadius * 2)), 0, 180 * 16);
+        p.drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() / 2 - s_handleRadius, m_rect.y() - s_handleRadius),
+                         QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                  0,
+                  180 * 16);
         // bottom
-        p.drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() / 2 - s_handleRadius, m_rect.y() + m_rect.height() - s_handleRadius), QSizeF(s_handleRadius * 2, s_handleRadius * 2)), 0, -180 * 16);
+        p.drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() / 2 - s_handleRadius,
+                                 m_rect.y() + m_rect.height() - s_handleRadius),
+                         QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                  0,
+                  -180 * 16);
         // top-left
-        p.drawPie(QRectF(QPointF(m_rect.x() - s_handleRadius, m_rect.y() - s_handleRadius), QSizeF(s_handleRadius * 2, s_handleRadius * 2)), 0, 270 * 16);
+        p.drawPie(QRectF(QPointF(m_rect.x() - s_handleRadius, m_rect.y() - s_handleRadius),
+                         QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                  0,
+                  270 * 16);
         // bottom-right
-        p.drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() - s_handleRadius, m_rect.y() + m_rect.height() - s_handleRadius), QSizeF(s_handleRadius * 2, s_handleRadius * 2)), 90 * 16, -270 * 16);
+        p.drawPie(
+            QRectF(QPointF(m_rect.x() + m_rect.width() - s_handleRadius, m_rect.y() + m_rect.height() - s_handleRadius),
+                   QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+            90 * 16,
+            -270 * 16);
         // bottom-left
-        p.drawPie(QRectF(QPointF(m_rect.x() - s_handleRadius, m_rect.y() + m_rect.height() - s_handleRadius), QSizeF(s_handleRadius * 2, s_handleRadius * 2)), 90 * 16, 270 * 16);
+        p.drawPie(QRectF(QPointF(m_rect.x() - s_handleRadius, m_rect.y() + m_rect.height() - s_handleRadius),
+                         QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                  90 * 16,
+                  270 * 16);
         // top-right
-        p.drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() - s_handleRadius, m_rect.y() - s_handleRadius), QSizeF(s_handleRadius * 2, s_handleRadius * 2)), 180 * 16, -270 * 16);
+        p.drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() - s_handleRadius, m_rect.y() - s_handleRadius),
+                         QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                  180 * 16,
+                  -270 * 16);
     }
 }
 
@@ -707,19 +735,33 @@ MainWindow::Orientation MainWindow::orientationUnder(const QPoint &p) const
 {
     if (m_topLeft.translated(QPoint(m_rect.x() - s_handleRadius, m_rect.y() - s_handleRadius)).contains(p)) {
         return TopLeft;
-    } else if (m_top.translated(QPoint(m_rect.x() + m_rect.width() / 2 - s_handleRadius, m_rect.y() - s_handleRadius)).contains(p)) {
+    } else if (m_top.translated(QPoint(m_rect.x() + m_rect.width() / 2 - s_handleRadius, m_rect.y() - s_handleRadius))
+                   .contains(p)) {
         return Top;
-    } else if (m_topRight.translated(QPoint(m_rect.x() + m_rect.width() - s_handleRadius, m_rect.y() - s_handleRadius)).contains(p)) {
+    } else if (m_topRight.translated(QPoint(m_rect.x() + m_rect.width() - s_handleRadius, m_rect.y() - s_handleRadius))
+                   .contains(p)) {
         return TopRight;
-    } else if (m_left.translated(QPoint(m_rect.x() - s_handleRadius, m_rect.y() + m_rect.height() / 2 - s_handleRadius)).contains(p)) {
+    } else if (m_left.translated(QPoint(m_rect.x() - s_handleRadius, m_rect.y() + m_rect.height() / 2 - s_handleRadius))
+                   .contains(p)) {
         return Left;
-    } else if (m_right.translated(QPoint(m_rect.x() + m_rect.width() - s_handleRadius, m_rect.y() + m_rect.height() / 2 - s_handleRadius)).contains(p)) {
+    } else if (m_right
+                   .translated(QPoint(m_rect.x() + m_rect.width() - s_handleRadius,
+                                      m_rect.y() + m_rect.height() / 2 - s_handleRadius))
+                   .contains(p)) {
         return Right;
-    } else if (m_bottomLeft.translated(QPoint(m_rect.x() - s_handleRadius, m_rect.y() + m_rect.height() - s_handleRadius)).contains(p)) {
+    } else if (m_bottomLeft
+                   .translated(QPoint(m_rect.x() - s_handleRadius, m_rect.y() + m_rect.height() - s_handleRadius))
+                   .contains(p)) {
         return BottomLeft;
-    } else if (m_bottom.translated(QPoint(m_rect.x() + m_rect.width() / 2 - s_handleRadius, m_rect.y() + m_rect.height() - s_handleRadius)).contains(p)) {
+    } else if (m_bottom
+                   .translated(QPoint(m_rect.x() + m_rect.width() / 2 - s_handleRadius,
+                                      m_rect.y() + m_rect.height() - s_handleRadius))
+                   .contains(p)) {
         return Bottom;
-    } else if (m_bottomRight.translated(QPoint(m_rect.x() + m_rect.width() - s_handleRadius, m_rect.y() + m_rect.height() - s_handleRadius)).contains(p)) {
+    } else if (m_bottomRight
+                   .translated(QPoint(m_rect.x() + m_rect.width() - s_handleRadius,
+                                      m_rect.y() + m_rect.height() - s_handleRadius))
+                   .contains(p)) {
         return BottomRight;
     } else {
         return Unknown;
@@ -739,15 +781,46 @@ void MainWindow::mousePressEvent(QMouseEvent *e)
 
 void MainWindow::mouseMoveEvent(QMouseEvent *e)
 {
-    if (m_current) {
+    if (m_current != Unknown) {
         auto delta = e->globalPosition() - m_pos;
         m_pos = e->globalPosition();
 
-        switch(m_current) {
+        switch (m_current) {
         case TopLeft: {
             m_rect.setTopLeft(m_rect.topLeft() + delta.toPoint());
-        }
-            break;
+        } break;
+
+        case Top: {
+            m_rect.setY(m_rect.y() + delta.toPoint().y());
+        } break;
+
+        case TopRight: {
+            m_rect.setTopRight(m_rect.topRight() + delta.toPoint());
+        } break;
+
+        case Left: {
+            m_rect.setX(m_rect.x() + delta.toPoint().x());
+        } break;
+
+        case Right: {
+            m_rect.setWidth(m_rect.width() + delta.toPoint().x());
+        } break;
+
+        case BottomLeft: {
+            m_rect.setBottomLeft(m_rect.bottomLeft() + delta.toPoint());
+        } break;
+
+        case Bottom: {
+            m_rect.setHeight(m_rect.height() + delta.toPoint().y());
+        } break;
+
+        case BottomRight: {
+            m_rect.setBottomRight(m_rect.bottomRight() + delta.toPoint());
+        } break;
+
+        case Move: {
+            m_rect.moveCenter(m_rect.center() + delta.toPoint());
+        } break;
 
         default:
             break;
@@ -757,30 +830,41 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
     } else {
         const auto handle = orientationUnder(e->globalPosition().toPoint());
 
-        switch (handle) {
-        case TopLeft:
-        case BottomRight:
-            QApplication::setOverrideCursor(Qt::SizeFDiagCursor);
-            break;
+        if (handle != m_cursor) {
+            if (m_cursor != Unknown) {
+                QApplication::restoreOverrideCursor();
+            }
 
-        case Top:
-        case Bottom:
-            QApplication::setOverrideCursor(Qt::SizeVerCursor);
-            break;
+            m_cursor = handle;
 
-        case TopRight:
-        case BottomLeft:
-            QApplication::setOverrideCursor(Qt::SizeBDiagCursor);
-            break;
+            switch (handle) {
+            case TopLeft:
+            case BottomRight:
+                QApplication::setOverrideCursor(Qt::SizeFDiagCursor);
+                break;
 
-        case Left:
-        case Right:
-            QApplication::setOverrideCursor(Qt::SizeHorCursor);
-            break;
+            case Top:
+            case Bottom:
+                QApplication::setOverrideCursor(Qt::SizeVerCursor);
+                break;
 
-        default:
-            QApplication::restoreOverrideCursor();
-            break;
+            case TopRight:
+            case BottomLeft:
+                QApplication::setOverrideCursor(Qt::SizeBDiagCursor);
+                break;
+
+            case Left:
+            case Right:
+                QApplication::setOverrideCursor(Qt::SizeHorCursor);
+                break;
+
+            case Move:
+                QApplication::setOverrideCursor(Qt::OpenHandCursor);
+                break;
+
+            default:
+                break;
+            }
         }
     }
 
