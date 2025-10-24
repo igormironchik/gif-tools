@@ -52,6 +52,7 @@ TitleWidget::TitleWidget(MainWindow *mainWindow, QWidget *parent)
     , m_mainWindow(mainWindow)
     , m_recordButton(new QToolButton(this))
     , m_settingsButton(new QToolButton(this))
+    , m_transparentForMouseButton(new QToolButton(this))
     , m_closeButton(new CloseButton(this))
     , m_msg(new QLabel(this))
     , m_progress(new QProgressBar(this))
@@ -59,6 +60,7 @@ TitleWidget::TitleWidget(MainWindow *mainWindow, QWidget *parent)
     auto layout = new QHBoxLayout(this);
     layout->setContentsMargins(5, 5, 5, 5);
     m_recordButton->setText(tr("Record"));
+    m_recordButton->setToolTip(tr("Start recording"));
     layout->addWidget(m_recordButton);
     layout->addItem(new QSpacerItem(10, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
     layout->addWidget(m_msg);
@@ -68,6 +70,12 @@ TitleWidget::TitleWidget(MainWindow *mainWindow, QWidget *parent)
     layout->addWidget(m_progress);
     layout->addItem(new QSpacerItem(10, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
     m_settingsButton->setIcon(QIcon(":/img/applications-system.png"));
+    m_settingsButton->setToolTip(tr("Settings"));
+    m_transparentForMouseButton->setToolTip(tr("Turn on/off transparency for mouse events"));
+    m_transparentForMouseButton->setCheckable(true);
+    m_transparentForMouseButton->setChecked(false);
+    m_transparentForMouseButton->setIcon(QIcon(":/img/edit-select.png"));
+    layout->addWidget(m_transparentForMouseButton);
     layout->addWidget(m_settingsButton);
     layout->addWidget(m_closeButton);
 
@@ -85,6 +93,11 @@ QToolButton *TitleWidget::recordButton() const
 QToolButton *TitleWidget::settingsButton() const
 {
     return m_settingsButton;
+}
+
+QToolButton *TitleWidget::transparentForMouseButton() const
+{
+    return m_transparentForMouseButton;
 }
 
 CloseButton *TitleWidget::closeButton() const
@@ -207,6 +220,8 @@ CloseButton::CloseButton(QWidget *parent)
     m_inactivePixmap = QPixmap::fromImage(target);
 
     setFocusPolicy(Qt::NoFocus);
+
+    setToolTip(tr("Close application"));
 }
 
 QSize CloseButton::sizeHint() const
@@ -261,8 +276,8 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     setWindowState(Qt::WindowFullScreen);
 
     const auto screenSize = qApp->primaryScreen()->size();
-    const auto width = screenSize.width() / 4;
-    const auto height = screenSize.height() / 5;
+    const auto width = screenSize.width() / 3;
+    const auto height = screenSize.height() / 4;
     const auto x = (screenSize.width() - width) / 2;
     const auto y = (screenSize.height() - height) / 2;
 
@@ -280,6 +295,7 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     connect(m_title, &TitleWidget::resizeRequested, this, &MainWindow::onResizeRequested);
     connect(m_title->recordButton(), &QToolButton::clicked, this, &MainWindow::onRecord);
     connect(m_title->settingsButton(), &QToolButton::clicked, this, &MainWindow::onSettings);
+    connect(m_title->transparentForMouseButton(), &QToolButton::toggled, this, &MainWindow::onTransparentForMouse);
 
     auto mask = QBitmap(s_handleRadius * 2, s_handleRadius * 2);
     mask.fill(Qt::color0);
@@ -340,11 +356,15 @@ void MainWindow::onRecord()
 {
     if (m_recording) {
         m_skipQuitEvent = false;
-        clearMask();
         m_title->recordButton()->setText(tr("Record"));
+        m_title->recordButton()->setToolTip(tr("Start recording"));
         m_title->settingsButton()->setEnabled(true);
         m_title->closeButton()->setEnabled(true);
-        m_title->enableMouse();
+
+        if (!m_isMouseDisabledByUser) {
+            clearMask();
+            m_title->enableMouse();
+        }
 
         update();
 
@@ -370,12 +390,16 @@ void MainWindow::onRecord()
         m_delays.clear();
     } else {
         m_skipQuitEvent = true;
-        restoreCursor(Unknown);
-        makeAndSetMask();
         m_title->recordButton()->setText(tr("Stop"));
+        m_title->recordButton()->setToolTip(tr("Stop recording"));
         m_title->settingsButton()->setEnabled(false);
         m_title->closeButton()->setEnabled(false);
-        m_title->disableMouse();
+
+        if (!m_isMouseDisabledByUser) {
+            restoreCursor(Unknown);
+            makeAndSetMask();
+            m_title->disableMouse();
+        }
 
         update();
 
@@ -412,6 +436,22 @@ void MainWindow::onResizeRequested()
 
         update();
     }
+}
+
+void MainWindow::onTransparentForMouse(bool checked)
+{
+    m_isMouseDisabledByUser = checked;
+
+    if (checked) {
+        restoreCursor(Unknown);
+        makeAndSetMask();
+        m_title->disableMouse();
+    } else {
+        clearMask();
+        m_title->enableMouse();
+    }
+
+    update();
 }
 
 namespace /* anonymous */

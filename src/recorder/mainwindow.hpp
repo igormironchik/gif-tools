@@ -38,6 +38,7 @@ public:
 
     QToolButton *recordButton() const;
     QToolButton *settingsButton() const;
+    QToolButton *transparentForMouseButton() const;
     CloseButton *closeButton() const;
     QLabel *msg() const;
     QProgressBar *progressBar() const;
@@ -63,6 +64,7 @@ private:
     MainWindow *m_mainWindow;
     QToolButton *m_recordButton = nullptr;
     QToolButton *m_settingsButton = nullptr;
+    QToolButton *m_transparentForMouseButton = nullptr;
     CloseButton *m_closeButton = nullptr;
     QLabel *m_msg = nullptr;
     QProgressBar *m_progress = nullptr;
@@ -145,6 +147,7 @@ private slots:
     void onMousePressed();
     void onMouseReleased();
     void onResizeRequested();
+    void onTransparentForMouse(bool checked);
 
 private:
     void makeFrame();
@@ -166,6 +169,7 @@ private:
     bool m_busy = false;
     bool m_isMouseButtonPressed = false;
     bool m_skipQuitEvent = false;
+    bool m_isMouseDisabledByUser = false;
     QTemporaryDir m_dir;
     QStringList m_frames;
     qsizetype m_counter = 0;

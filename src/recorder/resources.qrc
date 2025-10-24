@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>img/dialog-close.png</file>
         <file>img/applications-system.png</file>
+        <file>img/edit-select.png</file>
     </qresource>
 </RCC>
