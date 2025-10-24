@@ -148,6 +148,8 @@ private:
     void save(const QString &fileName);
     Orientation orientationUnder(const QPoint &p) const;
     void makeAndSetMask();
+    void drawRect(QPainter *p,
+                  const QColor &c);
 
 private:
     Q_DISABLE_COPY(MainWindow)

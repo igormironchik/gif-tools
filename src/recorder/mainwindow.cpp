@@ -245,7 +245,12 @@ void CloseButton::leaveEvent(QEvent *event)
 //
 
 MainWindow::MainWindow(EventMonitor *eventMonitor)
-    : QWidget(nullptr, Qt::Window | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint | Qt::ExpandedClientAreaHint | Qt::WindowStaysOnTopHint)
+    : QWidget(nullptr,
+              Qt::Window
+                  | Qt::FramelessWindowHint
+                  | Qt::NoDropShadowWindowHint
+                  | Qt::ExpandedClientAreaHint
+                  | Qt::WindowStaysOnTopHint)
     , m_title(new TitleWidget(this))
     , m_timer(new QTimer(this))
 {
@@ -336,6 +341,8 @@ void MainWindow::onRecord()
         m_title->closeButton()->setEnabled(true);
         m_title->enableMenu();
 
+        update();
+
         m_timer->stop();
 
         const auto dirs = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
@@ -363,6 +370,9 @@ void MainWindow::onRecord()
         m_title->settingsButton()->setEnabled(false);
         m_title->closeButton()->setEnabled(false);
         m_title->disableMenu();
+
+        update();
+
         m_timer->start(1000 / m_fps);
         m_dir = QTemporaryDir("./");
         m_elapsed.start();
@@ -724,74 +734,83 @@ void MainWindow::closeEvent(QCloseEvent *e)
     }
 }
 
-void MainWindow::paintEvent(QPaintEvent *e)
+void MainWindow::drawRect(QPainter *p,
+                          const QColor &c)
 {
-    QPainter p(this);
-    p.setRenderHint(QPainter::Antialiasing, true);
-    QPainterPath path;
-    path.addRect(rect());
-    path.addRect(m_rect);
-    path.setFillRule(Qt::OddEvenFill);
+    p->setBrush(Qt::NoBrush);
+    p->setPen(c);
+    p->drawRect(m_rect);
 
-    p.setPen(Qt::NoPen);
-
-    auto c = palette().color(QPalette::Window).darker(300);
-    c.setAlpha(75);
-
-    p.setBrush(c);
-    p.drawPath(path);
-
-    p.setBrush(Qt::NoBrush);
-    p.setPen(s_lightBlueColor);
-    p.drawRect(m_rect);
-
-    p.setBrush(s_lightBlueColor);
+    p->setBrush(c);
 
     if (m_current == Unknown) {
         // left
-        p.drawPie(QRectF(QPointF(m_rect.x() - s_handleRadius, m_rect.y() + m_rect.height() / 2 - s_handleRadius),
-                         QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
-                  90 * 16,
-                  180 * 16);
+        p->drawPie(QRectF(QPointF(m_rect.x() - s_handleRadius, m_rect.y() + m_rect.height() / 2 - s_handleRadius),
+                          QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                   90 * 16,
+                   180 * 16);
         // right
-        p.drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() - s_handleRadius,
-                                 m_rect.y() + m_rect.height() / 2 - s_handleRadius),
-                         QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
-                  90 * 16,
-                  -180 * 16);
+        p->drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() - s_handleRadius,
+                                  m_rect.y() + m_rect.height() / 2 - s_handleRadius),
+                          QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                   90 * 16,
+                   -180 * 16);
         // top
-        p.drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() / 2 - s_handleRadius, m_rect.y() - s_handleRadius),
-                         QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
-                  0,
-                  180 * 16);
+        p->drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() / 2 - s_handleRadius, m_rect.y() - s_handleRadius),
+                          QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                   0,
+                   180 * 16);
         // bottom
-        p.drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() / 2 - s_handleRadius,
-                                 m_rect.y() + m_rect.height() - s_handleRadius),
-                         QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
-                  0,
-                  -180 * 16);
+        p->drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() / 2 - s_handleRadius,
+                                  m_rect.y() + m_rect.height() - s_handleRadius),
+                          QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                   0,
+                   -180 * 16);
         // top-left
-        p.drawPie(QRectF(QPointF(m_rect.x() - s_handleRadius, m_rect.y() - s_handleRadius),
-                         QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
-                  0,
-                  270 * 16);
+        p->drawPie(QRectF(QPointF(m_rect.x() - s_handleRadius, m_rect.y() - s_handleRadius),
+                          QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                   0,
+                   270 * 16);
         // bottom-right
-        p.drawPie(
+        p->drawPie(
             QRectF(QPointF(m_rect.x() + m_rect.width() - s_handleRadius, m_rect.y() + m_rect.height() - s_handleRadius),
                    QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
             90 * 16,
             -270 * 16);
         // bottom-left
-        p.drawPie(QRectF(QPointF(m_rect.x() - s_handleRadius, m_rect.y() + m_rect.height() - s_handleRadius),
-                         QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
-                  90 * 16,
-                  270 * 16);
+        p->drawPie(QRectF(QPointF(m_rect.x() - s_handleRadius, m_rect.y() + m_rect.height() - s_handleRadius),
+                          QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                   90 * 16,
+                   270 * 16);
         // top-right
-        p.drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() - s_handleRadius, m_rect.y() - s_handleRadius),
-                         QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
-                  180 * 16,
-                  -270 * 16);
+        p->drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() - s_handleRadius, m_rect.y() - s_handleRadius),
+                          QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                   180 * 16,
+                   -270 * 16);
     }
+}
+
+void MainWindow::paintEvent(QPaintEvent *e)
+{
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing, true);
+
+    if (m_title->isMenuEnabled()) {
+        QPainterPath path;
+        path.addRect(rect());
+        path.addRect(m_rect);
+        path.setFillRule(Qt::OddEvenFill);
+
+        p.setPen(Qt::NoPen);
+
+        auto c = palette().color(QPalette::Window).darker(300);
+        c.setAlpha(75);
+
+        p.setBrush(c);
+        p.drawPath(path);
+    }
+
+    drawRect(&p, s_lightBlueColor);
 }
 
 MainWindow::Orientation MainWindow::orientationUnder(const QPoint &p) const
@@ -948,12 +967,13 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
 void MainWindow::makeAndSetMask()
 {
     auto mask = QBitmap(size());
-    mask.fill(Qt::color1);
+    mask.fill(Qt::color0);
 
     QPainter p(&mask);
-    p.setPen(Qt::NoPen);
-    p.setBrush(Qt::color0);
-    p.drawRect(m_rect);
+    drawRect(&p, Qt::color1);
+    auto r = m_title->rect();
+    r.moveTopLeft(m_title->pos());
+    p.drawRect(r);
 
     setMask(mask);
 }
