@@ -257,7 +257,6 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     m_topRight = QRegion(mask);
 
     setMouseTracking(true);
-    makeAndSetMask();
 }
 
 void MainWindow::onSettings()
@@ -275,6 +274,7 @@ void MainWindow::onRecord()
 {
     if (m_recording) {
         m_skipQuitEvent = false;
+        clearMask();
         m_recordButton->setText(tr("Record"));
         m_settingsButton->setEnabled(true);
         m_timer->stop();
@@ -299,6 +299,7 @@ void MainWindow::onRecord()
         m_delays.clear();
     } else {
         m_skipQuitEvent = true;
+        makeAndSetMask();
         m_recordButton->setText(tr("Stop"));
         m_settingsButton->setEnabled(false);
         m_timer->start(1000 / m_fps);
@@ -331,8 +332,6 @@ void MainWindow::onResizeRequested()
 
     if (dlg.exec() == QDialog::Accepted) {
         m_rect.setSize(QSize(dlg.requestedWidth(), dlg.requestedHeight()));
-
-        makeAndSetMask();
 
         update();
     }
@@ -767,6 +766,8 @@ MainWindow::Orientation MainWindow::orientationUnder(const QPoint &p) const
                                       m_rect.y() + m_rect.height() - s_handleRadius))
                    .contains(p)) {
         return BottomRight;
+    } else if (m_rect.contains(p)) {
+        return Move;
     } else {
         return Unknown;
     }
@@ -777,8 +778,6 @@ void MainWindow::mousePressEvent(QMouseEvent *e)
     if (e->button() == Qt::LeftButton) {
         m_pos = e->globalPosition();
         m_current = orientationUnder(m_pos.toPoint());
-
-        clearMask();
 
         update();
     }
@@ -896,8 +895,6 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *e)
     if (e->button() == Qt::LeftButton && m_current) {
         m_current = Unknown;
         m_rect = m_rect.normalized();
-
-        makeAndSetMask();
 
         update();
     }
