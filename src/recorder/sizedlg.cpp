@@ -10,7 +10,9 @@
 // SizeDlg
 //
 
-SizeDlg::SizeDlg(int w, int h, QWidget *parent)
+SizeDlg::SizeDlg(int w,
+                 int h,
+                 QWidget *parent)
     : QDialog(parent)
 {
     m_ui.setupUi(this);

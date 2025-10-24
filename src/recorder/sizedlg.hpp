@@ -21,7 +21,9 @@ class SizeDlg : public QDialog
     Q_OBJECT
 
 public:
-    SizeDlg(int w, int h, QWidget *parent);
+    SizeDlg(int w,
+            int h,
+            QWidget *parent);
     ~SizeDlg() override = default;
 
     int requestedWidth() const;

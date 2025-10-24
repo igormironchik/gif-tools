@@ -32,7 +32,6 @@ int main(int argc,
     EventMonitor m;
 
     MainWindow w(&m);
-    w.resize(800, 600);
     w.show();
 
     m.start();

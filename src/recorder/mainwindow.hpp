@@ -17,51 +17,8 @@
 #include <QToolButton>
 #include <QWidget>
 
+class CloseButton;
 class MainWindow;
-
-//
-// ResizeHandle
-//
-
-//! Resize handle.
-class ResizeHandle : public QFrame
-{
-    Q_OBJECT
-
-public:
-    enum Orientation {
-        Horizontal = 0,
-        Vertical,
-        TopLeftBotomRight,
-        BottomLeftTopRight
-    };
-
-    ResizeHandle(Orientation o,
-                 bool withMove,
-                 QWidget *parent,
-                 MainWindow *obj);
-    ~ResizeHandle() override = default;
-
-    QSize minimumSizeHint() const override;
-    QSize sizeHint() const override;
-
-protected:
-    void mousePressEvent(QMouseEvent *e) override;
-    void mouseReleaseEvent(QMouseEvent *e) override;
-    void mouseMoveEvent(QMouseEvent *e) override;
-
-private:
-    void handleMouseMove(QMouseEvent *e);
-
-private:
-    Q_DISABLE_COPY(ResizeHandle)
-
-    MainWindow *m_obj = nullptr;
-    Orientation m_orient = Orientation::Horizontal;
-    bool m_leftButtonPressed = false;
-    bool m_withMove = false;
-    QPointF m_pos = {0.0, 0.0};
-}; // class ResizeHandle
 
 //
 // Title
@@ -76,9 +33,20 @@ signals:
     void resizeRequested();
 
 public:
-    TitleWidget(QWidget *parent,
-                MainWindow *obj);
+    TitleWidget(MainWindow *mainWindow, QWidget *parent);
     ~TitleWidget() override = default;
+
+    QToolButton *recordButton() const;
+    QToolButton *settingsButton() const;
+    CloseButton *closeButton() const;
+    QLabel *msg() const;
+    QProgressBar *progressBar() const;
+
+    bool isMouseEnabled() const;
+
+public slots:
+    void disableMouse();
+    void enableMouse();
 
 protected:
     void mousePressEvent(QMouseEvent *e) override;
@@ -92,8 +60,14 @@ private:
 private:
     Q_DISABLE_COPY(TitleWidget)
 
-    MainWindow *m_obj = nullptr;
+    MainWindow *m_mainWindow;
+    QToolButton *m_recordButton = nullptr;
+    QToolButton *m_settingsButton = nullptr;
+    CloseButton *m_closeButton = nullptr;
+    QLabel *m_msg = nullptr;
+    QProgressBar *m_progress = nullptr;
     bool m_leftButtonPressed = false;
+    bool m_mouseEnabled = true;
     QPointF m_pos = {0.0, 0.0};
 }; // class TitleWidget
 
@@ -140,12 +114,29 @@ public:
     explicit MainWindow(EventMonitor *eventMonitor);
     ~MainWindow() override = default;
 
+    enum Orientation {
+        Unknown = 0,
+        Left,
+        Right,
+        Top,
+        Bottom,
+        TopLeft,
+        BottomRight,
+        BottomLeft,
+        TopRight,
+        Move
+    };
+
 public slots:
     void onWritePercent(int percent);
+    void restoreCursor(Orientation o);
 
 protected:
-    void resizeEvent(QResizeEvent *e) override;
     void closeEvent(QCloseEvent *e) override;
+    void paintEvent(QPaintEvent *e) override;
+    void mousePressEvent(QMouseEvent *e) override;
+    void mouseMoveEvent(QMouseEvent *e) override;
+    void mouseReleaseEvent(QMouseEvent *e) override;
 
 private slots:
     void onSettings();
@@ -158,20 +149,16 @@ private slots:
 private:
     void makeFrame();
     void save(const QString &fileName);
+    Orientation orientationUnder(const QPoint &p) const;
+    void makeAndSetMask();
+    void drawRect(QPainter *p,
+                  const QColor &c);
 
 private:
     Q_DISABLE_COPY(MainWindow)
 
     TitleWidget *m_title = nullptr;
-    QWidget *m_recordArea = nullptr;
-    QWidget *m_c = nullptr;
-    QToolButton *m_recordButton = nullptr;
-    QToolButton *m_settingsButton = nullptr;
-    CloseButton *m_closeButton = nullptr;
     QTimer *m_timer = nullptr;
-    QLabel *m_msg = nullptr;
-    QProgressBar *m_progress = nullptr;
-    QBitmap m_mask;
     int m_fps = 24;
     bool m_grabCursor = true;
     bool m_drawMouseClick = true;
@@ -184,4 +171,17 @@ private:
     qsizetype m_counter = 0;
     QElapsedTimer m_elapsed;
     QVector<int> m_delays;
+    QRect m_rect;
+    Orientation m_current = Unknown;
+    Orientation m_cursor = Unknown;
+    QPointF m_pos;
+    QRegion m_topLeft;
+    QRegion m_top;
+    QRegion m_topRight;
+    QRegion m_left;
+    QRegion m_right;
+    QRegion m_bottomLeft;
+    QRegion m_bottom;
+    QRegion m_bottomRight;
+    QColor m_color;
 }; // class MainWindow

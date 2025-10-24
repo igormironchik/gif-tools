@@ -23,6 +23,7 @@
 #include <QMetaMethod>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPainterPath>
 #include <QPalette>
 #include <QResizeEvent>
 #include <QRunnable>
@@ -40,185 +41,124 @@
 #include <Windows.h>
 #endif
 
-//
-// ResizeHandle
-//
-
-ResizeHandle::ResizeHandle(Orientation o,
-                           bool withMove,
-                           QWidget *parent,
-                           MainWindow *obj)
-    : QFrame(parent)
-    , m_obj(obj)
-    , m_orient(o)
-    , m_withMove(withMove)
-{
-    auto p = palette();
-    p.setColor(QPalette::Window, p.color(QPalette::Dark));
-    setPalette(p);
-    setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-    setAutoFillBackground(true);
-
-    switch (o) {
-    case Horizontal: {
-        setCursor(Qt::SizeHorCursor);
-        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-    } break;
-
-    case Vertical: {
-        setCursor(Qt::SizeVerCursor);
-        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    } break;
-
-    case TopLeftBotomRight: {
-        setCursor(Qt::SizeFDiagCursor);
-        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    } break;
-
-    case BottomLeftTopRight: {
-        setCursor(Qt::SizeBDiagCursor);
-        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    } break;
-    }
-}
-
-QSize ResizeHandle::minimumSizeHint() const
-{
-    return {5, 5};
-}
-
-QSize ResizeHandle::sizeHint() const
-{
-    return {5, 5};
-}
-
-void ResizeHandle::mousePressEvent(QMouseEvent *e)
-{
-    if (e->button() == Qt::LeftButton) {
-        m_leftButtonPressed = true;
-        m_pos = e->globalPosition();
-    }
-
-    e->accept();
-}
-
-void ResizeHandle::mouseReleaseEvent(QMouseEvent *e)
-{
-    if (e->button() == Qt::LeftButton && m_leftButtonPressed) {
-        handleMouseMove(e);
-
-        m_leftButtonPressed = false;
-    }
-
-    e->accept();
-}
-
-void ResizeHandle::mouseMoveEvent(QMouseEvent *e)
-{
-    if (m_leftButtonPressed) {
-        handleMouseMove(e);
-    }
-
-    e->accept();
-}
-
-void ResizeHandle::handleMouseMove(QMouseEvent *e)
-{
-    auto delta = e->globalPosition() - m_pos;
-    m_pos = e->globalPosition();
-
-    QMargins m = {0, 0, 0, 0};
-
-    switch (m_orient) {
-    case Horizontal: {
-        if (m_withMove) {
-            m.setLeft(qRound(-delta.x()));
-        } else {
-            m.setRight(qRound(delta.x()));
-        }
-    } break;
-
-    case Vertical: {
-        if (m_withMove) {
-            m.setTop(qRound(-delta.y()));
-        } else {
-            m.setBottom(qRound(delta.y()));
-        }
-    } break;
-
-    case TopLeftBotomRight: {
-        if (m_withMove) {
-            m.setTop(qRound(-delta.y()));
-            m.setLeft(qRound(-delta.x()));
-        } else {
-            m.setBottom(qRound(delta.y()));
-            m.setRight(qRound(delta.x()));
-        }
-    } break;
-
-    case BottomLeftTopRight: {
-        if (m_withMove) {
-            m.setLeft(qRound(-delta.x()));
-            m.setBottom(qRound(delta.y()));
-        } else {
-            m.setRight(qRound(delta.x()));
-            m.setTop(qRound(-delta.y()));
-        }
-    } break;
-
-    default:
-        break;
-    }
-
-    m_obj->setGeometry(m_obj->geometry() + m);
-    QApplication::processEvents();
-}
+static const int s_handleRadius = 9;
 
 //
 // Title
 //
 
-TitleWidget::TitleWidget(QWidget *parent,
-                         MainWindow *obj)
+TitleWidget::TitleWidget(MainWindow *mainWindow, QWidget *parent)
     : QFrame(parent)
-    , m_obj(obj)
+    , m_mainWindow(mainWindow)
+    , m_recordButton(new QToolButton(this))
+    , m_settingsButton(new QToolButton(this))
+    , m_closeButton(new CloseButton(this))
+    , m_msg(new QLabel(this))
+    , m_progress(new QProgressBar(this))
 {
-    auto p = palette();
-    p.setColor(QPalette::Window, p.color(QPalette::Dark));
-    setPalette(p);
-    setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+    auto layout = new QHBoxLayout(this);
+    layout->setContentsMargins(5, 5, 5, 5);
+    m_recordButton->setText(tr("Record"));
+    layout->addWidget(m_recordButton);
+    layout->addItem(new QSpacerItem(10, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+    layout->addWidget(m_msg);
+    m_progress->setMinimum(0);
+    m_progress->setMaximum(100);
+    m_progress->hide();
+    layout->addWidget(m_progress);
+    layout->addItem(new QSpacerItem(10, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+    m_settingsButton->setIcon(QIcon(":/img/applications-system.png"));
+    layout->addWidget(m_settingsButton);
+    layout->addWidget(m_closeButton);
+
     setAutoFillBackground(true);
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    setMouseTracking(true);
+}
+
+QToolButton *TitleWidget::recordButton() const
+{
+    return m_recordButton;
+}
+
+QToolButton *TitleWidget::settingsButton() const
+{
+    return m_settingsButton;
+}
+
+CloseButton *TitleWidget::closeButton() const
+{
+    return m_closeButton;
+}
+
+QLabel *TitleWidget::msg() const
+{
+    return m_msg;
+}
+
+QProgressBar *TitleWidget::progressBar() const
+{
+    return m_progress;
+}
+
+bool TitleWidget::isMouseEnabled() const
+{
+    return m_mouseEnabled;
+}
+
+void TitleWidget::disableMouse()
+{
+    m_mouseEnabled = false;
+}
+
+void TitleWidget::enableMouse()
+{
+    m_mouseEnabled = true;
 }
 
 void TitleWidget::mousePressEvent(QMouseEvent *e)
 {
-    if (e->button() == Qt::LeftButton) {
-        m_leftButtonPressed = true;
-        m_pos = e->globalPosition();
-    }
+    if (m_mouseEnabled) {
+        if (e->button() == Qt::LeftButton) {
+            m_leftButtonPressed = true;
+            m_pos = e->globalPosition();
+        }
 
-    e->accept();
+        e->accept();
+    } else {
+        e->ignore();
+    }
 }
 
 void TitleWidget::mouseReleaseEvent(QMouseEvent *e)
 {
-    if (e->button() == Qt::LeftButton && m_leftButtonPressed) {
-        handleMouseMove(e);
+    if (m_mouseEnabled) {
+        if (e->button() == Qt::LeftButton && m_leftButtonPressed) {
+            handleMouseMove(e);
 
-        m_leftButtonPressed = false;
+            m_leftButtonPressed = false;
+        }
+
+        e->accept();
+    } else {
+        e->ignore();
     }
-
-    e->accept();
 }
 
 void TitleWidget::mouseMoveEvent(QMouseEvent *e)
 {
-    if (m_leftButtonPressed) {
-        handleMouseMove(e);
-    }
+    m_mainWindow->restoreCursor(MainWindow::Unknown);
 
-    e->accept();
+    if (m_mouseEnabled) {
+        if (m_leftButtonPressed) {
+            handleMouseMove(e);
+        }
+
+        e->accept();
+    } else {
+        e->ignore();
+    }
 }
 
 void TitleWidget::handleMouseMove(QMouseEvent *e)
@@ -226,18 +166,21 @@ void TitleWidget::handleMouseMove(QMouseEvent *e)
     auto delta = e->globalPosition() - m_pos;
     m_pos = e->globalPosition();
 
-    m_obj->move(m_obj->x() + qRound(delta.x()), m_obj->y() + qRound(delta.y()));
-    QApplication::processEvents();
+    move(x() + qRound(delta.x()), y() + qRound(delta.y()));
 }
 
 void TitleWidget::contextMenuEvent(QContextMenuEvent *e)
 {
-    QMenu menu(this);
-    menu.addAction(tr("Resize Grab Area"), this, &TitleWidget::resizeRequested);
+    if (m_mouseEnabled) {
+        QMenu menu(this);
+        menu.addAction(tr("Resize Grab Area"), this, &TitleWidget::resizeRequested);
 
-    menu.exec(e->globalPos());
+        menu.exec(e->globalPos());
 
-    e->accept();
+        e->accept();
+    } else {
+        e->ignore();
+    }
 }
 
 //
@@ -275,7 +218,7 @@ void CloseButton::paintEvent(QPaintEvent *e)
 {
     QPainter p(this);
 
-    if (m_hovered) {
+    if (m_hovered && isEnabled()) {
         p.drawPixmap(rect(), m_activePixmap);
     } else {
         p.drawPixmap(rect(), m_inactivePixmap);
@@ -306,91 +249,80 @@ void CloseButton::leaveEvent(QEvent *event)
 
 MainWindow::MainWindow(EventMonitor *eventMonitor)
     : QWidget(nullptr,
-              Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool)
+              Qt::Window
+                  | Qt::FramelessWindowHint
+                  | Qt::NoDropShadowWindowHint
+                  | Qt::ExpandedClientAreaHint
+                  | Qt::WindowStaysOnTopHint)
+    , m_title(new TitleWidget(this, this))
+    , m_timer(new QTimer(this))
 {
-    setAttribute(Qt::WA_TranslucentBackground);
+    setAttribute(Qt::WA_TranslucentBackground, true);
+    setWindowState(Qt::WindowFullScreen);
 
-    auto grid = new QGridLayout(this);
-    grid->setHorizontalSpacing(1);
-    grid->setVerticalSpacing(1);
-    grid->setContentsMargins(0, 0, 0, 0);
+    const auto screenSize = qApp->primaryScreen()->size();
+    const auto width = screenSize.width() / 4;
+    const auto height = screenSize.height() / 5;
+    const auto x = (screenSize.width() - width) / 2;
+    const auto y = (screenSize.height() - height) / 2;
 
-    auto h1 = new ResizeHandle(ResizeHandle::TopLeftBotomRight, true, this, this);
-    grid->addWidget(h1, 0, 0);
-    auto h2 = new ResizeHandle(ResizeHandle::Vertical, true, this, this);
-    grid->addWidget(h2, 0, 1);
-    auto h3 = new ResizeHandle(ResizeHandle::BottomLeftTopRight, false, this, this);
-    grid->addWidget(h3, 0, 2);
+    resize(screenSize);
 
-    auto h4 = new ResizeHandle(ResizeHandle::Horizontal, true, this, this);
-    grid->addWidget(h4, 1, 0);
+    m_rect = QRect(x, y, width, height);
 
-    m_c = new QWidget(this);
-    auto vlayout = new QVBoxLayout(m_c);
-    vlayout->setContentsMargins(0, 0, 0, 0);
-    vlayout->setSpacing(0);
-    m_title = new TitleWidget(m_c, this);
-    auto layout = new QHBoxLayout(m_title);
-    layout->setContentsMargins(5, 5, 5, 5);
-    m_recordButton = new QToolButton(m_title);
-    m_recordButton->setText(tr("Record"));
-    connect(m_recordButton, &QToolButton::clicked, this, &MainWindow::onRecord);
-    layout->addWidget(m_recordButton);
-    layout->addItem(new QSpacerItem(10, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
-    m_msg = new QLabel(m_title);
-    layout->addWidget(m_msg);
-    m_progress = new QProgressBar(m_title);
-    m_progress->setMinimum(0);
-    m_progress->setMaximum(100);
-    m_progress->hide();
-    layout->addWidget(m_progress);
-    layout->addItem(new QSpacerItem(10, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
-    m_settingsButton = new QToolButton(m_title);
-    m_settingsButton->setIcon(QIcon(":/img/applications-system.png"));
-    layout->addWidget(m_settingsButton);
-    connect(m_settingsButton, &QToolButton::clicked, this, &MainWindow::onSettings);
-    m_closeButton = new CloseButton(m_title);
-    layout->addWidget(m_closeButton);
-    connect(m_closeButton, &CloseButton::clicked, qApp, &QApplication::quit);
-    vlayout->addWidget(m_title);
-    m_recordArea = new QWidget(m_c);
-    m_recordArea->setAttribute(Qt::WA_TranslucentBackground);
-    vlayout->addWidget(m_recordArea);
+    m_title->setMinimumWidth(width);
+    m_title->move(screenSize.width() / 2 - width / 2, s_handleRadius);
 
-    grid->addWidget(m_c, 1, 1);
-
-    auto h5 = new ResizeHandle(ResizeHandle::Horizontal, false, this, this);
-    grid->addWidget(h5, 1, 2);
-
-    auto h6 = new ResizeHandle(ResizeHandle::BottomLeftTopRight, true, this, this);
-    grid->addWidget(h6, 2, 0);
-    auto h7 = new ResizeHandle(ResizeHandle::Vertical, false, this, this);
-    grid->addWidget(h7, 2, 1);
-    auto h8 = new ResizeHandle(ResizeHandle::TopLeftBotomRight, false, this, this);
-    grid->addWidget(h8, 2, 2);
-
-    m_timer = new QTimer(this);
+    connect(m_title->closeButton(), &CloseButton::clicked, qApp, &QApplication::quit);
     connect(m_timer, &QTimer::timeout, this, &MainWindow::onTimer);
-
     connect(eventMonitor, &EventMonitor::buttonPress, this, &MainWindow::onMousePressed);
     connect(eventMonitor, &EventMonitor::buttonRelease, this, &MainWindow::onMouseReleased);
     connect(m_title, &TitleWidget::resizeRequested, this, &MainWindow::onResizeRequested);
-}
+    connect(m_title->recordButton(), &QToolButton::clicked, this, &MainWindow::onRecord);
+    connect(m_title->settingsButton(), &QToolButton::clicked, this, &MainWindow::onSettings);
 
-void MainWindow::resizeEvent(QResizeEvent *e)
-{
-    m_mask = QBitmap(e->size());
-    m_mask.fill(Qt::color1);
+    auto mask = QBitmap(s_handleRadius * 2, s_handleRadius * 2);
+    mask.fill(Qt::color0);
 
-    QPainter p(&m_mask);
-    p.setPen(Qt::color0);
-    p.setBrush(Qt::color0);
-    auto h = 5 + m_title->sizeHint().height() + 1;
-    p.drawRect(5, h, e->size().width() - 10 - 1, e->size().height() - h - 5 - 1);
+    QPainter p(&mask);
+    p.setBrush(Qt::color1);
+    p.setPen(Qt::color1);
 
-    setMask(m_mask);
+    // left
+    p.drawPie(QRectF(QPointF(0, 0), QSizeF(s_handleRadius * 2, s_handleRadius * 2)), 90 * 16, 180 * 16);
+    m_left = QRegion(mask);
+    mask.fill(Qt::color0);
+    // right
+    p.drawPie(QRectF(QPointF(0, 0), QSizeF(s_handleRadius * 2, s_handleRadius * 2)), 90 * 16, -180 * 16);
+    m_right = QRegion(mask);
+    mask.fill(Qt::color0);
+    // top
+    p.drawPie(QRectF(QPointF(0, 0), QSizeF(s_handleRadius * 2, s_handleRadius * 2)), 0, 180 * 16);
+    m_top = QRegion(mask);
+    mask.fill(Qt::color0);
+    // bottom
+    p.drawPie(QRectF(QPointF(0, 0), QSizeF(s_handleRadius * 2, s_handleRadius * 2)), 0, -180 * 16);
+    m_bottom = QRegion(mask);
+    mask.fill(Qt::color0);
+    // top-left
+    p.drawPie(QRectF(QPointF(0, 0), QSizeF(s_handleRadius * 2, s_handleRadius * 2)), 0, 270 * 16);
+    m_topLeft = QRegion(mask);
+    mask.fill(Qt::color0);
+    // bottom-right
+    p.drawPie(QRectF(QPointF(0, 0), QSizeF(s_handleRadius * 2, s_handleRadius * 2)), 90 * 16, -270 * 16);
+    m_bottomRight = QRegion(mask);
+    mask.fill(Qt::color0);
+    // bottom-left
+    p.drawPie(QRectF(QPointF(0, 0), QSizeF(s_handleRadius * 2, s_handleRadius * 2)), 90 * 16, 270 * 16);
+    m_bottomLeft = QRegion(mask);
+    mask.fill(Qt::color0);
+    // top-right
+    p.drawPie(QRectF(QPointF(0, 0), QSizeF(s_handleRadius * 2, s_handleRadius * 2)), 180 * 16, -270 * 16);
+    m_topRight = QRegion(mask);
 
-    e->accept();
+    setMouseTracking(true);
+
+    m_color = palette().color(QPalette::Highlight);
 }
 
 void MainWindow::onSettings()
@@ -407,14 +339,19 @@ void MainWindow::onSettings()
 void MainWindow::onRecord()
 {
     if (m_recording) {
-        m_recordButton->setText(tr("Record"));
-        m_settingsButton->setEnabled(true);
+        m_skipQuitEvent = false;
+        clearMask();
+        m_title->recordButton()->setText(tr("Record"));
+        m_title->settingsButton()->setEnabled(true);
+        m_title->closeButton()->setEnabled(true);
+        m_title->enableMouse();
+
+        update();
+
         m_timer->stop();
 
         const auto dirs = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
         const auto defaultDir = dirs.first();
-
-        m_skipQuitEvent = true;
 
         auto fileName = QFileDialog::getSaveFileName(this, tr("Save As"), defaultDir, tr("GIF (*.gif)"));
 
@@ -432,8 +369,16 @@ void MainWindow::onRecord()
         m_elapsed.invalidate();
         m_delays.clear();
     } else {
-        m_recordButton->setText(tr("Stop"));
-        m_settingsButton->setEnabled(false);
+        m_skipQuitEvent = true;
+        restoreCursor(Unknown);
+        makeAndSetMask();
+        m_title->recordButton()->setText(tr("Stop"));
+        m_title->settingsButton()->setEnabled(false);
+        m_title->closeButton()->setEnabled(false);
+        m_title->disableMouse();
+
+        update();
+
         m_timer->start(1000 / m_fps);
         m_dir = QTemporaryDir("./");
         m_elapsed.start();
@@ -460,10 +405,12 @@ void MainWindow::onMouseReleased()
 
 void MainWindow::onResizeRequested()
 {
-    SizeDlg dlg(m_recordArea->width(), m_recordArea->height(), this);
+    SizeDlg dlg(m_rect.width(), m_rect.height(), this);
 
     if (dlg.exec() == QDialog::Accepted) {
-        resize(dlg.requestedWidth() + 5 + 5 , dlg.requestedHeight() + m_title->height() + 5 + 1 + 5);
+        m_rect.setSize(QSize(dlg.requestedWidth(), dlg.requestedHeight()));
+
+        update();
     }
 }
 
@@ -670,8 +617,8 @@ void MainWindow::makeFrame()
     m_delays.push_back(m_elapsed.elapsed());
     m_elapsed.restart();
 
-    const auto p = mapToGlobal(QPoint(m_c->pos().x() - 1, m_c->pos().y() + m_title->height()));
-    const auto s = QSize(m_recordArea->width() + 2, m_recordArea->height() + 1);
+    const auto p = mapToGlobal(QPoint(m_rect.x(), m_rect.y()));
+    const auto s = QSize(m_rect.width(), m_rect.height());
 
     auto qimg = QApplication::primaryScreen()->grabWindow(0, p.x(), p.y(), s.width(), s.height()).toImage();
 
@@ -749,10 +696,10 @@ private:
 
 void MainWindow::save(const QString &fileName)
 {
-    m_recordButton->setEnabled(false);
-    m_settingsButton->setEnabled(false);
+    m_title->recordButton()->setEnabled(false);
+    m_title->settingsButton()->setEnabled(false);
 
-    m_msg->setText(tr("Writing GIF... Please wait."));
+    m_title->msg()->setText(tr("Writing GIF... Please wait."));
 
     QApplication::processEvents();
 
@@ -767,10 +714,9 @@ void MainWindow::save(const QString &fileName)
 
     m_busy = false;
 
-    m_recordButton->setEnabled(true);
-    m_settingsButton->setEnabled(true);
-
-    m_msg->setText({});
+    m_title->recordButton()->setEnabled(true);
+    m_title->settingsButton()->setEnabled(true);
+    m_title->msg()->setText({});
 
     m_frames.clear();
 }
@@ -792,19 +738,282 @@ void MainWindow::closeEvent(QCloseEvent *e)
     } else {
         e->accept();
     }
+}
 
-    m_skipQuitEvent = false;
+void MainWindow::drawRect(QPainter *p,
+                          const QColor &c)
+{
+    p->setBrush(Qt::NoBrush);
+    p->setPen(c);
+    p->drawRect(m_rect);
+
+    p->setBrush(c);
+
+    if (m_current == Unknown) {
+        // left
+        p->drawPie(QRectF(QPointF(m_rect.x() - s_handleRadius, m_rect.y() + m_rect.height() / 2 - s_handleRadius),
+                          QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                   90 * 16,
+                   180 * 16);
+        // right
+        p->drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() - s_handleRadius,
+                                  m_rect.y() + m_rect.height() / 2 - s_handleRadius),
+                          QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                   90 * 16,
+                   -180 * 16);
+        // top
+        p->drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() / 2 - s_handleRadius, m_rect.y() - s_handleRadius),
+                          QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                   0,
+                   180 * 16);
+        // bottom
+        p->drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() / 2 - s_handleRadius,
+                                  m_rect.y() + m_rect.height() - s_handleRadius),
+                          QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                   0,
+                   -180 * 16);
+        // top-left
+        p->drawPie(QRectF(QPointF(m_rect.x() - s_handleRadius, m_rect.y() - s_handleRadius),
+                          QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                   0,
+                   270 * 16);
+        // bottom-right
+        p->drawPie(
+            QRectF(QPointF(m_rect.x() + m_rect.width() - s_handleRadius, m_rect.y() + m_rect.height() - s_handleRadius),
+                   QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+            90 * 16,
+            -270 * 16);
+        // bottom-left
+        p->drawPie(QRectF(QPointF(m_rect.x() - s_handleRadius, m_rect.y() + m_rect.height() - s_handleRadius),
+                          QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                   90 * 16,
+                   270 * 16);
+        // top-right
+        p->drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() - s_handleRadius, m_rect.y() - s_handleRadius),
+                          QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                   180 * 16,
+                   -270 * 16);
+    }
+}
+
+void MainWindow::paintEvent(QPaintEvent *e)
+{
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing, true);
+
+    if (m_title->isMouseEnabled()) {
+        QPainterPath path;
+        path.addRect(rect());
+        path.addRect(m_rect);
+        path.setFillRule(Qt::OddEvenFill);
+
+        p.setPen(Qt::NoPen);
+
+        auto c = palette().color(QPalette::Window).darker(300);
+        c.setAlpha(75);
+
+        p.setBrush(c);
+        p.drawPath(path);
+    }
+
+    drawRect(&p, m_color);
+}
+
+MainWindow::Orientation MainWindow::orientationUnder(const QPoint &p) const
+{
+    if (m_topLeft.translated(QPoint(m_rect.x() - s_handleRadius, m_rect.y() - s_handleRadius)).contains(p)) {
+        return TopLeft;
+    } else if (m_top.translated(QPoint(m_rect.x() + m_rect.width() / 2 - s_handleRadius, m_rect.y() - s_handleRadius))
+                   .contains(p)) {
+        return Top;
+    } else if (m_topRight.translated(QPoint(m_rect.x() + m_rect.width() - s_handleRadius, m_rect.y() - s_handleRadius))
+                   .contains(p)) {
+        return TopRight;
+    } else if (m_left.translated(QPoint(m_rect.x() - s_handleRadius, m_rect.y() + m_rect.height() / 2 - s_handleRadius))
+                   .contains(p)) {
+        return Left;
+    } else if (m_right
+                   .translated(QPoint(m_rect.x() + m_rect.width() - s_handleRadius,
+                                      m_rect.y() + m_rect.height() / 2 - s_handleRadius))
+                   .contains(p)) {
+        return Right;
+    } else if (m_bottomLeft
+                   .translated(QPoint(m_rect.x() - s_handleRadius, m_rect.y() + m_rect.height() - s_handleRadius))
+                   .contains(p)) {
+        return BottomLeft;
+    } else if (m_bottom
+                   .translated(QPoint(m_rect.x() + m_rect.width() / 2 - s_handleRadius,
+                                      m_rect.y() + m_rect.height() - s_handleRadius))
+                   .contains(p)) {
+        return Bottom;
+    } else if (m_bottomRight
+                   .translated(QPoint(m_rect.x() + m_rect.width() - s_handleRadius,
+                                      m_rect.y() + m_rect.height() - s_handleRadius))
+                   .contains(p)) {
+        return BottomRight;
+    } else if (m_rect.contains(p)) {
+        return Move;
+    } else {
+        return Unknown;
+    }
+}
+
+void MainWindow::mousePressEvent(QMouseEvent *e)
+{
+    if (m_title->isMouseEnabled()) {
+        if (e->button() == Qt::LeftButton) {
+            m_pos = e->globalPosition();
+            m_current = orientationUnder(m_pos.toPoint());
+
+            update();
+        }
+
+        e->accept();
+    } else {
+        e->ignore();
+    }
+}
+
+void MainWindow::restoreCursor(Orientation o)
+{
+    if (m_cursor != Unknown) {
+        QApplication::restoreOverrideCursor();
+    }
+
+    m_cursor = o;
+}
+
+void MainWindow::mouseMoveEvent(QMouseEvent *e)
+{
+    if (m_title->isMouseEnabled()) {
+        if (m_current != Unknown) {
+            auto delta = e->globalPosition() - m_pos;
+            m_pos = e->globalPosition();
+
+            switch (m_current) {
+            case TopLeft: {
+                m_rect.setTopLeft(m_rect.topLeft() + delta.toPoint());
+            } break;
+
+            case Top: {
+                m_rect.setY(m_rect.y() + delta.toPoint().y());
+            } break;
+
+            case TopRight: {
+                m_rect.setTopRight(m_rect.topRight() + delta.toPoint());
+            } break;
+
+            case Left: {
+                m_rect.setX(m_rect.x() + delta.toPoint().x());
+            } break;
+
+            case Right: {
+                m_rect.setWidth(m_rect.width() + delta.toPoint().x());
+            } break;
+
+            case BottomLeft: {
+                m_rect.setBottomLeft(m_rect.bottomLeft() + delta.toPoint());
+            } break;
+
+            case Bottom: {
+                m_rect.setHeight(m_rect.height() + delta.toPoint().y());
+            } break;
+
+            case BottomRight: {
+                m_rect.setBottomRight(m_rect.bottomRight() + delta.toPoint());
+            } break;
+
+            case Move: {
+                m_rect.moveCenter(m_rect.center() + delta.toPoint());
+            } break;
+
+            default:
+                break;
+            }
+
+            update();
+        } else {
+            const auto handle = orientationUnder(e->globalPosition().toPoint());
+
+            if (handle != m_cursor) {
+                restoreCursor(handle);
+
+                switch (handle) {
+                case TopLeft:
+                case BottomRight:
+                    QApplication::setOverrideCursor(Qt::SizeFDiagCursor);
+                    break;
+
+                case Top:
+                case Bottom:
+                    QApplication::setOverrideCursor(Qt::SizeVerCursor);
+                    break;
+
+                case TopRight:
+                case BottomLeft:
+                    QApplication::setOverrideCursor(Qt::SizeBDiagCursor);
+                    break;
+
+                case Left:
+                case Right:
+                    QApplication::setOverrideCursor(Qt::SizeHorCursor);
+                    break;
+
+                case Move:
+                    QApplication::setOverrideCursor(Qt::OpenHandCursor);
+                    break;
+
+                default:
+                    break;
+                }
+            }
+        }
+
+        e->accept();
+    } else {
+        e->ignore();
+    }
+}
+
+void MainWindow::makeAndSetMask()
+{
+    auto mask = QBitmap(size());
+    mask.fill(Qt::color0);
+
+    QPainter p(&mask);
+    drawRect(&p, Qt::color1);
+    auto r = m_title->rect();
+    r.moveTopLeft(m_title->pos());
+    p.drawRect(r);
+
+    setMask(mask);
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent *e)
+{
+    if (m_title->isMouseEnabled()) {
+        if (e->button() == Qt::LeftButton && m_current) {
+            m_current = Unknown;
+            m_rect = m_rect.normalized();
+
+            update();
+        }
+
+        e->accept();
+    } else {
+        e->ignore();
+    }
 }
 
 void MainWindow::onWritePercent(int percent)
 {
     if (percent == 0) {
-        m_progress->show();
+        m_title->progressBar()->show();
     }
 
-    m_progress->setValue(percent);
+    m_title->progressBar()->setValue(percent);
 
     if (percent == 100) {
-        m_progress->hide();
+        m_title->progressBar()->hide();
     }
 }
