@@ -327,11 +327,15 @@ void MainWindow::onMouseReleased()
 
 void MainWindow::onResizeRequested()
 {
-    // SizeDlg dlg(m_recordArea->width(), m_recordArea->height(), this);
+    SizeDlg dlg(m_rect.width(), m_rect.height(), this);
 
-    // if (dlg.exec() == QDialog::Accepted) {
-    //     resize(dlg.requestedWidth() + 5 + 5 , dlg.requestedHeight() + m_title->height() + 5 + 1 + 5);
-    // }
+    if (dlg.exec() == QDialog::Accepted) {
+        m_rect.setSize(QSize(dlg.requestedWidth(), dlg.requestedHeight()));
+
+        makeAndSetMask();
+
+        update();
+    }
 }
 
 namespace /* anonymous */
@@ -773,6 +777,9 @@ void MainWindow::mousePressEvent(QMouseEvent *e)
     if (e->button() == Qt::LeftButton) {
         m_pos = e->globalPosition();
         m_current = orientationUnder(m_pos.toPoint());
+
+        clearMask();
+
         update();
     }
 
@@ -880,6 +887,14 @@ void MainWindow::makeAndSetMask()
     p.setPen(Qt::NoPen);
     p.setBrush(Qt::color0);
     p.drawRect(m_rect);
+
+    setMask(mask);
+}
+
+void MainWindow::clearMask()
+{
+    auto mask = QBitmap(size());
+    mask.fill(Qt::color1);
 
     setMask(mask);
 }
