@@ -891,14 +891,6 @@ void MainWindow::makeAndSetMask()
     setMask(mask);
 }
 
-void MainWindow::clearMask()
-{
-    auto mask = QBitmap(size());
-    mask.fill(Qt::color1);
-
-    setMask(mask);
-}
-
 void MainWindow::mouseReleaseEvent(QMouseEvent *e)
 {
     if (e->button() == Qt::LeftButton && m_current) {
