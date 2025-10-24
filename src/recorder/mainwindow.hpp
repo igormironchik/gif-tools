@@ -17,6 +17,8 @@
 #include <QToolButton>
 #include <QWidget>
 
+class CloseButton;
+
 //
 // Title
 //
@@ -33,6 +35,18 @@ public:
     TitleWidget(QWidget *parent);
     ~TitleWidget() override = default;
 
+    QToolButton *recordButton() const;
+    QToolButton *settingsButton() const;
+    CloseButton *closeButton() const;
+    QLabel *msg() const;
+    QProgressBar *progressBar() const;
+
+    bool isMenuEnabled() const;
+
+public slots:
+    void disableMenu();
+    void enableMenu();
+
 protected:
     void mousePressEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
@@ -45,7 +59,13 @@ private:
 private:
     Q_DISABLE_COPY(TitleWidget)
 
+    QToolButton *m_recordButton = nullptr;
+    QToolButton *m_settingsButton = nullptr;
+    CloseButton *m_closeButton = nullptr;
+    QLabel *m_msg = nullptr;
+    QProgressBar *m_progress = nullptr;
     bool m_leftButtonPressed = false;
+    bool m_menuEnabled = true;
     QPointF m_pos = {0.0, 0.0};
 }; // class TitleWidget
 
@@ -133,12 +153,7 @@ private:
     Q_DISABLE_COPY(MainWindow)
 
     TitleWidget *m_title = nullptr;
-    QToolButton *m_recordButton = nullptr;
-    QToolButton *m_settingsButton = nullptr;
-    CloseButton *m_closeButton = nullptr;
     QTimer *m_timer = nullptr;
-    QLabel *m_msg = nullptr;
-    QProgressBar *m_progress = nullptr;
     int m_fps = 24;
     bool m_grabCursor = true;
     bool m_drawMouseClick = true;
