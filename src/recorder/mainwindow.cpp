@@ -48,8 +48,9 @@ static const int s_handleRadius = 9;
 // Title
 //
 
-TitleWidget::TitleWidget(QWidget *parent)
+TitleWidget::TitleWidget(MainWindow *mainWindow, QWidget *parent)
     : QFrame(parent)
+    , m_mainWindow(mainWindow)
     , m_recordButton(new QToolButton(this))
     , m_settingsButton(new QToolButton(this))
     , m_closeButton(new CloseButton(this))
@@ -74,6 +75,7 @@ TitleWidget::TitleWidget(QWidget *parent)
     setAutoFillBackground(true);
     setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    setMouseTracking(true);
 }
 
 QToolButton *TitleWidget::recordButton() const
@@ -147,6 +149,8 @@ void TitleWidget::mouseReleaseEvent(QMouseEvent *e)
 
 void TitleWidget::mouseMoveEvent(QMouseEvent *e)
 {
+    m_mainWindow->restoreCursor(MainWindow::Unknown);
+
     if (m_menuEnabled) {
         if (m_leftButtonPressed) {
             handleMouseMove(e);
@@ -251,7 +255,7 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
                   | Qt::NoDropShadowWindowHint
                   | Qt::ExpandedClientAreaHint
                   | Qt::WindowStaysOnTopHint)
-    , m_title(new TitleWidget(this))
+    , m_title(new TitleWidget(this, this))
     , m_timer(new QTimer(this))
 {
     setAttribute(Qt::WA_TranslucentBackground, true);
@@ -365,6 +369,7 @@ void MainWindow::onRecord()
         m_delays.clear();
     } else {
         m_skipQuitEvent = true;
+        restoreCursor(Unknown);
         makeAndSetMask();
         m_title->recordButton()->setText(tr("Stop"));
         m_title->settingsButton()->setEnabled(false);
@@ -868,6 +873,15 @@ void MainWindow::mousePressEvent(QMouseEvent *e)
     }
 }
 
+void MainWindow::restoreCursor(Orientation o)
+{
+    if (m_cursor != Unknown) {
+        QApplication::restoreOverrideCursor();
+    }
+
+    m_cursor = o;
+}
+
 void MainWindow::mouseMoveEvent(QMouseEvent *e)
 {
     if (m_title->isMenuEnabled()) {
@@ -921,11 +935,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
             const auto handle = orientationUnder(e->globalPosition().toPoint());
 
             if (handle != m_cursor) {
-                if (m_cursor != Unknown) {
-                    QApplication::restoreOverrideCursor();
-                }
-
-                m_cursor = handle;
+                restoreCursor(handle);
 
                 switch (handle) {
                 case TopLeft:

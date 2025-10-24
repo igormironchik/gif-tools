@@ -18,6 +18,7 @@
 #include <QWidget>
 
 class CloseButton;
+class MainWindow;
 
 //
 // Title
@@ -32,7 +33,7 @@ signals:
     void resizeRequested();
 
 public:
-    TitleWidget(QWidget *parent);
+    TitleWidget(MainWindow *mainWindow, QWidget *parent);
     ~TitleWidget() override = default;
 
     QToolButton *recordButton() const;
@@ -59,6 +60,7 @@ private:
 private:
     Q_DISABLE_COPY(TitleWidget)
 
+    MainWindow *m_mainWindow;
     QToolButton *m_recordButton = nullptr;
     QToolButton *m_settingsButton = nullptr;
     CloseButton *m_closeButton = nullptr;
@@ -112,8 +114,22 @@ public:
     explicit MainWindow(EventMonitor *eventMonitor);
     ~MainWindow() override = default;
 
+    enum Orientation {
+        Unknown = 0,
+        Left,
+        Right,
+        Top,
+        Bottom,
+        TopLeft,
+        BottomRight,
+        BottomLeft,
+        TopRight,
+        Move
+    };
+
 public slots:
     void onWritePercent(int percent);
+    void restoreCursor(Orientation o);
 
 protected:
     void closeEvent(QCloseEvent *e) override;
@@ -131,19 +147,6 @@ private slots:
     void onResizeRequested();
 
 private:
-    enum Orientation {
-        Unknown = 0,
-        Left,
-        Right,
-        Top,
-        Bottom,
-        TopLeft,
-        BottomRight,
-        BottomLeft,
-        TopRight,
-        Move
-    };
-
     void makeFrame();
     void save(const QString &fileName);
     Orientation orientationUnder(const QPoint &p) const;
