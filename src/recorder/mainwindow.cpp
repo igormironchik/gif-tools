@@ -47,7 +47,8 @@ static const int s_handleRadius = 9;
 // Title
 //
 
-TitleWidget::TitleWidget(MainWindow *mainWindow, QWidget *parent)
+TitleWidget::TitleWidget(MainWindow *mainWindow,
+                         QWidget *parent)
     : QFrame(parent)
     , m_mainWindow(mainWindow)
     , m_recordButton(new QToolButton(this))
@@ -264,12 +265,17 @@ void CloseButton::leaveEvent(QEvent *event)
 
 MainWindow::MainWindow(EventMonitor *eventMonitor)
     : QWidget(nullptr)
-    , m_title(new TitleWidget(this, this))
+    , m_title(new TitleWidget(this,
+                              this))
     , m_timer(new QTimer(this))
 {
     setAttribute(Qt::WA_TranslucentBackground, true);
     setWindowState(Qt::WindowFullScreen);
-    setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint | Qt::ExpandedClientAreaHint | Qt::WindowStaysOnTopHint);
+    setWindowFlags(Qt::Window
+                   | Qt::FramelessWindowHint
+                   | Qt::NoDropShadowWindowHint
+                   | Qt::ExpandedClientAreaHint
+                   | Qt::WindowStaysOnTopHint);
 
     const auto screenSize = qApp->primaryScreen()->size();
     const auto width = screenSize.width() / 3;

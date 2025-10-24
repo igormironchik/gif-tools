@@ -33,7 +33,8 @@ signals:
     void resizeRequested();
 
 public:
-    TitleWidget(MainWindow *mainWindow, QWidget *parent);
+    TitleWidget(MainWindow *mainWindow,
+                QWidget *parent);
     ~TitleWidget() override = default;
 
     QToolButton *recordButton() const;
