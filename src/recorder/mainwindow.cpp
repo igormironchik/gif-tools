@@ -103,24 +103,24 @@ QProgressBar *TitleWidget::progressBar() const
     return m_progress;
 }
 
-bool TitleWidget::isMenuEnabled() const
+bool TitleWidget::isMouseEnabled() const
 {
-    return m_menuEnabled;
+    return m_mouseEnabled;
 }
 
-void TitleWidget::disableMenu()
+void TitleWidget::disableMouse()
 {
-    m_menuEnabled = false;
+    m_mouseEnabled = false;
 }
 
-void TitleWidget::enableMenu()
+void TitleWidget::enableMouse()
 {
-    m_menuEnabled = true;
+    m_mouseEnabled = true;
 }
 
 void TitleWidget::mousePressEvent(QMouseEvent *e)
 {
-    if (m_menuEnabled) {
+    if (m_mouseEnabled) {
         if (e->button() == Qt::LeftButton) {
             m_leftButtonPressed = true;
             m_pos = e->globalPosition();
@@ -134,7 +134,7 @@ void TitleWidget::mousePressEvent(QMouseEvent *e)
 
 void TitleWidget::mouseReleaseEvent(QMouseEvent *e)
 {
-    if (m_menuEnabled) {
+    if (m_mouseEnabled) {
         if (e->button() == Qt::LeftButton && m_leftButtonPressed) {
             handleMouseMove(e);
 
@@ -151,7 +151,7 @@ void TitleWidget::mouseMoveEvent(QMouseEvent *e)
 {
     m_mainWindow->restoreCursor(MainWindow::Unknown);
 
-    if (m_menuEnabled) {
+    if (m_mouseEnabled) {
         if (m_leftButtonPressed) {
             handleMouseMove(e);
         }
@@ -172,7 +172,7 @@ void TitleWidget::handleMouseMove(QMouseEvent *e)
 
 void TitleWidget::contextMenuEvent(QContextMenuEvent *e)
 {
-    if (m_menuEnabled) {
+    if (m_mouseEnabled) {
         QMenu menu(this);
         menu.addAction(tr("Resize Grab Area"), this, &TitleWidget::resizeRequested);
 
@@ -343,7 +343,7 @@ void MainWindow::onRecord()
         m_title->recordButton()->setText(tr("Record"));
         m_title->settingsButton()->setEnabled(true);
         m_title->closeButton()->setEnabled(true);
-        m_title->enableMenu();
+        m_title->enableMouse();
 
         update();
 
@@ -374,7 +374,7 @@ void MainWindow::onRecord()
         m_title->recordButton()->setText(tr("Stop"));
         m_title->settingsButton()->setEnabled(false);
         m_title->closeButton()->setEnabled(false);
-        m_title->disableMenu();
+        m_title->disableMouse();
 
         update();
 
@@ -800,7 +800,7 @@ void MainWindow::paintEvent(QPaintEvent *e)
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing, true);
 
-    if (m_title->isMenuEnabled()) {
+    if (m_title->isMouseEnabled()) {
         QPainterPath path;
         path.addRect(rect());
         path.addRect(m_rect);
@@ -859,7 +859,7 @@ MainWindow::Orientation MainWindow::orientationUnder(const QPoint &p) const
 
 void MainWindow::mousePressEvent(QMouseEvent *e)
 {
-    if (m_title->isMenuEnabled()) {
+    if (m_title->isMouseEnabled()) {
         if (e->button() == Qt::LeftButton) {
             m_pos = e->globalPosition();
             m_current = orientationUnder(m_pos.toPoint());
@@ -884,7 +884,7 @@ void MainWindow::restoreCursor(Orientation o)
 
 void MainWindow::mouseMoveEvent(QMouseEvent *e)
 {
-    if (m_title->isMenuEnabled()) {
+    if (m_title->isMouseEnabled()) {
         if (m_current != Unknown) {
             auto delta = e->globalPosition() - m_pos;
             m_pos = e->globalPosition();
@@ -990,7 +990,7 @@ void MainWindow::makeAndSetMask()
 
 void MainWindow::mouseReleaseEvent(QMouseEvent *e)
 {
-    if (m_title->isMenuEnabled()) {
+    if (m_title->isMouseEnabled()) {
         if (e->button() == Qt::LeftButton && m_current) {
             m_current = Unknown;
             m_rect = m_rect.normalized();

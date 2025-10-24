@@ -42,11 +42,11 @@ public:
     QLabel *msg() const;
     QProgressBar *progressBar() const;
 
-    bool isMenuEnabled() const;
+    bool isMouseEnabled() const;
 
 public slots:
-    void disableMenu();
-    void enableMenu();
+    void disableMouse();
+    void enableMouse();
 
 protected:
     void mousePressEvent(QMouseEvent *e) override;
@@ -67,7 +67,7 @@ private:
     QLabel *m_msg = nullptr;
     QProgressBar *m_progress = nullptr;
     bool m_leftButtonPressed = false;
-    bool m_menuEnabled = true;
+    bool m_mouseEnabled = true;
     QPointF m_pos = {0.0, 0.0};
 }; // class TitleWidget
 
