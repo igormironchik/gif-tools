@@ -183,4 +183,5 @@ private:
     QRegion m_bottomLeft;
     QRegion m_bottom;
     QRegion m_bottomRight;
+    QColor m_color;
 }; // class MainWindow

@@ -41,7 +41,6 @@
 #include <Windows.h>
 #endif
 
-static const QColor s_lightBlueColor = QColor(40, 158, 196);
 static const int s_handleRadius = 9;
 
 //
@@ -322,6 +321,8 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     m_topRight = QRegion(mask);
 
     setMouseTracking(true);
+
+    m_color = palette().color(QPalette::Highlight);
 }
 
 void MainWindow::onSettings()
@@ -815,7 +816,7 @@ void MainWindow::paintEvent(QPaintEvent *e)
         p.drawPath(path);
     }
 
-    drawRect(&p, s_lightBlueColor);
+    drawRect(&p, m_color);
 }
 
 MainWindow::Orientation MainWindow::orientationUnder(const QPoint &p) const
