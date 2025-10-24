@@ -263,17 +263,13 @@ void CloseButton::leaveEvent(QEvent *event)
 //
 
 MainWindow::MainWindow(EventMonitor *eventMonitor)
-    : QWidget(nullptr,
-              Qt::Window
-                  | Qt::FramelessWindowHint
-                  | Qt::NoDropShadowWindowHint
-                  | Qt::ExpandedClientAreaHint
-                  | Qt::WindowStaysOnTopHint)
+    : QWidget(nullptr)
     , m_title(new TitleWidget(this, this))
     , m_timer(new QTimer(this))
 {
     setAttribute(Qt::WA_TranslucentBackground, true);
     setWindowState(Qt::WindowFullScreen);
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint | Qt::ExpandedClientAreaHint | Qt::WindowStaysOnTopHint);
 
     const auto screenSize = qApp->primaryScreen()->size();
     const auto width = screenSize.width() / 3;
@@ -854,6 +850,9 @@ void MainWindow::paintEvent(QPaintEvent *e)
 
         p.setBrush(c);
         p.drawPath(path);
+
+        p.setBrush(QColor(255, 255, 255, 1));
+        p.drawRect(m_rect);
     }
 
     drawRect(&p, m_color);
