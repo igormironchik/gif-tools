@@ -1026,6 +1026,7 @@ void MainWindow::makeAndSetMask()
     mask.fill(Qt::color0);
 
     QPainter p(&mask);
+    p.setRenderHint(QPainter::Antialiasing);
     drawRect(&p, Qt::color1);
     auto r = m_title->rect();
     r.moveTopLeft(m_title->pos());
