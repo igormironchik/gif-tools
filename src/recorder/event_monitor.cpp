@@ -10,6 +10,7 @@
 // Xlib include.
 #include <X11/Xlib.h>
 #include <X11/Xlibint.h>
+#include <X11/XKBlib.h>
 #include <X11/extensions/record.h>
 #endif
 
@@ -60,6 +61,20 @@ void EventMonitorPrivate::handleRecordEvent(XRecordInterceptData *data)
         case ButtonRelease: {
             if (filterWheelEvent(event->u.u.detail))
                 emit m_q->buttonRelease();
+        } break;
+
+        case KeyPress: {
+            const KeyCode keycode = event->u.u.detail;
+            KeySym sym = XkbKeycodeToKeysym(m_display_datalink, keycode, 0, 0);
+
+            emit m_q->keyPressed(QString(XKeysymToString(sym)));
+        } break;
+
+        case KeyRelease: {
+            const KeyCode keycode = event->u.u.detail;
+            KeySym sym = XkbKeycodeToKeysym(m_display_datalink, keycode, 0, 0);
+
+            emit m_q->keyReleased(QString(XKeysymToString(sym)));
         } break;
 
         default:
@@ -119,7 +134,7 @@ void EventMonitor::run()
     }
 
     memset(m_d->m_range, 0, sizeof(XRecordRange));
-    m_d->m_range->device_events.first = ButtonPress;
+    m_d->m_range->device_events.first = KeyPress;
     m_d->m_range->device_events.last = ButtonRelease;
 
     m_d->m_context = XRecordCreateContext(m_d->m_display, 0, &clients, 1, &m_d->m_range, 1);

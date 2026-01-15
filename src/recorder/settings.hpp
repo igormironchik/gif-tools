@@ -24,12 +24,14 @@ public:
     Settings(int fpsValue,
              bool grabCursorValue,
              bool drawMouseClicks,
+             bool drawKeyboardKeysPresses,
              QWidget *parent);
     ~Settings() override = default;
 
     int fps() const;
     bool grabCursor() const;
     bool drawMouseClicks() const;
+    bool drawKeyboardKeysPresses() const;
 
 private:
     Q_DISABLE_COPY(Settings)

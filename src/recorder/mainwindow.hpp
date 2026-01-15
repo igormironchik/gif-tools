@@ -147,6 +147,8 @@ private slots:
     void onTimer();
     void onMousePressed();
     void onMouseReleased();
+    void onKeyPressed(const QString &key);
+    void onKeyReleased(const QString &key);
     void onResizeRequested();
     void onTransparentForMouse(bool checked);
 
@@ -165,6 +167,7 @@ private:
     QTimer *m_timer = nullptr;
     int m_fps = 24;
     bool m_grabCursor = true;
+    bool m_grabKeys = false;
     bool m_drawMouseClick = true;
     bool m_recording = false;
     bool m_busy = false;
@@ -173,6 +176,7 @@ private:
     bool m_isMouseDisabledByUser = false;
     QTemporaryDir m_dir;
     QStringList m_frames;
+    QString m_key;
     qsizetype m_counter = 0;
     QElapsedTimer m_elapsed;
     QVector<int> m_delays;

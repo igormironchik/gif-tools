@@ -17,6 +17,7 @@
 Settings::Settings(int fpsValue,
                    bool grabCursorValue,
                    bool drawMouseClicks,
+                   bool drawKeyboardKeysPresses,
                    QWidget *parent)
     : QDialog(parent)
 {
@@ -25,6 +26,7 @@ Settings::Settings(int fpsValue,
     m_ui.m_fps->setValue(fpsValue);
     m_ui.m_cursor->setChecked(grabCursorValue);
     m_ui.m_click->setChecked(drawMouseClicks);
+    m_ui.m_key->setChecked(drawKeyboardKeysPresses);
 }
 
 int Settings::fps() const
@@ -40,4 +42,9 @@ bool Settings::grabCursor() const
 bool Settings::drawMouseClicks() const
 {
     return m_ui.m_click->isChecked();
+}
+
+bool Settings::drawKeyboardKeysPresses() const
+{
+    return m_ui.m_key->isChecked();
 }

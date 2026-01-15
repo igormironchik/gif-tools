@@ -23,6 +23,8 @@ class EventMonitor final : public QThread
 signals:
     void buttonPress();
     void buttonRelease();
+    void keyPressed(const QString &);
+    void keyReleased(const QString &);
 
 public:
     EventMonitor();

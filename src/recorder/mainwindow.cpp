@@ -294,6 +294,8 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     connect(m_timer, &QTimer::timeout, this, &MainWindow::onTimer);
     connect(eventMonitor, &EventMonitor::buttonPress, this, &MainWindow::onMousePressed);
     connect(eventMonitor, &EventMonitor::buttonRelease, this, &MainWindow::onMouseReleased);
+    connect(eventMonitor, &EventMonitor::keyPressed, this, &MainWindow::onKeyPressed);
+    connect(eventMonitor, &EventMonitor::keyReleased, this, &MainWindow::onKeyReleased);
     connect(m_title, &TitleWidget::resizeRequested, this, &MainWindow::onResizeRequested);
     connect(m_title->recordButton(), &QToolButton::clicked, this, &MainWindow::onRecord);
     connect(m_title->settingsButton(), &QToolButton::clicked, this, &MainWindow::onSettings);
@@ -345,12 +347,13 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
 
 void MainWindow::onSettings()
 {
-    Settings dlg(m_fps, m_grabCursor, m_drawMouseClick, this);
+    Settings dlg(m_fps, m_grabCursor, m_drawMouseClick, m_grabKeys, this);
 
     if (dlg.exec() == QDialog::Accepted) {
         m_fps = dlg.fps();
         m_grabCursor = dlg.grabCursor();
         m_drawMouseClick = dlg.drawMouseClicks();
+        m_grabKeys = dlg.drawKeyboardKeysPresses();
     }
 }
 
@@ -427,6 +430,16 @@ void MainWindow::onMousePressed()
 void MainWindow::onMouseReleased()
 {
     m_isMouseButtonPressed = false;
+}
+
+void MainWindow::onKeyPressed(const QString &key)
+{
+    m_key = key.toUpper();
+}
+
+void MainWindow::onKeyReleased(const QString &)
+{
+    QTimer::singleShot(500, [this](){ this->m_key.clear(); });
 }
 
 void MainWindow::onResizeRequested()
@@ -688,6 +701,20 @@ void MainWindow::makeFrame()
         }
 
         p.drawImage(cr, ci, ci.rect());
+    }
+
+    if (m_grabKeys && !m_key.isEmpty()) {
+        QPainter p(&qimg);
+
+        const auto w = p.fontMetrics().horizontalAdvance(m_key);
+        static const int delta = 5;
+
+        p.setPen(Qt::black);
+        p.setBrush(Qt::white);
+        const auto r = QRect(qimg.width() - w - delta, delta, w, p.fontMetrics().height());
+
+        p.drawRect(r.adjusted(-delta - 1, -delta + 1, delta - 1, delta + 1));
+        p.drawText(r, m_key);
     }
 
     m_frames.push_back(m_dir.filePath(QString("%1.png").arg(++m_counter)));
