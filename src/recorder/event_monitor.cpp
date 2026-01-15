@@ -14,6 +14,16 @@
 #include <X11/extensions/record.h>
 #endif
 
+#ifdef Q_OS_WINDOWS
+// Windows include.
+#include <Windows.h>
+
+
+// Qt include.
+#include <QMutex>
+#include <QMutexLocker>
+#endif // Q_OS_WINDOWS
+
 //
 // EventMonitorPrivate
 //
@@ -37,6 +47,11 @@ struct EventMonitorPrivate {
     void handleRecordEvent(XRecordInterceptData *data);
     bool filterWheelEvent(int detail);
 #endif
+
+#ifdef Q_OS_WINDOWS
+    QMutex m_mutex;
+    bool m_quitLoop = false;
+#endif // Q_OS_WINDOWS
 }; // struct EventMonitorPrivate
 
 #ifdef Q_OS_LINUX
@@ -92,6 +107,57 @@ bool EventMonitorPrivate::filterWheelEvent(int detail)
 
 #endif // Q_OS_LINUX
 
+#ifdef Q_OS_WINDOWS
+
+HHOOK hHook = NULL;
+EventMonitor *s_eventMonitor = nullptr;
+
+LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
+    if (nCode == HC_ACTION) {
+        switch (wParam) {
+        case WM_KEYDOWN: {
+            KBDLLHOOKSTRUCT* kbStruct = (KBDLLHOOKSTRUCT*)lParam;
+            if (s_eventMonitor) {
+                LONG lKeyParam = kbStruct->scanCode << 16;
+
+                if (kbStruct->flags & LLKHF_EXTENDED) {
+                    lKeyParam |= (1 << 24);
+                }
+
+                wchar_t keyName[64];
+                if (GetKeyNameTextW(lKeyParam, keyName, 64) > 0) {
+                    emit s_eventMonitor->keyPressed(QString::fromWCharArray(&keyName[0]));
+                }
+            }
+        } break;
+
+        case WM_KEYUP: {
+            KBDLLHOOKSTRUCT* kbStruct = (KBDLLHOOKSTRUCT*)lParam;
+            if (s_eventMonitor) {
+                LONG lKeyParam = kbStruct->scanCode << 16;
+
+                if (kbStruct->flags & LLKHF_EXTENDED) {
+                    lKeyParam |= (1 << 24);
+                }
+
+                wchar_t keyName[64];
+                if (GetKeyNameTextW(lKeyParam, keyName, 64) > 0) {
+                    emit s_eventMonitor->keyReleased(QString::fromWCharArray(&keyName[0]));
+                }
+            }
+        } break;
+
+        default: {
+            break;
+        }
+        }
+    }
+
+    return CallNextHookEx(hHook, nCode, wParam, lParam);
+}
+
+#endif // Q_OS_WINDOWS
+
 //
 // EventMonitor
 //
@@ -117,6 +183,11 @@ void EventMonitor::stopListening()
     XRecordDisableContext(m_d->m_display_datalink, m_d->m_context);
     XSync(m_d->m_display_datalink, true);
 #endif // Q_OS_LINUX
+
+#ifdef Q_OS_WINDOWS
+    QMutexLocker lock(&m_d->m_mutex);
+    m_d->m_quitLoop = true;
+#endif // Q_OS_WINDOWS
 }
 
 void EventMonitor::run()
@@ -155,4 +226,28 @@ void EventMonitor::run()
         return;
     }
 #endif // Q_OS_LINUX
+
+#ifdef Q_OS_WINDOWS
+    s_eventMonitor = this;
+    HINSTANCE hInstance = GetModuleHandle(NULL);
+    hHook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardProc, hInstance, 0);
+
+    if (!hHook) {
+        return;
+    }
+
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+
+        QMutexLocker lock(&m_d->m_mutex);
+
+        if (m_d->m_quitLoop) {
+            break;
+        }
+    }
+
+    UnhookWindowsHookEx(hHook);
+#endif // Q_OS_WINDOWS
 }
