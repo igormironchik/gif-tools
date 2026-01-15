@@ -18,7 +18,6 @@
 // Windows include.
 #include <Windows.h>
 
-
 // Qt include.
 #include <QMutex>
 #include <QMutexLocker>
@@ -109,8 +108,36 @@ bool EventMonitorPrivate::filterWheelEvent(int detail)
 
 #ifdef Q_OS_WINDOWS
 
+#define WM_QUIT_LOOP (WM_USER + 1)
+
 HHOOK hHook = NULL;
 EventMonitor *s_eventMonitor = nullptr;
+HHOOK hMouseHook = NULL;
+DWORD s_threadId = 0;
+
+LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
+    if (nCode >= 0) {
+        switch (wParam) {
+        case WM_LBUTTONDOWN:
+        case WM_RBUTTONDOWN:
+        case WM_MBUTTONDOWN: {
+            emit s_eventMonitor->buttonPress();
+        } break;
+
+        case WM_LBUTTONUP:
+        case WM_RBUTTONUP:
+        case WM_MBUTTONUP: {
+            emit s_eventMonitor->buttonRelease();
+        } break;
+
+        default: {
+            break;
+        }
+        }
+    }
+
+    return CallNextHookEx(hMouseHook, nCode, wParam, lParam);
+}
 
 LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
     if (nCode == HC_ACTION) {
@@ -187,6 +214,7 @@ void EventMonitor::stopListening()
 #ifdef Q_OS_WINDOWS
     QMutexLocker lock(&m_d->m_mutex);
     m_d->m_quitLoop = true;
+    PostThreadMessage(s_threadId, WM_QUIT_LOOP, 0, 0);
 #endif // Q_OS_WINDOWS
 }
 
@@ -229,6 +257,7 @@ void EventMonitor::run()
 
 #ifdef Q_OS_WINDOWS
     s_eventMonitor = this;
+    s_threadId = GetCurrentThreadId();
     HINSTANCE hInstance = GetModuleHandle(NULL);
     hHook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardProc, hInstance, 0);
 
@@ -236,18 +265,27 @@ void EventMonitor::run()
         return;
     }
 
+    hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, MouseHookProc, hInstance, 0);
+
+    if (!hMouseHook) {
+        UnhookWindowsHookEx(hHook);
+
+        return;
+    }
+
     MSG msg;
-    while (GetMessage(&msg, NULL, 0, 0)) {
+    while (GetMessage(&msg, NULL, 0, 0) > 0) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
 
         QMutexLocker lock(&m_d->m_mutex);
 
-        if (m_d->m_quitLoop) {
+        if (m_d->m_quitLoop || msg.message == WM_QUIT_LOOP) {
             break;
         }
     }
 
     UnhookWindowsHookEx(hHook);
+    UnhookWindowsHookEx(hMouseHook);
 #endif // Q_OS_WINDOWS
 }

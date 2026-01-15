@@ -648,23 +648,6 @@ grabMouseCursor(const QRect &r,
     return {cursorImage, {cursorPos, QSize(w, h)}, clickPos};
 }
 
-#ifdef Q_OS_WINDOWS
-
-bool isMouseButtonPressed()
-{
-    if (GetKeyState(VK_LBUTTON) & 0xF000) {
-        return true;
-    } else if (GetKeyState(VK_RBUTTON) & 0xF000) {
-        return true;
-    } else if (GetKeyState(VK_MBUTTON) & 0xF000) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-#endif // Q_OS_WINDOWS
-
 } /* namespace anonymous */
 
 void MainWindow::makeFrame()
@@ -685,19 +668,14 @@ void MainWindow::makeFrame()
 
         QPainter p(&qimg);
 
-        if (m_drawMouseClick) {
-#ifdef Q_OS_WINDOWS
-            m_isMouseButtonPressed = isMouseButtonPressed();
-#endif // Q_OS_WINDOWS
-            if (m_isMouseButtonPressed) {
-                QRadialGradient gradient(cp, cr.width() / 2);
-                gradient.setColorAt(0, Qt::transparent);
-                gradient.setColorAt(1, Qt::yellow);
+        if (m_drawMouseClick && m_isMouseButtonPressed) {
+            QRadialGradient gradient(cp, cr.width() / 2);
+            gradient.setColorAt(0, Qt::transparent);
+            gradient.setColorAt(1, Qt::yellow);
 
-                p.setPen(Qt::NoPen);
-                p.setBrush(QBrush(gradient));
-                p.drawEllipse(cp.x() - cr.width() / 2, cp.y() - cr.width() / 2, cr.width(), cr.width());
-            }
+            p.setPen(Qt::NoPen);
+            p.setBrush(QBrush(gradient));
+            p.drawEllipse(cp.x() - cr.width() / 2, cp.y() - cr.width() / 2, cr.width(), cr.width());
         }
 
         p.drawImage(cr, ci, ci.rect());
