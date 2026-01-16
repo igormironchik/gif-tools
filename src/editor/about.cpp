@@ -30,7 +30,7 @@ About::About(QWidget *parent)
     t->setText(
         tr("GIF editor.\n\n"
            "Author - Igor Mironchik (igor.mironchik at gmail dot com).\n\n"
-           "Copyright (c) 2018 Igor Mironchik.\n\n"
+           "Copyright (c) 2026 Igor Mironchik.\n\n"
            "Licensed under GNU GPL 3.0."));
     l->addWidget(t);
 
