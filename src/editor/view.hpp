@@ -29,6 +29,10 @@ class View final : public QWidget
 {
     Q_OBJECT
 
+signals:
+    //! Apply editing.
+    void applyEdit();
+
 public:
     explicit View(const QGifLib::Gif &data,
                   QWidget *parent = nullptr);

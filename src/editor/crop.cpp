@@ -8,8 +8,11 @@
 #include "frame.hpp"
 
 // Qt include.
+#include <QAction>
 #include <QApplication>
+#include <QContextMenuEvent>
 #include <QEvent>
+#include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
@@ -213,8 +216,12 @@ public:
     bool m_clicked;
     //! Hover entered.
     bool m_hovered;
+    //! Context menu is active.
+    bool m_menu = false;
     //! Cursor overriden.
     bool m_cursorOverriden;
+    //! Tmp cursor shape.
+    Qt::CursorShape m_cursor;
     //! Current handle.
     Handle m_handle;
     //! Frame to observe resize event.
@@ -591,7 +598,12 @@ void CropFrame::enterEvent(QEnterEvent *e)
     if (m_d->m_started) {
         m_d->m_hovered = true;
 
-        QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+        if (!m_d->m_menu) {
+            QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+        } else {
+            m_d->m_menu = false;
+            QApplication::changeOverrideCursor(m_d->m_cursor);
+        }
 
         e->accept();
     } else {
@@ -604,10 +616,35 @@ void CropFrame::leaveEvent(QEvent *e)
     if (m_d->m_started) {
         m_d->m_hovered = false;
 
-        QApplication::restoreOverrideCursor();
+        if (!m_d->m_menu) {
+            QApplication::restoreOverrideCursor();
+        } else {
+            if (QApplication::overrideCursor()) {
+                m_d->m_cursor = QApplication::overrideCursor()->shape();
+                QApplication::changeOverrideCursor(Qt::ArrowCursor);
+            }
+        }
 
         e->accept();
     } else {
         e->ignore();
     }
+}
+
+void CropFrame::contextMenuEvent(QContextMenuEvent *e)
+{
+    QMenu menu(this);
+    auto cropAction = new QAction(QIcon(QStringLiteral(":/img/transform-crop.png")), tr("Crop"), this);
+    connect(cropAction, &QAction::triggered, this, &CropFrame::applyEdit);
+    menu.addAction(cropAction);
+
+    m_d->m_menu = true;
+
+    auto action = menu.exec(e->globalPos());
+
+    if (action) {
+        QApplication::restoreOverrideCursor();
+    }
+
+    e->accept();
 }

@@ -132,6 +132,7 @@ void View::startCrop()
 {
     if (!m_d->m_crop) {
         m_d->m_crop = new CropFrame(m_d->m_currentFrame);
+        connect(m_d->m_crop, &CropFrame::applyEdit, this, &View::applyEdit);
         m_d->m_crop->setGeometry(QRect(0, 0, m_d->m_currentFrame->width(), m_d->m_currentFrame->height()));
         m_d->m_crop->show();
         m_d->m_crop->raise();

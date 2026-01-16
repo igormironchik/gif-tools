@@ -23,6 +23,10 @@ class CropFrame final : public QWidget
 {
     Q_OBJECT
 
+signals:
+    //! Apply editing.
+    void applyEdit();
+
 public:
     CropFrame(Frame *parent = nullptr);
     ~CropFrame() noexcept override;
@@ -47,6 +51,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *e) override;
     void enterEvent(QEnterEvent *e) override;
     void leaveEvent(QEvent *e) override;
+    void contextMenuEvent(QContextMenuEvent *e) override;
 
 private:
     Q_DISABLE_COPY(CropFrame)

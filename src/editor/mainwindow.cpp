@@ -386,6 +386,7 @@ MainWindow::MainWindow()
     connect(m_d->m_applyEdit, &QAction::triggered, this, &MainWindow::applyEdit);
     connect(m_d->m_cancelEdit, &QAction::triggered, this, &MainWindow::cancelEdit);
     connect(m_d->m_playTimer, &QTimer::timeout, this, &MainWindow::showNextFrame);
+    connect(m_d->m_view, &View::applyEdit, this, &MainWindow::applyEdit);
 
     auto edit = menuBar()->addMenu(tr("&Edit"));
     edit->addAction(m_d->m_crop);
