@@ -17,10 +17,6 @@
 #ifdef Q_OS_WINDOWS
 // Windows include.
 #include <Windows.h>
-
-// Qt include.
-#include <QMutex>
-#include <QMutexLocker>
 #endif // Q_OS_WINDOWS
 
 //
@@ -46,11 +42,6 @@ struct EventMonitorPrivate {
     void handleRecordEvent(XRecordInterceptData *data);
     bool filterWheelEvent(int detail);
 #endif
-
-#ifdef Q_OS_WINDOWS
-    QMutex m_mutex;
-    bool m_quitLoop = false;
-#endif // Q_OS_WINDOWS
 }; // struct EventMonitorPrivate
 
 #ifdef Q_OS_LINUX
@@ -110,9 +101,9 @@ bool EventMonitorPrivate::filterWheelEvent(int detail)
 
 #define WM_QUIT_LOOP (WM_USER + 1)
 
-HHOOK hHook = NULL;
+HHOOK s_hKeyHook = NULL;
 EventMonitor *s_eventMonitor = nullptr;
-HHOOK hMouseHook = NULL;
+HHOOK s_hMouseHook = NULL;
 DWORD s_threadId = 0;
 
 LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
@@ -136,42 +127,36 @@ LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
         }
     }
 
-    return CallNextHookEx(hMouseHook, nCode, wParam, lParam);
+    return CallNextHookEx(s_hMouseHook, nCode, wParam, lParam);
 }
 
-LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
+template<class Func>
+void handleKey(LPARAM lParam, Func f)
+{
+    KBDLLHOOKSTRUCT* kbStruct = (KBDLLHOOKSTRUCT*)lParam;
+    if (s_eventMonitor) {
+        LONG lKeyParam = kbStruct->scanCode << 16;
+
+        if (kbStruct->flags & LLKHF_EXTENDED) {
+            lKeyParam |= (1 << 24);
+        }
+
+        wchar_t keyName[64];
+        if (GetKeyNameTextW(lKeyParam, keyName, 64) > 0) {
+            f(QString::fromWCharArray(&keyName[0]));
+        }
+    }
+}
+
+LRESULT CALLBACK KeyboardHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
     if (nCode == HC_ACTION) {
         switch (wParam) {
         case WM_KEYDOWN: {
-            KBDLLHOOKSTRUCT* kbStruct = (KBDLLHOOKSTRUCT*)lParam;
-            if (s_eventMonitor) {
-                LONG lKeyParam = kbStruct->scanCode << 16;
-
-                if (kbStruct->flags & LLKHF_EXTENDED) {
-                    lKeyParam |= (1 << 24);
-                }
-
-                wchar_t keyName[64];
-                if (GetKeyNameTextW(lKeyParam, keyName, 64) > 0) {
-                    emit s_eventMonitor->keyPressed(QString::fromWCharArray(&keyName[0]));
-                }
-            }
+            handleKey(lParam, [](const QString &keyName){ emit s_eventMonitor->keyPressed(keyName); });
         } break;
 
         case WM_KEYUP: {
-            KBDLLHOOKSTRUCT* kbStruct = (KBDLLHOOKSTRUCT*)lParam;
-            if (s_eventMonitor) {
-                LONG lKeyParam = kbStruct->scanCode << 16;
-
-                if (kbStruct->flags & LLKHF_EXTENDED) {
-                    lKeyParam |= (1 << 24);
-                }
-
-                wchar_t keyName[64];
-                if (GetKeyNameTextW(lKeyParam, keyName, 64) > 0) {
-                    emit s_eventMonitor->keyReleased(QString::fromWCharArray(&keyName[0]));
-                }
-            }
+            handleKey(lParam, [](const QString &keyName){ emit s_eventMonitor->keyReleased(keyName); });
         } break;
 
         default: {
@@ -180,7 +165,7 @@ LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
         }
     }
 
-    return CallNextHookEx(hHook, nCode, wParam, lParam);
+    return CallNextHookEx(s_hKeyHook, nCode, wParam, lParam);
 }
 
 #endif // Q_OS_WINDOWS
@@ -212,8 +197,6 @@ void EventMonitor::stopListening()
 #endif // Q_OS_LINUX
 
 #ifdef Q_OS_WINDOWS
-    QMutexLocker lock(&m_d->m_mutex);
-    m_d->m_quitLoop = true;
     PostThreadMessage(s_threadId, WM_QUIT_LOOP, 0, 0);
 #endif // Q_OS_WINDOWS
 }
@@ -256,20 +239,37 @@ void EventMonitor::run()
 #endif // Q_OS_LINUX
 
 #ifdef Q_OS_WINDOWS
+    struct AutoReleaseHook {
+        AutoReleaseHook(HHOOK hook)
+            : m_hook(hook)
+        {
+        }
+
+        ~AutoReleaseHook()
+        {
+            if (m_hook) {
+                UnhookWindowsHookEx(m_hook);
+            }
+        }
+
+    private:
+        HHOOK m_hook;
+    };
+
     s_eventMonitor = this;
     s_threadId = GetCurrentThreadId();
     HINSTANCE hInstance = GetModuleHandle(NULL);
-    hHook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardProc, hInstance, 0);
+    s_hKeyHook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardHookProc, hInstance, 0);
+    AutoReleaseHook keyHookReleaser(s_hKeyHook);
 
-    if (!hHook) {
+    if (!s_hKeyHook) {
         return;
     }
 
-    hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, MouseHookProc, hInstance, 0);
+    s_hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, MouseHookProc, hInstance, 0);
+    AutoReleaseHook mouseHookReleaser(s_hMouseHook);
 
-    if (!hMouseHook) {
-        UnhookWindowsHookEx(hHook);
-
+    if (!s_hMouseHook) {
         return;
     }
 
@@ -278,14 +278,9 @@ void EventMonitor::run()
         TranslateMessage(&msg);
         DispatchMessage(&msg);
 
-        QMutexLocker lock(&m_d->m_mutex);
-
-        if (m_d->m_quitLoop || msg.message == WM_QUIT_LOOP) {
+        if (msg.message == WM_QUIT_LOOP) {
             break;
         }
     }
-
-    UnhookWindowsHookEx(hHook);
-    UnhookWindowsHookEx(hMouseHook);
 #endif // Q_OS_WINDOWS
 }

@@ -292,10 +292,10 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
 
     connect(m_title->closeButton(), &CloseButton::clicked, qApp, &QApplication::quit);
     connect(m_timer, &QTimer::timeout, this, &MainWindow::onTimer);
-    connect(eventMonitor, &EventMonitor::buttonPress, this, &MainWindow::onMousePressed);
-    connect(eventMonitor, &EventMonitor::buttonRelease, this, &MainWindow::onMouseReleased);
-    connect(eventMonitor, &EventMonitor::keyPressed, this, &MainWindow::onKeyPressed);
-    connect(eventMonitor, &EventMonitor::keyReleased, this, &MainWindow::onKeyReleased);
+    connect(eventMonitor, &EventMonitor::buttonPress, this, &MainWindow::onMousePressed, Qt::QueuedConnection);
+    connect(eventMonitor, &EventMonitor::buttonRelease, this, &MainWindow::onMouseReleased, Qt::QueuedConnection);
+    connect(eventMonitor, &EventMonitor::keyPressed, this, &MainWindow::onKeyPressed, Qt::QueuedConnection);
+    connect(eventMonitor, &EventMonitor::keyReleased, this, &MainWindow::onKeyReleased, Qt::QueuedConnection);
     connect(m_title, &TitleWidget::resizeRequested, this, &MainWindow::onResizeRequested);
     connect(m_title->recordButton(), &QToolButton::clicked, this, &MainWindow::onRecord);
     connect(m_title->settingsButton(), &QToolButton::clicked, this, &MainWindow::onSettings);
