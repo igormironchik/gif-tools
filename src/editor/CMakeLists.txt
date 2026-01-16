@@ -27,7 +27,9 @@ set(SRC main.cpp
 	frameontape.hpp
 	mainwindow.hpp
 	tape.hpp
-    view.hpp)
+    view.hpp
+    rectangle.hpp
+    rectangle.cpp)
 
 qt6_add_resources(SRC resources.qrc)
 

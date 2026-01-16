@@ -6,20 +6,15 @@
 #ifndef GIF_EDITOR_CROP_HPP_INCLUDED
 #define GIF_EDITOR_CROP_HPP_INCLUDED
 
-// Qt include.
-#include <QScopedPointer>
-#include <QWidget>
-
-class Frame;
+// GIF editor include.
+#include "rectangle.hpp"
 
 //
 // CropFrame
 //
 
-class CropFramePrivate;
-
 //! Crop frame.
-class CropFrame final : public QWidget
+class CropFrame final : public RectangleSelection
 {
     Q_OBJECT
 
@@ -34,29 +29,11 @@ public:
     //! \return Crop rectangle.
     QRect cropRect() const;
 
-public slots:
-    //! Start.
-    void start();
-    //! Stop.
-    void stop();
-
-private slots:
-    //! Frame resized.
-    void frameResized();
-
 protected:
-    void paintEvent(QPaintEvent *) override;
-    void mousePressEvent(QMouseEvent *e) override;
-    void mouseMoveEvent(QMouseEvent *e) override;
-    void mouseReleaseEvent(QMouseEvent *e) override;
-    void enterEvent(QEnterEvent *e) override;
-    void leaveEvent(QEvent *e) override;
     void contextMenuEvent(QContextMenuEvent *e) override;
 
 private:
     Q_DISABLE_COPY(CropFrame)
-
-    QScopedPointer<CropFramePrivate> m_d;
 }; // class CropFrame
 
 #endif // GIF_EDITOR_CROP_HPP_INCLUDED
