@@ -268,6 +268,7 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     , m_title(new TitleWidget(this,
                               this))
     , m_timer(new QTimer(this))
+    , m_keysTimer(new QTimer(this))
 {
     setAttribute(Qt::WA_TranslucentBackground, true);
     setWindowState(Qt::WindowFullScreen);
@@ -290,8 +291,11 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     m_title->setMinimumWidth(width);
     m_title->move(screenSize.width() / 2 - width / 2, s_handleRadius);
 
+    m_keysTimer->setSingleShot(true);
+
     connect(m_title->closeButton(), &CloseButton::clicked, qApp, &QApplication::quit);
     connect(m_timer, &QTimer::timeout, this, &MainWindow::onTimer);
+    connect(m_keysTimer, &QTimer::timeout, [this](){ this->m_key.clear(); });
     connect(eventMonitor, &EventMonitor::buttonPress, this, &MainWindow::onMousePressed, Qt::QueuedConnection);
     connect(eventMonitor, &EventMonitor::buttonRelease, this, &MainWindow::onMouseReleased, Qt::QueuedConnection);
     connect(eventMonitor, &EventMonitor::keyPressed, this, &MainWindow::onKeyPressed, Qt::QueuedConnection);
@@ -439,7 +443,8 @@ void MainWindow::onKeyPressed(const QString &key)
 
 void MainWindow::onKeyReleased(const QString &)
 {
-    QTimer::singleShot(500, [this](){ this->m_key.clear(); });
+    m_keysTimer->stop();
+    m_keysTimer->start(500);
 }
 
 void MainWindow::onResizeRequested()

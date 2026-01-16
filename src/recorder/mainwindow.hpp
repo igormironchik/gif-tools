@@ -165,6 +165,7 @@ private:
 
     TitleWidget *m_title = nullptr;
     QTimer *m_timer = nullptr;
+    QTimer *m_keysTimer = nullptr;
     int m_fps = 24;
     bool m_grabCursor = true;
     bool m_grabKeys = false;
