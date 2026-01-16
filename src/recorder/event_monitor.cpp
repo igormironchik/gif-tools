@@ -59,13 +59,15 @@ void EventMonitorPrivate::handleRecordEvent(XRecordInterceptData *data)
 
         switch (event->u.u.type) {
         case ButtonPress: {
-            if (filterWheelEvent(event->u.u.detail))
+            if (filterWheelEvent(event->u.u.detail)) {
                 emit m_q->buttonPress();
+            }
         } break;
 
         case ButtonRelease: {
-            if (filterWheelEvent(event->u.u.detail))
+            if (filterWheelEvent(event->u.u.detail)) {
                 emit m_q->buttonRelease();
+            }
         } break;
 
         case KeyPress: {
