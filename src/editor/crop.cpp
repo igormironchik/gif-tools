@@ -248,14 +248,14 @@ QPoint CropFramePrivate::boundLeftTopToAvailable(const QPoint &p) const
 
     if (p.x() < m_available.x()) {
         ret.setX(m_available.x());
-    } else if (p.x() > m_available.x() + m_available.width() - qRound(m_selected.width()) - 1) {
-        ret.setX(m_available.x() + m_available.width() - qRound(m_selected.width()) - 1);
+    } else if (p.x() > m_available.x() + m_available.width() - qRound(m_selected.width())) {
+        ret.setX(m_available.x() + m_available.width() - qRound(m_selected.width()));
     }
 
     if (p.y() < m_available.y()) {
         ret.setY(m_available.y());
-    } else if (p.y() > m_available.y() + m_available.height() - qRound(m_selected.height()) - 1) {
-        ret.setY(m_available.y() + m_available.height() - qRound(m_selected.height()) - 1);
+    } else if (p.y() > m_available.y() + m_available.height() - qRound(m_selected.height())) {
+        ret.setY(m_available.y() + m_available.height() - qRound(m_selected.height()));
     }
 
     return ret;
