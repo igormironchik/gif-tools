@@ -125,26 +125,26 @@ public:
     //! \return Y handle width.
     int yHandleWidth() const
     {
-        const int w = qRound(m_selected.width() - 1);
+        const int w = qRound(m_selected.width());
 
         return (isHandleOutside() ? w : w - 2 * c_handleSize - (w - 2 * c_handleSize) / 3);
     }
     //! \return X handle height.
     int xHandleHeight() const
     {
-        const int h = qRound(m_selected.height() - 1);
+        const int h = qRound(m_selected.height());
 
         return (isHandleOutside() ? h : h - 2 * c_handleSize - (h - 2 * c_handleSize) / 3);
     }
     //! \return Y handle x position.
     int yHandleXPos() const
     {
-        return qRound(m_selected.x() + (m_selected.width() - yHandleWidth()) / 2.0);
+        return qRound(m_selected.x() + (qRound(m_selected.width()) - yHandleWidth()) / 2.0);
     }
     //! \return X handle y position.
     int xHandleYPos() const
     {
-        return qRound(m_selected.y() + (m_selected.height() - xHandleHeight()) / 2.0);
+        return qRound(m_selected.y() + (qRound(m_selected.height()) - xHandleHeight()) / 2.0);
     }
     //! \return Top handle rect.
     QRect topHandleRect() const
@@ -504,19 +504,19 @@ void CropFrame::paintEvent(QPaintEvent *)
             break;
 
         case CropFramePrivate::Handle::Top:
-            p.drawRect(m_d->topHandleRect());
+            p.drawRect(m_d->topHandleRect().adjusted(0, 0, -1, 0));
             break;
 
         case CropFramePrivate::Handle::Bottom:
-            p.drawRect(m_d->bottomHandleRect());
+            p.drawRect(m_d->bottomHandleRect().adjusted(0, 0, -1, 0));
             break;
 
         case CropFramePrivate::Handle::Left:
-            p.drawRect(m_d->leftHandleRect());
+            p.drawRect(m_d->leftHandleRect().adjusted(0, 0, 0, -1));
             break;
 
         case CropFramePrivate::Handle::Right:
-            p.drawRect(m_d->rightHandleRect());
+            p.drawRect(m_d->rightHandleRect().adjusted(0, 0, 0, -1));
             break;
 
         default:
