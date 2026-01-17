@@ -44,7 +44,7 @@ public:
     Frame *currentFrame() const;
 
     //! \return Crop rectangle.
-    QRect cropRect() const;
+    QRect selectedRect() const;
 
 public slots:
     //! Start crop.

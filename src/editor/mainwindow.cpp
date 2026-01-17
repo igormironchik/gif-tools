@@ -675,7 +675,7 @@ void MainWindow::applyEdit()
 {
     switch (m_d->m_editMode) {
     case MainWindowPrivate::EditMode::Crop: {
-        const auto rect = m_d->m_view->cropRect();
+        const auto rect = m_d->m_view->selectedRect();
 
         if (!rect.isNull() && rect != m_d->m_view->currentFrame()->imageRect()) {
             m_d->busy();
@@ -717,6 +717,18 @@ void MainWindow::applyEdit()
             cancelEdit();
 
             m_d->ready();
+        } else {
+            cancelEdit();
+        }
+    } break;
+
+    case MainWindowPrivate::EditMode::Text: {
+        const auto rect = m_d->m_view->selectedRect();
+
+        if (!rect.isNull()) {
+            m_d->setModified(true);
+
+            cancelEdit();
         } else {
             cancelEdit();
         }

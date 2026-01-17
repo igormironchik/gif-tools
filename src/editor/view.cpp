@@ -119,7 +119,7 @@ Frame *View::currentFrame() const
     return m_d->m_currentFrame;
 }
 
-QRect View::cropRect() const
+QRect View::selectedRect() const
 {
     if (m_d->m_crop) {
         return m_d->m_crop->cropRect();
