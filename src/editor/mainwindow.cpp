@@ -121,6 +121,7 @@ public:
                           m_stack))
         , m_about(new About(parent))
         , m_crop(nullptr)
+        , m_insertText(nullptr)
         , m_playStop(nullptr)
         , m_save(nullptr)
         , m_saveAs(nullptr)
@@ -137,7 +138,8 @@ public:
     //! Edit mode.
     enum class EditMode {
         Unknow,
-        Crop
+        Crop,
+        Text
     }; // enum class EditMode
 
     //! Clear view.
@@ -173,6 +175,7 @@ public:
         m_busy->setRunning(true);
 
         m_crop->setEnabled(false);
+        m_insertText->setEnabled(false);
         m_save->setEnabled(false);
         m_saveAs->setEnabled(false);
         m_open->setEnabled(false);
@@ -190,6 +193,7 @@ public:
         m_busy->setRunning(false);
 
         m_crop->setEnabled(true);
+        m_insertText->setEnabled(true);
 
         if (!m_currentGif.isEmpty()) {
             if (m_q->isWindowModified()) {
@@ -266,6 +270,7 @@ public:
         }
 
         m_crop->setEnabled(true);
+        m_insertText->setEnabled(true);
         m_playStop->setEnabled(true);
         m_saveAs->setEnabled(true);
     }
@@ -292,6 +297,8 @@ public:
     About *m_about;
     //! Crop action.
     QAction *m_crop;
+    //! Insert text action.
+    QAction *m_insertText;
     //! Play/stop action.
     QAction *m_playStop;
     //! Save action.
@@ -363,6 +370,18 @@ MainWindow::MainWindow()
     m_d->m_crop->setChecked(false);
     m_d->m_crop->setEnabled(false);
 
+    m_d->m_insertText = new QAction(QIcon(QStringLiteral(":/img/insert-text.png")), tr("Insert text"), this);
+    m_d->m_insertText->setShortcut(tr("Ctrl+T"));
+    m_d->m_insertText->setShortcutContext(Qt::ApplicationShortcut);
+    m_d->m_insertText->setCheckable(true);
+    m_d->m_insertText->setChecked(false);
+    m_d->m_insertText->setEnabled(false);
+
+    auto actionsGroup = new QActionGroup(this);
+    actionsGroup->addAction(m_d->m_crop);
+    actionsGroup->addAction(m_d->m_insertText);
+    actionsGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+
     m_d->m_playStop = new QAction(QIcon(QStringLiteral(":/img/media-playback-start.png")), tr("Play"), this);
     m_d->m_playStop->setEnabled(false);
 
@@ -382,6 +401,7 @@ MainWindow::MainWindow()
     m_d->m_playTimer = new QTimer(this);
 
     connect(m_d->m_crop, &QAction::triggered, this, &MainWindow::crop);
+    connect(m_d->m_insertText, &QAction::triggered, this, &MainWindow::insertText);
     connect(m_d->m_playStop, &QAction::triggered, this, &MainWindow::playStop);
     connect(m_d->m_applyEdit, &QAction::triggered, this, &MainWindow::applyEdit);
     connect(m_d->m_cancelEdit, &QAction::triggered, this, &MainWindow::cancelEdit);
@@ -390,11 +410,13 @@ MainWindow::MainWindow()
 
     auto edit = menuBar()->addMenu(tr("&Edit"));
     edit->addAction(m_d->m_crop);
+    edit->addAction(m_d->m_insertText);
 
     m_d->m_editToolBar = new QToolBar(tr("Tools"), this);
     m_d->m_editToolBar->addAction(m_d->m_playStop);
     m_d->m_editToolBar->addSeparator();
     m_d->m_editToolBar->addAction(m_d->m_crop);
+    m_d->m_editToolBar->addAction(m_d->m_insertText);
 
     addToolBar(Qt::LeftToolBarArea, m_d->m_editToolBar);
 
@@ -606,6 +628,19 @@ void MainWindow::crop(bool on)
     }
 }
 
+void MainWindow::insertText(bool on)
+{
+    if (on) {
+        m_d->enableFileActions(false);
+
+        m_d->m_editMode = MainWindowPrivate::EditMode::Text;
+    } else {
+        m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
+
+        m_d->enableFileActions();
+    }
+}
+
 void MainWindow::cancelEdit()
 {
     switch (m_d->m_editMode) {
@@ -615,6 +650,16 @@ void MainWindow::cancelEdit()
         m_d->enableFileActions();
 
         m_d->m_crop->setChecked(false);
+
+        m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
+
+        QApplication::processEvents();
+    } break;
+
+    case MainWindowPrivate::EditMode::Text: {
+        m_d->enableFileActions();
+
+        m_d->m_insertText->setChecked(false);
 
         m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
 
