@@ -400,8 +400,8 @@ MainWindow::MainWindow()
 
     m_d->m_playTimer = new QTimer(this);
 
-    connect(m_d->m_crop, &QAction::triggered, this, &MainWindow::crop);
-    connect(m_d->m_insertText, &QAction::triggered, this, &MainWindow::insertText);
+    connect(m_d->m_crop, &QAction::toggled, this, &MainWindow::crop);
+    connect(m_d->m_insertText, &QAction::toggled, this, &MainWindow::insertText);
     connect(m_d->m_playStop, &QAction::triggered, this, &MainWindow::playStop);
     connect(m_d->m_applyEdit, &QAction::triggered, this, &MainWindow::applyEdit);
     connect(m_d->m_cancelEdit, &QAction::triggered, this, &MainWindow::cancelEdit);
@@ -643,32 +643,26 @@ void MainWindow::insertText(bool on)
 
 void MainWindow::cancelEdit()
 {
+    m_d->m_view->stopCrop();
+
+    m_d->enableFileActions();
+
     switch (m_d->m_editMode) {
     case MainWindowPrivate::EditMode::Crop: {
-        m_d->m_view->stopCrop();
-
-        m_d->enableFileActions();
-
         m_d->m_crop->setChecked(false);
-
-        m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
-
-        QApplication::processEvents();
     } break;
 
     case MainWindowPrivate::EditMode::Text: {
-        m_d->enableFileActions();
-
         m_d->m_insertText->setChecked(false);
-
-        m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
-
-        QApplication::processEvents();
     } break;
 
     default:
         break;
     }
+
+    m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
+
+    QApplication::processEvents();
 }
 
 void MainWindow::applyEdit()
