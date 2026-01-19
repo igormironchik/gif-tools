@@ -634,7 +634,11 @@ void MainWindow::insertText(bool on)
         m_d->enableFileActions(false);
 
         m_d->m_editMode = MainWindowPrivate::EditMode::Text;
+
+        m_d->m_view->startText();
     } else {
+        m_d->m_view->stopText();
+
         m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
 
         m_d->enableFileActions();

@@ -9,6 +9,7 @@
 #include "frame.hpp"
 #include "frameontape.hpp"
 #include "tape.hpp"
+#include "text.hpp"
 
 // Qt include.
 #include <QApplication>
@@ -57,6 +58,7 @@ public:
                                    Frame::ResizeMode::FitToSize,
                                    parent))
         , m_crop(nullptr)
+        , m_text(nullptr)
         , m_scroll(nullptr)
         , m_q(parent)
     {
@@ -68,6 +70,8 @@ public:
     Frame *m_currentFrame;
     //! Crop.
     CropFrame *m_crop;
+    //! Text.
+    TextFrame *m_text;
     //! Scroll area for tape.
     ScrollArea *m_scroll;
     //! Parent.
@@ -146,6 +150,26 @@ void View::stopCrop()
         m_d->m_crop->stop();
         m_d->m_crop->deleteLater();
         m_d->m_crop = nullptr;
+    }
+}
+
+void View::startText()
+{
+    if (!m_d->m_text) {
+        m_d->m_text = new TextFrame(m_d->m_currentFrame);
+        m_d->m_text->setGeometry(QRect(0, 0, m_d->m_currentFrame->width(), m_d->m_currentFrame->height()));
+        m_d->m_text->show();
+        m_d->m_text->raise();
+        m_d->m_text->start();
+    }
+}
+
+void View::stopText()
+{
+    if (m_d->m_text) {
+        m_d->m_text->stop();
+        m_d->m_text->deleteLater();
+        m_d->m_text = nullptr;
     }
 }
 
