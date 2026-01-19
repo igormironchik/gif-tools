@@ -20,6 +20,9 @@ class TextFrame final : public RectangleSelection
 {
     Q_OBJECT
 
+signals:
+    void switchToTextEditingMode();
+
 public:
     TextFrame(Frame *parent = nullptr);
     ~TextFrame() noexcept override;

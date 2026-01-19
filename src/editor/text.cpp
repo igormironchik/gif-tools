@@ -63,6 +63,8 @@ void TextFrame::contextMenuEvent(QContextMenuEvent *e)
 
         if (action == textAction) {
             startTextEditing();
+
+            emit switchToTextEditingMode();
         }
     }
 
