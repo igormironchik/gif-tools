@@ -10,6 +10,7 @@
 #include "frame.hpp"
 #include "frameontape.hpp"
 #include "tape.hpp"
+#include "text.hpp"
 #include "view.hpp"
 
 // Qt include.
@@ -129,7 +130,14 @@ public:
         , m_applyEdit(nullptr)
         , m_cancelEdit(nullptr)
         , m_quit(nullptr)
+        , m_boldText(nullptr)
+        , m_italicText(nullptr)
+        , m_fontLess(nullptr)
+        , m_fontMore(nullptr)
+        , m_textColor(nullptr)
+        , m_clearFormat(nullptr)
         , m_editToolBar(nullptr)
+        , m_textToolBar(nullptr)
         , m_q(parent)
     {
         m_busy->setRadius(75);
@@ -313,8 +321,22 @@ public:
     QAction *m_cancelEdit;
     //! Quit action.
     QAction *m_quit;
+    //! Bold text action.
+    QAction *m_boldText;
+    //! Italic text.
+    QAction *m_italicText;
+    //! Font less.
+    QAction *m_fontLess;
+    //! Font more.
+    QAction *m_fontMore;
+    //! Text color.
+    QAction *m_textColor;
+    //! Clear text format.
+    QAction *m_clearFormat;
     //! Edit toolbar.
     QToolBar *m_editToolBar;
+    //! Text toolbar.
+    QToolBar *m_textToolBar;
     //! Play timer.
     QTimer *m_playTimer;
     //! Parent.
@@ -421,6 +443,26 @@ MainWindow::MainWindow()
     addToolBar(Qt::LeftToolBarArea, m_d->m_editToolBar);
 
     m_d->m_editToolBar->hide();
+
+    m_d->m_textToolBar = new QToolBar(tr("Text"), this);
+
+    m_d->m_boldText = new QAction(QIcon(QStringLiteral(":/img/format-text-bold.png")), tr("Bold text"), this);
+    m_d->m_italicText = new QAction(QIcon(QStringLiteral(":/img/format-text-italic.png")), tr("Italic text"), this);
+    m_d->m_fontLess = new QAction(QIcon(QStringLiteral(":/img/format-font-size-less.png")), tr("Less font size"), this);
+    m_d->m_fontMore = new QAction(QIcon(QStringLiteral(":/img/format-font-size-more.png")), tr("More font size"), this);
+    m_d->m_textColor = new QAction(QIcon(QStringLiteral(":/img/format-text-color.png")), tr("Text color"), this);
+    m_d->m_clearFormat = new QAction(QIcon(QStringLiteral(":/img/edit-clear.png")), tr("Clear format"), this);
+
+    m_d->m_textToolBar->addAction(m_d->m_boldText);
+    m_d->m_textToolBar->addAction(m_d->m_italicText);
+    m_d->m_textToolBar->addAction(m_d->m_fontMore);
+    m_d->m_textToolBar->addAction(m_d->m_fontLess);
+    m_d->m_textToolBar->addAction(m_d->m_textColor);
+    m_d->m_textToolBar->addAction(m_d->m_clearFormat);
+
+    addToolBar(Qt::LeftToolBarArea, m_d->m_textToolBar);
+
+    m_d->m_textToolBar->hide();
 
     auto help = menuBar()->addMenu(tr("&Help"));
     help->addAction(QIcon(QStringLiteral(":/icon/icon_22x22.png")), tr("About"), this, &MainWindow::about);
@@ -636,6 +678,21 @@ void MainWindow::insertText(bool on)
         m_d->m_editMode = MainWindowPrivate::EditMode::Text;
 
         m_d->m_view->startText();
+
+        connect(m_d->m_view->textFrame(),
+                &TextFrame::switchToTextEditingMode,
+                this,
+                &MainWindow::onSwitchToTextEditMode);
+        connect(m_d->m_view->textFrame(),
+                &TextFrame::switchToTextSelectionRectMode,
+                this,
+                &MainWindow::onSwitchToTextSelectionRectMode);
+        connect(m_d->m_boldText, &QAction::triggered, m_d->m_view->textFrame(), &TextFrame::boldText);
+        connect(m_d->m_italicText, &QAction::triggered, m_d->m_view->textFrame(), &TextFrame::italicText);
+        connect(m_d->m_fontLess, &QAction::triggered, m_d->m_view->textFrame(), &TextFrame::fontLess);
+        connect(m_d->m_fontMore, &QAction::triggered, m_d->m_view->textFrame(), &TextFrame::fontMore);
+        connect(m_d->m_textColor, &QAction::triggered, m_d->m_view->textFrame(), &TextFrame::textColor);
+        connect(m_d->m_clearFormat, &QAction::triggered, m_d->m_view->textFrame(), &TextFrame::clearFormat);
     } else {
         m_d->m_view->stopText();
 
@@ -648,6 +705,7 @@ void MainWindow::insertText(bool on)
 void MainWindow::cancelEdit()
 {
     m_d->m_view->stopCrop();
+    m_d->m_view->stopText();
 
     m_d->enableFileActions();
 
@@ -1062,4 +1120,14 @@ void MainWindow::showNextFrame()
         m_d->m_view->tape()->setCurrentFrame(next);
         m_d->m_view->scrollTo(next);
     }
+}
+
+void MainWindow::onSwitchToTextEditMode()
+{
+    m_d->m_textToolBar->show();
+}
+
+void MainWindow::onSwitchToTextSelectionRectMode()
+{
+    m_d->m_textToolBar->hide();
 }

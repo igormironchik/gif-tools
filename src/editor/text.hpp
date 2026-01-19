@@ -22,6 +22,7 @@ class TextFrame final : public RectangleSelection
 
 signals:
     void switchToTextEditingMode();
+    void switchToTextSelectionRectMode();
 
 public:
     TextFrame(Frame *parent = nullptr);
@@ -30,9 +31,24 @@ public:
 public slots:
     //! Switch to text typing mode.
     void startTextEditing();
+    //! Bold text.
+    void boldText();
+    //! Italic text.
+    void italicText();
+    //! Font less.
+    void fontLess();
+    //! Font more.
+    void fontMore();
+    //! Text color.
+    void textColor();
+    //! Clear format.
+    void clearFormat();
+    //! Set font size.
+    void setFontSize(int p);
 
 private slots:
     void switchToSelectMode();
+    void frameResized();
 
 protected:
     void contextMenuEvent(QContextMenuEvent *e) override;

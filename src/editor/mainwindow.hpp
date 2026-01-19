@@ -58,6 +58,10 @@ private slots:
     void playStop();
     //! Show next frame.
     void showNextFrame();
+    //! Switch to text edit mode.
+    void onSwitchToTextEditMode();
+    //! Switch to text selection rect mode.
+    void onSwitchToTextSelectionRectMode();
 
 protected:
     void resizeEvent(QResizeEvent *e) override;

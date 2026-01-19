@@ -368,7 +368,7 @@ RectangleSelection::~RectangleSelection() noexcept
 
 QRect RectangleSelection::selectionRect() const
 {
-    return m_d->selected(m_d->m_frame->imageRect()).toRect();
+    return m_d->m_selected.toRect();
 }
 
 QRect RectangleSelection::availableRect() const

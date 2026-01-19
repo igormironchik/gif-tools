@@ -166,6 +166,11 @@ void View::startText()
     }
 }
 
+TextFrame *View::textFrame() const
+{
+    return m_d->m_text;
+}
+
 void View::stopText()
 {
     if (m_d->m_text) {
