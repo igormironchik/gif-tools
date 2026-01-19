@@ -9,6 +9,8 @@
 // GIF editor include.
 #include "rectangle.hpp"
 
+class TextEdit;
+
 //
 // TextFrame
 //
@@ -22,11 +24,20 @@ public:
     TextFrame(Frame *parent = nullptr);
     ~TextFrame() noexcept override;
 
+public slots:
+    //! Switch to text typing mode.
+    void startTextEditing();
+
+private slots:
+    void switchToSelectMode();
+
 protected:
     void contextMenuEvent(QContextMenuEvent *e) override;
 
 private:
     Q_DISABLE_COPY(TextFrame)
+
+    TextEdit *m_editor = nullptr;
 }; // class TextFrame
 
 #endif // GIF_EDITOR_TEXT_HPP_INCLUDED

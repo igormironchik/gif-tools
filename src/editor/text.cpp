@@ -5,6 +5,7 @@
 
 // GIF editor include.
 #include "text.hpp"
+#include "texteditor.hpp"
 
 // Qt include.
 #include <QApplication>
@@ -24,20 +25,46 @@ TextFrame::~TextFrame() noexcept
 {
 }
 
+void TextFrame::startTextEditing()
+{
+    if (!m_editor) {
+        m_editor = new TextEdit(static_cast<QWidget *>(parent()));
+        connect(m_editor, &TextEdit::switchToSelectMode, this, &TextFrame::switchToSelectMode);
+    }
+
+    QEnterEvent e({}, {}, {});
+    enterEvent(&e);
+    enableMouse(false);
+    m_editor->setGeometry(selectionRect().translated(availableRect().topLeft()));
+    m_editor->show();
+    m_editor->raise();
+    m_editor->setFocus();
+}
+
+void TextFrame::switchToSelectMode()
+{
+    m_editor->hide();
+    QApplication::processEvents();
+    enableMouse(true);
+}
+
 void TextFrame::contextMenuEvent(QContextMenuEvent *e)
 {
-    // QMenu menu(this);
-    // auto cropAction = new QAction(QIcon(QStringLiteral(":/img/transform-crop.png")), tr("Crop"), this);
-    // connect(cropAction, &QAction::triggered, this, &CropFrame::applyEdit);
-    // menu.addAction(cropAction);
+    QMenu menu(this);
+    auto textAction = new QAction(QIcon(QStringLiteral(":/img/draw-text.png")), tr("Switch to text mode"), this);
+    menu.addAction(textAction);
 
-    // m_d->m_menu = true;
+    m_d->m_menu = true;
 
-    // auto action = menu.exec(e->globalPos());
+    auto action = menu.exec(e->globalPos());
 
-    // if (action) {
-    //     QApplication::restoreOverrideCursor();
-    // }
+    if (action) {
+        QApplication::restoreOverrideCursor();
+
+        if (action == textAction) {
+            startTextEditing();
+        }
+    }
 
     e->accept();
 }

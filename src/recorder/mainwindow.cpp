@@ -295,7 +295,9 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
 
     connect(m_title->closeButton(), &CloseButton::clicked, qApp, &QApplication::quit);
     connect(m_timer, &QTimer::timeout, this, &MainWindow::onTimer);
-    connect(m_keysTimer, &QTimer::timeout, [this](){ this->m_key.clear(); });
+    connect(m_keysTimer, &QTimer::timeout, [this]() {
+        this->m_key.clear();
+    });
     connect(eventMonitor, &EventMonitor::buttonPress, this, &MainWindow::onMousePressed, Qt::QueuedConnection);
     connect(eventMonitor, &EventMonitor::buttonRelease, this, &MainWindow::onMouseReleased, Qt::QueuedConnection);
     connect(eventMonitor, &EventMonitor::keyPressed, this, &MainWindow::onKeyPressed, Qt::QueuedConnection);
@@ -532,9 +534,8 @@ QImage qimageFromXImage(XImage *xi)
 
 std::tuple<QImage,
            QRect,
-           QPoint>
-grabMouseCursor(const QRect &r,
-                const QImage &i)
+           QPoint> grabMouseCursor(const QRect &r,
+                                   const QImage &i)
 {
     QImage cursorImage;
     QPoint cursorPos(-1, -1);

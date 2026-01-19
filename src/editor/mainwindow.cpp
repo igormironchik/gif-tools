@@ -724,9 +724,7 @@ void MainWindow::applyEdit()
         const auto rect = m_d->m_view->selectedRect();
 
         if (!rect.isNull()) {
-            m_d->setModified(true);
-
-            cancelEdit();
+            m_d->m_view->startTextEditing();
         } else {
             cancelEdit();
         }

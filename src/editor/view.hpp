@@ -55,6 +55,8 @@ public slots:
     void startText();
     //! Stop text.
     void stopText();
+    //! Enter in text typing mode.
+    void startTextEditing();
     //! Scroll to frame.
     void scrollTo(int idx);
 

@@ -31,7 +31,9 @@ set(SRC main.cpp
     rectangle.hpp
     rectangle.cpp
     text.hpp
-    text.cpp)
+    text.cpp
+    texteditor.hpp
+    texteditor.cpp)
 
 qt6_add_resources(SRC resources.qrc)
 

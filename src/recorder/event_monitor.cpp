@@ -8,9 +8,9 @@
 
 #ifdef Q_OS_LINUX
 // Xlib include.
+#include <X11/XKBlib.h>
 #include <X11/Xlib.h>
 #include <X11/Xlibint.h>
-#include <X11/XKBlib.h>
 #include <X11/extensions/record.h>
 #endif
 
@@ -108,7 +108,10 @@ EventMonitor *s_eventMonitor = nullptr;
 HHOOK s_hMouseHook = NULL;
 DWORD s_threadId = 0;
 
-LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK MouseHookProc(int nCode,
+                               WPARAM wParam,
+                               LPARAM lParam)
+{
     if (nCode >= 0) {
         switch (wParam) {
         case WM_LBUTTONDOWN:
@@ -133,9 +136,10 @@ LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
 }
 
 template<class Func>
-void handleKey(LPARAM lParam, Func f)
+void handleKey(LPARAM lParam,
+               Func f)
 {
-    KBDLLHOOKSTRUCT* kbStruct = (KBDLLHOOKSTRUCT*)lParam;
+    KBDLLHOOKSTRUCT *kbStruct = (KBDLLHOOKSTRUCT *)lParam;
     if (s_eventMonitor) {
         LONG lKeyParam = kbStruct->scanCode << 16;
 
@@ -150,15 +154,22 @@ void handleKey(LPARAM lParam, Func f)
     }
 }
 
-LRESULT CALLBACK KeyboardHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK KeyboardHookProc(int nCode,
+                                  WPARAM wParam,
+                                  LPARAM lParam)
+{
     if (nCode == HC_ACTION) {
         switch (wParam) {
         case WM_KEYDOWN: {
-            handleKey(lParam, [](const QString &keyName){ emit s_eventMonitor->keyPressed(keyName); });
+            handleKey(lParam, [](const QString &keyName) {
+                emit s_eventMonitor->keyPressed(keyName);
+            });
         } break;
 
         case WM_KEYUP: {
-            handleKey(lParam, [](const QString &keyName){ emit s_eventMonitor->keyReleased(keyName); });
+            handleKey(lParam, [](const QString &keyName) {
+                emit s_eventMonitor->keyReleased(keyName);
+            });
         } break;
 
         default: {

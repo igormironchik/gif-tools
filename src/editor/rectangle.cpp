@@ -56,44 +56,41 @@ QRect RectangleSelectionPrivate::topLeftHandleRect() const
 
 QRect RectangleSelectionPrivate::topRightHandleRect() const
 {
-    return (
-        isHandleOutside()
-            ? QRect(qRound(m_selected.x() + m_selected.width() - 1 - (m_selected.width() > 0 ? 0 : c_handleSize)),
-                    qRound(m_selected.y() - (m_selected.height() > 0 ? c_handleSize : 0)),
-                    c_handleSize,
-                    c_handleSize)
-            : QRect(qRound(m_selected.x() + m_selected.width() - (m_selected.width() > 0 ? c_handleSize : 0) - 1),
-                    qRound(m_selected.y() - (m_selected.height() > 0 ? 0 : c_handleSize)),
-                    c_handleSize,
-                    c_handleSize));
+    return (isHandleOutside()
+                ? QRect(qRound(m_selected.x() + m_selected.width() - 1 - (m_selected.width() > 0 ? 0 : c_handleSize)),
+                        qRound(m_selected.y() - (m_selected.height() > 0 ? c_handleSize : 0)),
+                        c_handleSize,
+                        c_handleSize)
+                : QRect(qRound(m_selected.x() + m_selected.width() - (m_selected.width() > 0 ? c_handleSize : 0) - 1),
+                        qRound(m_selected.y() - (m_selected.height() > 0 ? 0 : c_handleSize)),
+                        c_handleSize,
+                        c_handleSize));
 }
 
 QRect RectangleSelectionPrivate::bottomRightHandleRect() const
 {
-    return (
-        isHandleOutside()
-            ? QRect(qRound(m_selected.x() + m_selected.width() - 1 - (m_selected.width() > 0 ? 0 : c_handleSize)),
-                    qRound(m_selected.y() + m_selected.height() - (m_selected.height() > 0 ? 0 : c_handleSize)),
-                    c_handleSize,
-                    c_handleSize)
-            : QRect(qRound(m_selected.x() + m_selected.width() - (m_selected.width() > 0 ? c_handleSize : 0) - 1),
-                    qRound(m_selected.y() + m_selected.height() - (m_selected.height() > 0 ? c_handleSize : 0) - 1),
-                    c_handleSize,
-                    c_handleSize));
+    return (isHandleOutside()
+                ? QRect(qRound(m_selected.x() + m_selected.width() - 1 - (m_selected.width() > 0 ? 0 : c_handleSize)),
+                        qRound(m_selected.y() + m_selected.height() - (m_selected.height() > 0 ? 0 : c_handleSize)),
+                        c_handleSize,
+                        c_handleSize)
+                : QRect(qRound(m_selected.x() + m_selected.width() - (m_selected.width() > 0 ? c_handleSize : 0) - 1),
+                        qRound(m_selected.y() + m_selected.height() - (m_selected.height() > 0 ? c_handleSize : 0) - 1),
+                        c_handleSize,
+                        c_handleSize));
 }
 
 QRect RectangleSelectionPrivate::bottomLeftHandleRect() const
 {
-    return (
-        isHandleOutside()
-            ? QRect(qRound(m_selected.x() - (m_selected.width() > 0 ? c_handleSize : 0)),
-                    qRound(m_selected.y() + m_selected.height() - 1 - (m_selected.height() > 0 ? 0 : c_handleSize)),
-                    c_handleSize,
-                    c_handleSize)
-            : QRect(qRound(m_selected.x() - (m_selected.width() > 0 ? 0 : c_handleSize)),
-                    qRound(m_selected.y() + m_selected.height() - (m_selected.height() > 0 ? c_handleSize : 0) - 1),
-                    c_handleSize,
-                    c_handleSize));
+    return (isHandleOutside()
+                ? QRect(qRound(m_selected.x() - (m_selected.width() > 0 ? c_handleSize : 0)),
+                        qRound(m_selected.y() + m_selected.height() - 1 - (m_selected.height() > 0 ? 0 : c_handleSize)),
+                        c_handleSize,
+                        c_handleSize)
+                : QRect(qRound(m_selected.x() - (m_selected.width() > 0 ? 0 : c_handleSize)),
+                        qRound(m_selected.y() + m_selected.height() - (m_selected.height() > 0 ? c_handleSize : 0) - 1),
+                        c_handleSize,
+                        c_handleSize));
 }
 
 int RectangleSelectionPrivate::yHandleWidth() const
@@ -134,16 +131,15 @@ QRect RectangleSelectionPrivate::topHandleRect() const
 
 QRect RectangleSelectionPrivate::bottomHandleRect() const
 {
-    return (
-        isHandleOutside()
-            ? QRect(yHandleXPos(),
-                    qRound(m_selected.y() + m_selected.height() - 1 - (m_selected.height() > 0 ? 0 : c_handleSize)),
-                    yHandleWidth(),
-                    c_handleSize)
-            : QRect(yHandleXPos(),
-                    qRound(m_selected.y() + m_selected.height() - 1 - (m_selected.height() > 0 ? c_handleSize : 0)),
-                    yHandleWidth(),
-                    c_handleSize));
+    return (isHandleOutside()
+                ? QRect(yHandleXPos(),
+                        qRound(m_selected.y() + m_selected.height() - 1 - (m_selected.height() > 0 ? 0 : c_handleSize)),
+                        yHandleWidth(),
+                        c_handleSize)
+                : QRect(yHandleXPos(),
+                        qRound(m_selected.y() + m_selected.height() - 1 - (m_selected.height() > 0 ? c_handleSize : 0)),
+                        yHandleWidth(),
+                        c_handleSize));
 }
 
 QRect RectangleSelectionPrivate::leftHandleRect() const
@@ -160,16 +156,15 @@ QRect RectangleSelectionPrivate::leftHandleRect() const
 
 QRect RectangleSelectionPrivate::rightHandleRect() const
 {
-    return (
-        isHandleOutside()
-            ? QRect(qRound(m_selected.x() + m_selected.width() - 1 - (m_selected.width() > 0 ? 0 : c_handleSize)),
-                    xHandleYPos(),
-                    c_handleSize,
-                    xHandleHeight())
-            : QRect(qRound(m_selected.x() + m_selected.width() - 1 - (m_selected.width() > 0 ? c_handleSize : 0)),
-                    xHandleYPos(),
-                    c_handleSize,
-                    xHandleHeight()));
+    return (isHandleOutside()
+                ? QRect(qRound(m_selected.x() + m_selected.width() - 1 - (m_selected.width() > 0 ? 0 : c_handleSize)),
+                        xHandleYPos(),
+                        c_handleSize,
+                        xHandleHeight())
+                : QRect(qRound(m_selected.x() + m_selected.width() - 1 - (m_selected.width() > 0 ? c_handleSize : 0)),
+                        xHandleYPos(),
+                        c_handleSize,
+                        xHandleHeight()));
 }
 
 QPoint RectangleSelectionPrivate::boundToAvailable(const QPoint &p) const
@@ -376,6 +371,11 @@ QRect RectangleSelection::selectionRect() const
     return m_d->selected(m_d->m_frame->imageRect()).toRect();
 }
 
+QRect RectangleSelection::availableRect() const
+{
+    return m_d->m_available;
+}
+
 void RectangleSelection::start()
 {
     m_d->m_started = true;
@@ -389,6 +389,20 @@ void RectangleSelection::stop()
     m_d->m_started = false;
 
     m_d->restoreOverridenCursor();
+
+    update();
+}
+
+void RectangleSelection::enableMouse(bool on)
+{
+    m_d->m_mouseEnabled = on;
+
+    if (!on) {
+        m_d->restoreOverridenCursor();
+    } else if (underMouse()) {
+        QEnterEvent e({}, {}, {});
+        enterEvent(&e);
+    }
 
     update();
 }
@@ -427,67 +441,76 @@ void RectangleSelection::paintEvent(QPaintEvent *)
         p.drawPath(path);
     }
 
-    p.setBrush(Qt::lightGray);
+    if (m_d->m_mouseEnabled) {
+        p.setBrush(Qt::lightGray);
 
-    if (m_d->m_started && !m_d->m_clicked && !m_d->m_nothing && m_d->m_handle == RectangleSelectionPrivate::Handle::Unknown) {
-        p.drawRect(m_d->topLeftHandleRect());
-        p.drawRect(m_d->topRightHandleRect());
-        p.drawRect(m_d->bottomRightHandleRect());
-        p.drawRect(m_d->bottomLeftHandleRect());
-    } else if (m_d->m_started && !m_d->m_nothing && m_d->m_handle != RectangleSelectionPrivate::Handle::Unknown) {
-        switch (m_d->m_handle) {
-        case RectangleSelectionPrivate::Handle::TopLeft:
+        if (m_d->m_started
+            && !m_d->m_clicked
+            && !m_d->m_nothing
+            && m_d->m_handle == RectangleSelectionPrivate::Handle::Unknown) {
             p.drawRect(m_d->topLeftHandleRect());
-            break;
-
-        case RectangleSelectionPrivate::Handle::TopRight:
             p.drawRect(m_d->topRightHandleRect());
-            break;
-
-        case RectangleSelectionPrivate::Handle::BottomRight:
             p.drawRect(m_d->bottomRightHandleRect());
-            break;
-
-        case RectangleSelectionPrivate::Handle::BottomLeft:
             p.drawRect(m_d->bottomLeftHandleRect());
-            break;
+        } else if (m_d->m_started && !m_d->m_nothing && m_d->m_handle != RectangleSelectionPrivate::Handle::Unknown) {
+            switch (m_d->m_handle) {
+            case RectangleSelectionPrivate::Handle::TopLeft:
+                p.drawRect(m_d->topLeftHandleRect());
+                break;
 
-        case RectangleSelectionPrivate::Handle::Top:
-            p.drawRect(m_d->topHandleRect().adjusted(0, 0, -1, 0));
-            break;
+            case RectangleSelectionPrivate::Handle::TopRight:
+                p.drawRect(m_d->topRightHandleRect());
+                break;
 
-        case RectangleSelectionPrivate::Handle::Bottom:
-            p.drawRect(m_d->bottomHandleRect().adjusted(0, 0, -1, 0));
-            break;
+            case RectangleSelectionPrivate::Handle::BottomRight:
+                p.drawRect(m_d->bottomRightHandleRect());
+                break;
 
-        case RectangleSelectionPrivate::Handle::Left:
-            p.drawRect(m_d->leftHandleRect().adjusted(0, 0, 0, -1));
-            break;
+            case RectangleSelectionPrivate::Handle::BottomLeft:
+                p.drawRect(m_d->bottomLeftHandleRect());
+                break;
 
-        case RectangleSelectionPrivate::Handle::Right:
-            p.drawRect(m_d->rightHandleRect().adjusted(0, 0, 0, -1));
-            break;
+            case RectangleSelectionPrivate::Handle::Top:
+                p.drawRect(m_d->topHandleRect().adjusted(0, 0, -1, 0));
+                break;
 
-        default:
-            break;
+            case RectangleSelectionPrivate::Handle::Bottom:
+                p.drawRect(m_d->bottomHandleRect().adjusted(0, 0, -1, 0));
+                break;
+
+            case RectangleSelectionPrivate::Handle::Left:
+                p.drawRect(m_d->leftHandleRect().adjusted(0, 0, 0, -1));
+                break;
+
+            case RectangleSelectionPrivate::Handle::Right:
+                p.drawRect(m_d->rightHandleRect().adjusted(0, 0, 0, -1));
+                break;
+
+            default:
+                break;
+            }
         }
     }
 }
 
 void RectangleSelection::mousePressEvent(QMouseEvent *e)
 {
-    if (e->button() == Qt::LeftButton) {
-        m_d->m_clicked = true;
+    if (m_d->m_mouseEnabled) {
+        if (e->button() == Qt::LeftButton) {
+            m_d->m_clicked = true;
 
-        if (!m_d->m_cursorOverriden) {
-            m_d->m_selected.setTopLeft(m_d->boundToAvailable(e->pos()));
+            if (!m_d->m_cursorOverriden) {
+                m_d->m_selected.setTopLeft(m_d->boundToAvailable(e->pos()));
+            } else {
+                m_d->m_mousePos = e->pos();
+            }
+
+            update();
+
+            e->accept();
         } else {
-            m_d->m_mousePos = e->pos();
+            e->ignore();
         }
-
-        update();
-
-        e->accept();
     } else {
         e->ignore();
     }
@@ -495,26 +518,30 @@ void RectangleSelection::mousePressEvent(QMouseEvent *e)
 
 void RectangleSelection::mouseMoveEvent(QMouseEvent *e)
 {
-    if (m_d->m_clicked) {
-        if (!m_d->m_cursorOverriden) {
-            m_d->m_selected.setBottomRight(m_d->boundToAvailable(e->pos()));
+    if (m_d->m_mouseEnabled) {
+        if (m_d->m_clicked) {
+            if (!m_d->m_cursorOverriden) {
+                m_d->m_selected.setBottomRight(m_d->boundToAvailable(e->pos()));
 
-            m_d->m_nothing = false;
+                m_d->m_nothing = false;
+            } else {
+                m_d->resize(e->pos());
+            }
+
+            update();
+
+            e->accept();
+        } else if (!m_d->m_hovered) {
+            m_d->m_hovered = true;
+
+            QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+        } else if (m_d->m_hovered && !m_d->m_nothing) {
+            m_d->overrideCursor(e->pos());
+
+            update();
         } else {
-            m_d->resize(e->pos());
+            e->ignore();
         }
-
-        update();
-
-        e->accept();
-    } else if (!m_d->m_hovered) {
-        m_d->m_hovered = true;
-
-        QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
-    } else if (m_d->m_hovered && !m_d->m_nothing) {
-        m_d->overrideCursor(e->pos());
-
-        update();
     } else {
         e->ignore();
     }
@@ -522,14 +549,18 @@ void RectangleSelection::mouseMoveEvent(QMouseEvent *e)
 
 void RectangleSelection::mouseReleaseEvent(QMouseEvent *e)
 {
-    m_d->m_clicked = false;
+    if (m_d->m_mouseEnabled) {
+        m_d->m_clicked = false;
 
-    if (e->button() == Qt::LeftButton) {
-        m_d->m_selected = m_d->m_selected.normalized();
+        if (e->button() == Qt::LeftButton) {
+            m_d->m_selected = m_d->m_selected.normalized();
 
-        update();
+            update();
 
-        e->accept();
+            e->accept();
+        } else {
+            e->ignore();
+        }
     } else {
         e->ignore();
     }
@@ -537,17 +568,21 @@ void RectangleSelection::mouseReleaseEvent(QMouseEvent *e)
 
 void RectangleSelection::enterEvent(QEnterEvent *e)
 {
-    if (m_d->m_started) {
-        m_d->m_hovered = true;
+    if (m_d->m_mouseEnabled) {
+        if (m_d->m_started) {
+            m_d->m_hovered = true;
 
-        if (!m_d->m_menu) {
-            QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+            if (!m_d->m_menu) {
+                QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+            } else {
+                m_d->m_menu = false;
+                QApplication::changeOverrideCursor(m_d->m_cursor);
+            }
+
+            e->accept();
         } else {
-            m_d->m_menu = false;
-            QApplication::changeOverrideCursor(m_d->m_cursor);
+            e->ignore();
         }
-
-        e->accept();
     } else {
         e->ignore();
     }
@@ -555,19 +590,23 @@ void RectangleSelection::enterEvent(QEnterEvent *e)
 
 void RectangleSelection::leaveEvent(QEvent *e)
 {
-    if (m_d->m_started) {
-        m_d->m_hovered = false;
+    if (m_d->m_mouseEnabled) {
+        if (m_d->m_started) {
+            m_d->m_hovered = false;
 
-        if (!m_d->m_menu) {
-            QApplication::restoreOverrideCursor();
-        } else {
-            if (QApplication::overrideCursor()) {
-                m_d->m_cursor = QApplication::overrideCursor()->shape();
-                QApplication::changeOverrideCursor(Qt::ArrowCursor);
+            if (!m_d->m_menu) {
+                QApplication::restoreOverrideCursor();
+            } else {
+                if (QApplication::overrideCursor()) {
+                    m_d->m_cursor = QApplication::overrideCursor()->shape();
+                    QApplication::changeOverrideCursor(Qt::ArrowCursor);
+                }
             }
-        }
 
-        e->accept();
+            e->accept();
+        } else {
+            e->ignore();
+        }
     } else {
         e->ignore();
     }

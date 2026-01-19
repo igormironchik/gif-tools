@@ -97,6 +97,8 @@ public:
     bool m_menu = false;
     //! Cursor overriden.
     bool m_cursorOverriden;
+    //! Is mouse handling enabled?
+    bool m_mouseEnabled = true;
     //! Tmp cursor shape.
     Qt::CursorShape m_cursor;
     //! Current handle.
@@ -118,12 +120,16 @@ public:
 
     //! \return Selection rectangle.
     QRect selectionRect() const;
+    //! \return Available rectangle.
+    QRect availableRect() const;
 
 public slots:
     //! Start.
     void start();
     //! Stop.
     void stop();
+    //! Turn on/off mouse handling.
+    void enableMouse(bool on = true);
 
 private slots:
     //! Frame resized.

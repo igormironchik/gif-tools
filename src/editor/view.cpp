@@ -127,6 +127,8 @@ QRect View::selectedRect() const
 {
     if (m_d->m_crop) {
         return m_d->m_crop->cropRect();
+    } else if (m_d->m_text) {
+        return m_d->m_text->selectionRect();
     } else {
         return QRect();
     }
@@ -173,6 +175,13 @@ void View::stopText()
     }
 }
 
+void View::startTextEditing()
+{
+    if (m_d->m_text) {
+        m_d->m_text->startTextEditing();
+    }
+}
+
 void View::frameSelected(int idx)
 {
     if (idx >= 1 && idx <= m_d->m_tape->count()) {
@@ -185,7 +194,6 @@ void View::frameSelected(int idx)
 
 void View::scrollTo(int idx)
 {
-    const auto x = m_d->m_scroll->horizontalScrollBar()->sliderPosition();
     const auto viewWidth = m_d->m_scroll->viewport()->width();
     const auto frameX = m_d->m_tape->xOfFrame(idx);
     const auto frameWidth = m_d->m_tape->currentFrame()->width();
