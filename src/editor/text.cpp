@@ -58,9 +58,11 @@ void TextFrame::startTextEditing()
 
 void TextFrame::clear()
 {
-    m_editor->hide();
-    m_editor->deleteLater();
-    m_editor = nullptr;
+    if (m_editor) {
+        m_editor->hide();
+        m_editor->deleteLater();
+        m_editor = nullptr;
+    }
 }
 
 void TextFrame::switchToSelectMode()
