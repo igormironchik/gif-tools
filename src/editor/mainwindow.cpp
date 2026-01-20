@@ -14,6 +14,7 @@
 #include "text.hpp"
 #include "view.hpp"
 
+#include <QTextBlock>
 // Qt include.
 #include <QAction>
 #include <QActionGroup>
@@ -24,11 +25,13 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QMetaMethod>
+#include <QPainter>
 #include <QResizeEvent>
 #include <QRunnable>
 #include <QStackedWidget>
 #include <QStandardPaths>
 #include <QThreadPool>
+#include <QTextDocument>
 #include <QTimer>
 #include <QToolBar>
 #include <QVector>
@@ -103,6 +106,62 @@ private:
     BusyIndicator *m_receiver;
 }; // class CropGIF
 
+class ApplyText final : public QRunnable
+{
+public:
+    ApplyText(BusyIndicator *receiver,
+              QGifLib::Gif *container,
+              const QRect &rect,
+              const TextFrame::Documents &docs,
+              const QVector<qsizetype> &unchecked)
+        : m_container(container)
+        , m_rect(rect)
+        , m_receiver(receiver)
+        , m_docs(docs)
+        , m_unchecked(unchecked)
+    {
+        setAutoDelete(false);
+    }
+
+    void run() override
+    {
+        const auto index = m_receiver->metaObject()->indexOfProperty("percent");
+        auto property = m_receiver->metaObject()->property(index);
+
+        int current = 0;
+        const auto count = m_docs.size();
+        const auto fileNames = m_container->fileNames();
+
+        property.write(m_receiver, 0);
+
+        for (const auto idx : m_docs.keys()) {
+            if (!m_unchecked.contains(idx + 1)) {
+                QImage img(fileNames.at(idx));
+                QPainter p(&img);
+                QTextDocument *doc = m_docs[idx]->clone();
+                doc->setPageSize(m_rect.size().toSizeF());
+                doc->setTextWidth(m_rect.width());
+                p.translate(m_rect.topLeft());
+                doc->drawContents(&p);
+                doc->deleteLater();
+                img.save(fileNames.at(idx));
+            }
+
+            ++current;
+            property.write(m_receiver, qRound(((double)current / (double)count) * 100.0));
+        }
+
+        property.write(m_receiver, 100);
+    }
+
+private:
+    QGifLib::Gif *m_container;
+    QRect m_rect;
+    BusyIndicator *m_receiver;
+    const TextFrame::Documents &m_docs;
+    const QVector<qsizetype> &m_unchecked;
+}; // class ApplyText
+
 } /* namespace anonymous */
 
 //
@@ -137,6 +196,7 @@ public:
         , m_fontMore(nullptr)
         , m_textColor(nullptr)
         , m_clearFormat(nullptr)
+        , m_finishText(nullptr)
         , m_editToolBar(nullptr)
         , m_textToolBar(nullptr)
         , m_q(parent)
@@ -334,6 +394,8 @@ public:
     QAction *m_textColor;
     //! Clear text format.
     QAction *m_clearFormat;
+    //! Show previous.
+    QAction *m_finishText;
     //! Edit toolbar.
     QToolBar *m_editToolBar;
     //! Text toolbar.
@@ -453,6 +515,7 @@ MainWindow::MainWindow()
     m_d->m_fontMore = new QAction(QIcon(QStringLiteral(":/img/format-font-size-more.png")), tr("More font size"), this);
     m_d->m_textColor = new QAction(QIcon(QStringLiteral(":/img/format-text-color.png")), tr("Text color"), this);
     m_d->m_clearFormat = new QAction(QIcon(QStringLiteral(":/img/edit-clear.png")), tr("Clear format"), this);
+    m_d->m_finishText = new QAction(QIcon(QStringLiteral(":/img/dialog-ok-apply.png")), tr("Finish text"), this);
 
     m_d->m_textToolBar->addAction(m_d->m_boldText);
     m_d->m_textToolBar->addAction(m_d->m_italicText);
@@ -460,6 +523,7 @@ MainWindow::MainWindow()
     m_d->m_textToolBar->addAction(m_d->m_fontLess);
     m_d->m_textToolBar->addAction(m_d->m_textColor);
     m_d->m_textToolBar->addAction(m_d->m_clearFormat);
+    m_d->m_textToolBar->addAction(m_d->m_finishText);
 
     addToolBar(Qt::LeftToolBarArea, m_d->m_textToolBar);
 
@@ -696,6 +760,7 @@ void MainWindow::insertText(bool on)
         connect(m_d->m_fontMore, &QAction::triggered, m_d->m_view->textFrame(), &TextFrame::fontMore);
         connect(m_d->m_textColor, &QAction::triggered, m_d->m_view->textFrame(), &TextFrame::textColor);
         connect(m_d->m_clearFormat, &QAction::triggered, m_d->m_view->textFrame(), &TextFrame::clearFormat);
+        connect(m_d->m_finishText, &QAction::triggered, this, &MainWindow::applyText);
         connect(m_d->m_view->textFrame(), &TextFrame::started, this, &MainWindow::onRectSelectionStarted);
     } else {
         m_d->m_view->stopText();
@@ -1148,5 +1213,50 @@ void MainWindow::onRectSelectionStarted()
         m_d->m_insertText->setEnabled(false);
     } else {
         m_d->m_crop->setEnabled(false);
+    }
+}
+
+void MainWindow::applyText()
+{
+    const auto rect = m_d->m_view->selectedRect();
+
+    if (!rect.isNull()) {
+        m_d->busy();
+
+        QApplication::processEvents();
+
+        m_d->m_busy->setShowPercent(true);
+
+        QVector<qsizetype> unchecked;
+
+        for (qsizetype i = 1; i <= m_d->m_view->tape()->count(); ++i) {
+            if (!m_d->m_view->tape()->frame(i)->isChecked()) {
+                unchecked.append(i);
+            }
+        }
+
+        ApplyText apply(m_d->m_busy, &m_d->m_frames, rect, m_d->m_view->textFrame()->text(), unchecked);
+        QThreadPool::globalInstance()->start(&apply);
+
+        m_d->waitThreadPool();
+
+        m_d->m_busy->setShowPercent(false);
+
+        const auto current = m_d->m_view->tape()->currentFrame()->counter();
+        m_d->m_view->tape()->clear();
+
+        QApplication::processEvents();
+
+        m_d->initTape();
+
+        m_d->m_view->tape()->setCurrentFrame(current);
+
+        m_d->setModified(true);
+
+        cancelEdit();
+
+        m_d->ready();
+    } else {
+        cancelEdit();
     }
 }

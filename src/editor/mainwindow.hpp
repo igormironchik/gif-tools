@@ -64,6 +64,8 @@ private slots:
     void onSwitchToTextSelectionRectMode();
     //! Rectangle selection is started.
     void onRectSelectionStarted();
+    //! Apply text.
+    void applyText();
 
 protected:
     void resizeEvent(QResizeEvent *e) override;

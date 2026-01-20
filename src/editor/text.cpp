@@ -23,15 +23,30 @@ TextFrame::TextFrame(Frame *parent)
     : RectangleSelection(parent)
 {
     connect(parent, &Frame::resized, this, &TextFrame::frameResized);
+    connect(parent, &Frame::imagePosChanged, this, &TextFrame::imagePosChanged);
 }
 
 TextFrame::~TextFrame() noexcept
 {
 }
 
+const QMap<qsizetype, QTextDocument*> &TextFrame::text() const
+{
+    return m_map;
+}
+
 void TextFrame::frameResized()
 {
     m_editor->setGeometry(selectionRectScaled());
+}
+
+void TextFrame::imagePosChanged(qsizetype idx)
+{
+    if (!m_map.contains(idx)) {
+        m_map.insert(idx, m_editor->document()->clone(this));
+    }
+
+    m_editor->setDocument(m_map[idx]);
 }
 
 void TextFrame::startTextEditing()
@@ -53,6 +68,12 @@ void TextFrame::startTextEditing()
     m_editor->raise();
     m_editor->setFocus();
 
+    if (!m_map.contains(m_d->m_frame->image().m_pos)) {
+        m_map.insert(m_d->m_frame->image().m_pos, m_editor->document()->clone(this));
+    }
+
+    m_editor->setDocument(m_map[m_d->m_frame->image().m_pos]);
+
     emit switchToTextEditingMode();
 }
 
@@ -62,6 +83,7 @@ void TextFrame::clear()
         m_editor->hide();
         m_editor->deleteLater();
         m_editor = nullptr;
+        m_map.clear();
     }
 }
 

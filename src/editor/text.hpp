@@ -9,6 +9,10 @@
 // GIF editor include.
 #include "rectangle.hpp"
 
+QT_BEGIN_NAMESPACE
+class QTextDocument;
+QT_END_NAMESPACE
+
 class TextEdit;
 
 //
@@ -27,6 +31,10 @@ signals:
 public:
     TextFrame(Frame *parent = nullptr);
     ~TextFrame() noexcept override;
+
+    using Documents = QMap<qsizetype, QTextDocument*>;
+
+    const Documents &text() const;
 
 public slots:
     //! Switch to text typing mode.
@@ -51,6 +59,7 @@ public slots:
 private slots:
     void switchToSelectMode();
     void frameResized();
+    void imagePosChanged(qsizetype idx);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *e) override;
@@ -59,6 +68,7 @@ private:
     Q_DISABLE_COPY(TextFrame)
 
     TextEdit *m_editor = nullptr;
+    Documents m_map;
 }; // class TextFrame
 
 #endif // GIF_EDITOR_TEXT_HPP_INCLUDED

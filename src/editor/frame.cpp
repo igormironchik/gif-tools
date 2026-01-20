@@ -177,6 +177,8 @@ void Frame::setImagePos(qsizetype pos)
     m_d->m_desiredHeight = -1;
     m_d->m_width = 0;
     m_d->m_height = 0;
+
+    emit imagePosChanged(pos);
 }
 
 void Frame::clearImage()

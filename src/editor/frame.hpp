@@ -40,6 +40,8 @@ signals:
     void clicked();
     //! Resized.
     void resized();
+    //! Image position was changed.
+    void imagePosChanged(qsizetype idx);
 
 public:
     //! Resize mode.
