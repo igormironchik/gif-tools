@@ -171,6 +171,11 @@ TextFrame *View::textFrame() const
     return m_d->m_text;
 }
 
+CropFrame *View::cropFrame() const
+{
+    return m_d->m_crop;
+}
+
 void View::stopText()
 {
     if (m_d->m_text) {

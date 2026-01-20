@@ -31,7 +31,7 @@ TextFrame::~TextFrame() noexcept
 
 void TextFrame::frameResized()
 {
-    m_editor->setGeometry(selectionRect());
+    m_editor->setGeometry(selectionRectScaled());
 }
 
 void TextFrame::startTextEditing()

@@ -18,6 +18,7 @@
 
 class Tape;
 class TextFrame;
+class CropFrame;
 
 //
 // View
@@ -49,6 +50,8 @@ public:
 
     //! \return Text frame widget.
     TextFrame *textFrame() const;
+    //! \return Crop frame widget.
+    CropFrame *cropFrame() const;
 
 public slots:
     //! Start crop.

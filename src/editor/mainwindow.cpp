@@ -7,6 +7,7 @@
 #include "mainwindow.hpp"
 #include "about.hpp"
 #include "busyindicator.hpp"
+#include "crop.hpp"
 #include "frame.hpp"
 #include "frameontape.hpp"
 #include "tape.hpp"
@@ -661,6 +662,8 @@ void MainWindow::crop(bool on)
         m_d->m_editMode = MainWindowPrivate::EditMode::Crop;
 
         m_d->m_view->startCrop();
+
+        connect(m_d->m_view->cropFrame(), &CropFrame::started, this, &MainWindow::onRectSelectionStarted);
     } else {
         m_d->m_view->stopCrop();
 
@@ -693,6 +696,7 @@ void MainWindow::insertText(bool on)
         connect(m_d->m_fontMore, &QAction::triggered, m_d->m_view->textFrame(), &TextFrame::fontMore);
         connect(m_d->m_textColor, &QAction::triggered, m_d->m_view->textFrame(), &TextFrame::textColor);
         connect(m_d->m_clearFormat, &QAction::triggered, m_d->m_view->textFrame(), &TextFrame::clearFormat);
+        connect(m_d->m_view->textFrame(), &TextFrame::started, this, &MainWindow::onRectSelectionStarted);
     } else {
         m_d->m_view->stopText();
 
@@ -706,6 +710,8 @@ void MainWindow::cancelEdit()
 {
     m_d->m_view->stopCrop();
     m_d->m_view->stopText();
+    m_d->m_crop->setEnabled(true);
+    m_d->m_insertText->setEnabled(true);
 
     m_d->enableFileActions();
 
@@ -730,6 +736,9 @@ void MainWindow::cancelEdit()
 
 void MainWindow::applyEdit()
 {
+    m_d->m_crop->setEnabled(true);
+    m_d->m_insertText->setEnabled(true);
+
     switch (m_d->m_editMode) {
     case MainWindowPrivate::EditMode::Crop: {
         const auto rect = m_d->m_view->selectedRect();
@@ -1131,4 +1140,13 @@ void MainWindow::onSwitchToTextEditMode()
 void MainWindow::onSwitchToTextSelectionRectMode()
 {
     m_d->m_textToolBar->hide();
+}
+
+void MainWindow::onRectSelectionStarted()
+{
+    if (m_d->m_crop->isChecked()) {
+        m_d->m_insertText->setEnabled(false);
+    } else {
+        m_d->m_crop->setEnabled(false);
+    }
 }

@@ -366,14 +366,24 @@ RectangleSelection::~RectangleSelection() noexcept
     m_d->restoreOverridenCursor();
 }
 
-QRect RectangleSelection::selectionRect() const
+QRect RectangleSelection::selectionRectScaled() const
 {
     return m_d->m_selected.toRect();
 }
 
-QRect RectangleSelection::availableRect() const
+QRect RectangleSelection::availableRectScaled() const
 {
     return m_d->m_available;
+}
+
+QRect RectangleSelection::selectionRect() const
+{
+    return m_d->selected(availableRect()).toRect();
+}
+
+QRect RectangleSelection::availableRect() const
+{
+    return m_d->m_frame->imageRect();
 }
 
 void RectangleSelection::start()
@@ -554,6 +564,8 @@ void RectangleSelection::mouseReleaseEvent(QMouseEvent *e)
 
         if (e->button() == Qt::LeftButton) {
             m_d->m_selected = m_d->m_selected.normalized();
+
+            emit started();
 
             update();
 

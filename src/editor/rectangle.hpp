@@ -114,10 +114,17 @@ class RectangleSelection : public QWidget
 {
     Q_OBJECT
 
+signals:
+    void started();
+
 public:
     RectangleSelection(Frame *parent = nullptr);
     ~RectangleSelection() noexcept override;
 
+    //! \return Scaled selection rectangle.
+    QRect selectionRectScaled() const;
+    //! \return Scaled available rectangle.
+    QRect availableRectScaled() const;
     //! \return Selection rectangle.
     QRect selectionRect() const;
     //! \return Available rectangle.
