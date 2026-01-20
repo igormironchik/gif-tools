@@ -715,6 +715,7 @@ void MainWindow::cancelEdit()
     } break;
 
     case MainWindowPrivate::EditMode::Text: {
+        m_d->m_textToolBar->hide();
         m_d->m_insertText->setChecked(false);
     } break;
 

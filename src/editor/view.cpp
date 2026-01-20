@@ -175,6 +175,7 @@ void View::stopText()
 {
     if (m_d->m_text) {
         m_d->m_text->stop();
+        m_d->m_text->clear();
         m_d->m_text->deleteLater();
         m_d->m_text = nullptr;
     }

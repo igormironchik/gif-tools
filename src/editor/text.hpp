@@ -45,6 +45,8 @@ public slots:
     void clearFormat();
     //! Set font size.
     void setFontSize(int p);
+    //! Clear.
+    void clear();
 
 private slots:
     void switchToSelectMode();
