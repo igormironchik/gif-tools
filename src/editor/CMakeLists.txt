@@ -29,7 +29,11 @@ set(SRC main.cpp
 	tape.hpp
     view.hpp
     rectangle.hpp
-    rectangle.cpp)
+    rectangle.cpp
+    text.hpp
+    text.cpp
+    texteditor.hpp
+    texteditor.cpp)
 
 qt6_add_resources(SRC resources.qrc)
 

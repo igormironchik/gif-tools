@@ -97,6 +97,8 @@ public:
     bool m_menu = false;
     //! Cursor overriden.
     bool m_cursorOverriden;
+    //! Is mouse handling enabled?
+    bool m_mouseEnabled = true;
     //! Tmp cursor shape.
     Qt::CursorShape m_cursor;
     //! Current handle.
@@ -112,18 +114,29 @@ class RectangleSelection : public QWidget
 {
     Q_OBJECT
 
+signals:
+    void started();
+
 public:
     RectangleSelection(Frame *parent = nullptr);
     ~RectangleSelection() noexcept override;
 
+    //! \return Scaled selection rectangle.
+    QRect selectionRectScaled() const;
+    //! \return Scaled available rectangle.
+    QRect availableRectScaled() const;
     //! \return Selection rectangle.
     QRect selectionRect() const;
+    //! \return Available rectangle.
+    QRect availableRect() const;
 
 public slots:
     //! Start.
     void start();
     //! Stop.
     void stop();
+    //! Turn on/off mouse handling.
+    void enableMouse(bool on = true);
 
 private slots:
     //! Frame resized.

@@ -9,6 +9,7 @@
 #include "frame.hpp"
 #include "frameontape.hpp"
 #include "tape.hpp"
+#include "text.hpp"
 
 // Qt include.
 #include <QApplication>
@@ -57,6 +58,7 @@ public:
                                    Frame::ResizeMode::FitToSize,
                                    parent))
         , m_crop(nullptr)
+        , m_text(nullptr)
         , m_scroll(nullptr)
         , m_q(parent)
     {
@@ -68,6 +70,8 @@ public:
     Frame *m_currentFrame;
     //! Crop.
     CropFrame *m_crop;
+    //! Text.
+    TextFrame *m_text;
     //! Scroll area for tape.
     ScrollArea *m_scroll;
     //! Parent.
@@ -119,10 +123,12 @@ Frame *View::currentFrame() const
     return m_d->m_currentFrame;
 }
 
-QRect View::cropRect() const
+QRect View::selectedRect() const
 {
     if (m_d->m_crop) {
         return m_d->m_crop->cropRect();
+    } else if (m_d->m_text) {
+        return m_d->m_text->selectionRect();
     } else {
         return QRect();
     }
@@ -149,6 +155,44 @@ void View::stopCrop()
     }
 }
 
+void View::startText()
+{
+    if (!m_d->m_text) {
+        m_d->m_text = new TextFrame(m_d->m_currentFrame);
+        m_d->m_text->setGeometry(QRect(0, 0, m_d->m_currentFrame->width(), m_d->m_currentFrame->height()));
+        m_d->m_text->show();
+        m_d->m_text->raise();
+        m_d->m_text->start();
+    }
+}
+
+TextFrame *View::textFrame() const
+{
+    return m_d->m_text;
+}
+
+CropFrame *View::cropFrame() const
+{
+    return m_d->m_crop;
+}
+
+void View::stopText()
+{
+    if (m_d->m_text) {
+        m_d->m_text->stop();
+        m_d->m_text->clear();
+        m_d->m_text->deleteLater();
+        m_d->m_text = nullptr;
+    }
+}
+
+void View::startTextEditing()
+{
+    if (m_d->m_text) {
+        m_d->m_text->startTextEditing();
+    }
+}
+
 void View::frameSelected(int idx)
 {
     if (idx >= 1 && idx <= m_d->m_tape->count()) {
@@ -161,7 +205,6 @@ void View::frameSelected(int idx)
 
 void View::scrollTo(int idx)
 {
-    const auto x = m_d->m_scroll->horizontalScrollBar()->sliderPosition();
     const auto viewWidth = m_d->m_scroll->viewport()->width();
     const auto frameX = m_d->m_tape->xOfFrame(idx);
     const auto frameWidth = m_d->m_tape->currentFrame()->width();

@@ -17,6 +17,8 @@
 #include <qgiflib.hpp>
 
 class Tape;
+class TextFrame;
+class CropFrame;
 
 //
 // View
@@ -44,13 +46,24 @@ public:
     Frame *currentFrame() const;
 
     //! \return Crop rectangle.
-    QRect cropRect() const;
+    QRect selectedRect() const;
+
+    //! \return Text frame widget.
+    TextFrame *textFrame() const;
+    //! \return Crop frame widget.
+    CropFrame *cropFrame() const;
 
 public slots:
     //! Start crop.
     void startCrop();
     //! Stop crop.
     void stopCrop();
+    //! Start text.
+    void startText();
+    //! Stop text.
+    void stopText();
+    //! Enter in text typing mode.
+    void startTextEditing();
     //! Scroll to frame.
     void scrollTo(int idx);
 

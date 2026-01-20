@@ -42,6 +42,8 @@ private slots:
                       bool on);
     //! Crop.
     void crop(bool on);
+    //! Insert text.
+    void insertText(bool on);
     //! Cancel edit.
     void cancelEdit();
     //! Apply edit.
@@ -56,6 +58,14 @@ private slots:
     void playStop();
     //! Show next frame.
     void showNextFrame();
+    //! Switch to text edit mode.
+    void onSwitchToTextEditMode();
+    //! Switch to text selection rect mode.
+    void onSwitchToTextSelectionRectMode();
+    //! Rectangle selection is started.
+    void onRectSelectionStarted();
+    //! Apply text.
+    void applyText();
 
 protected:
     void resizeEvent(QResizeEvent *e) override;
