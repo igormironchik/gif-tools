@@ -47,6 +47,12 @@ void TextFrame::imagePosChanged(qsizetype idx)
     }
 
     m_editor->setDocument(m_map[idx]);
+
+    m_editor->setFocus();
+
+    auto cursor = m_editor->textCursor();
+    cursor.movePosition(QTextCursor::End);
+    m_editor->setTextCursor(cursor);
 }
 
 void TextFrame::startTextEditing()
