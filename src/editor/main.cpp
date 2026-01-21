@@ -10,6 +10,7 @@
 
 // GIF editor include.
 #include "mainwindow.hpp"
+#include "settings.hpp"
 
 // gif-widgets include.
 #include "utils.hpp"

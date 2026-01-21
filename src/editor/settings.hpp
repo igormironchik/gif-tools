@@ -29,6 +29,14 @@ public:
     bool showHelpMsg() const;
     //! Turn on/off show help messages.
     void setShowHelpMsg(bool on = true);
+    //! \return Rect of the application's window.
+    QRect appWinRect() const;
+    //! Set rect of the application's window.
+    void setAppWinRect(const QRect &r);
+    //! \return Is application's window maximized?
+    bool isAppWinMaximized() const;
+    //! Set whether application's window maximized.
+    void setAppWinMaximized(bool on = true);
 
 private:
     void readCfg();
@@ -37,6 +45,10 @@ private:
 private:
     //! Show help messages?
     bool m_showHelpMsg = true;
+    //! Rect of the application's window.
+    QRect m_appWinRect = {-1, -1, -1, -1};
+    //! Is application's window maximized?
+    bool m_isAppWinMaximized = false;
 }; // class Settings
 
 //

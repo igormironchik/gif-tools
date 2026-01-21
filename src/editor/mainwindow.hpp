@@ -25,9 +25,6 @@ public:
     MainWindow();
     ~MainWindow() noexcept override;
 
-protected:
-    void closeEvent(QCloseEvent *e) override;
-
 private slots:
     //! Open GIF.
     void openGif();
@@ -71,6 +68,8 @@ private slots:
 
 protected:
     void resizeEvent(QResizeEvent *e) override;
+    void closeEvent(QCloseEvent *e) override;
+    void showEvent(QShowEvent *e) override;
 
 private:
     Q_DISABLE_COPY(MainWindow)

@@ -36,6 +36,7 @@
 #include <QTimer>
 #include <QToolBar>
 #include <QVector>
+#include <QWindow>
 
 // C++ include.
 #include <algorithm>
@@ -556,6 +557,10 @@ MainWindow::~MainWindow() noexcept
 
 void MainWindow::closeEvent(QCloseEvent *e)
 {
+    Settings::instance().setAppWinMaximized(isMaximized());
+    Settings::instance().setAppWinRect(QRect(windowHandle()->x(), windowHandle()->y(),
+                                             width(), height()));
+
     if (m_d->m_busyFlag) {
         const auto btn = QMessageBox::question(this,
                                                tr("GIF editor is busy..."),
@@ -571,6 +576,30 @@ void MainWindow::closeEvent(QCloseEvent *e)
     }
 
     quit();
+}
+
+void MainWindow::showEvent(QShowEvent *e)
+{
+    static auto s_alreadyShown = false;
+
+    if (!s_alreadyShown) {
+        s_alreadyShown = true;
+
+        const auto r = Settings::instance().appWinRect();
+
+        if (r.width() != -1) {
+            resize(r.width(), r.height());
+
+            windowHandle()->setX(r.x());
+            windowHandle()->setY(r.y());
+        }
+
+        if (Settings::instance().isAppWinMaximized()) {
+            showMaximized();
+        }
+    }
+
+    e->accept();
 }
 
 void MainWindow::openGif()
