@@ -30,7 +30,7 @@ TextFrame::~TextFrame() noexcept
 {
 }
 
-const QMap<qsizetype, QTextDocument*> &TextFrame::text() const
+const TextFrame::Documents &TextFrame::text() const
 {
     return m_map;
 }
