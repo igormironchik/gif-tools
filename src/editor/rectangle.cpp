@@ -6,6 +6,7 @@
 // GIF editor include.
 #include "rectangle.hpp"
 #include "frame.hpp"
+#include "settings.hpp"
 
 // Qt include.
 #include <QAction>
@@ -417,6 +418,11 @@ void RectangleSelection::enableMouse(bool on)
     update();
 }
 
+void RectangleSelection::setStartMessage(const QString &msg)
+{
+    m_d->m_msg = msg;
+}
+
 void RectangleSelection::frameResized()
 {
     m_d->m_selected = m_d->selected(m_d->m_frame->thumbnailRect());
@@ -449,6 +455,16 @@ void RectangleSelection::paintEvent(QPaintEvent *)
         }
 
         p.drawPath(path);
+    } else if (Settings::instance().showHelpMsg() && !m_d->m_msg.isEmpty()) {
+        p.drawRect(rect());
+        QTextOption opt;
+        opt.setAlignment(Qt::AlignCenter);
+        opt.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+        auto f = p.font();
+        f.setPointSize(16);
+        f.setBold(true);
+        p.setFont(f);
+        p.drawText(rect().toRectF(), m_d->m_msg, opt);
     }
 
     if (m_d->m_mouseEnabled) {

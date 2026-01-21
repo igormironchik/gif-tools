@@ -33,7 +33,10 @@ set(SRC main.cpp
     text.hpp
     text.cpp
     texteditor.hpp
-    texteditor.cpp)
+    texteditor.cpp
+    settings.hpp
+    settings.cpp
+    settings.ui)
 
 qt6_add_resources(SRC resources.qrc)
 

@@ -37,22 +37,26 @@ const QMap<qsizetype, QTextDocument*> &TextFrame::text() const
 
 void TextFrame::frameResized()
 {
-    m_editor->setGeometry(selectionRectScaled());
+    if (m_editor) {
+        m_editor->setGeometry(selectionRectScaled());
+    }
 }
 
 void TextFrame::imagePosChanged(qsizetype idx)
 {
-    if (!m_map.contains(idx)) {
-        m_map.insert(idx, m_editor->document()->clone(this));
+    if (m_editor) {
+        if (!m_map.contains(idx)) {
+            m_map.insert(idx, m_editor->document()->clone(this));
+        }
+
+        m_editor->setDocument(m_map[idx]);
+
+        m_editor->setFocus();
+
+        auto cursor = m_editor->textCursor();
+        cursor.movePosition(QTextCursor::End);
+        m_editor->setTextCursor(cursor);
     }
-
-    m_editor->setDocument(m_map[idx]);
-
-    m_editor->setFocus();
-
-    auto cursor = m_editor->textCursor();
-    cursor.movePosition(QTextCursor::End);
-    m_editor->setTextCursor(cursor);
 }
 
 void TextFrame::startTextEditing()

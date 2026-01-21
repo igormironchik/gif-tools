@@ -19,6 +19,10 @@ int main(int argc,
 {
     QApplication app(argc, argv);
 
+    app.setOrganizationName(QStringLiteral("Igor Mironchik"));
+    app.setOrganizationDomain(QStringLiteral("github.com/igormironchik"));
+    app.setApplicationName(QStringLiteral("GIF Editor"));
+
     initSharedResources();
 
     QIcon appIcon(QStringLiteral(":/icon/icon_256x256.png"));

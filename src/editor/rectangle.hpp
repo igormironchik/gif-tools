@@ -79,6 +79,8 @@ public:
     //! \return Right handle rect.
     QRect rightHandleRect() const;
 
+    //! Start message.
+    QString m_msg;
     //! Selected rectangle.
     QRectF m_selected;
     //! Available rectangle.
@@ -137,6 +139,8 @@ public slots:
     void stop();
     //! Turn on/off mouse handling.
     void enableMouse(bool on = true);
+    //! Set start message.
+    void setStartMessage(const QString &msg);
 
 private slots:
     //! Frame resized.

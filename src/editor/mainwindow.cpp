@@ -10,6 +10,7 @@
 #include "crop.hpp"
 #include "frame.hpp"
 #include "frameontape.hpp"
+#include "settings.hpp"
 #include "tape.hpp"
 #include "text.hpp"
 #include "view.hpp"
@@ -528,6 +529,9 @@ MainWindow::MainWindow()
     addToolBar(Qt::LeftToolBarArea, m_d->m_textToolBar);
 
     m_d->m_textToolBar->hide();
+
+    auto settings = menuBar()->addMenu(tr("&Settings"));
+    settings->addAction(QIcon(QStringLiteral(":/img/configure.png")), tr("Settings"), this, &MainWindow::onSettings);
 
     auto help = menuBar()->addMenu(tr("&Help"));
     help->addAction(QIcon(QStringLiteral(":/icon/icon_22x22.png")), tr("About"), this, &MainWindow::about);
@@ -1256,4 +1260,11 @@ void MainWindow::applyText()
     } else {
         cancelEdit();
     }
+}
+
+void MainWindow::onSettings()
+{
+    SettingsDlg dlg(this);
+
+    dlg.exec();
 }

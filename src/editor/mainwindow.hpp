@@ -66,6 +66,8 @@ private slots:
     void onRectSelectionStarted();
     //! Apply text.
     void applyText();
+    //! Show setting dlg.
+    void onSettings();
 
 protected:
     void resizeEvent(QResizeEvent *e) override;
