@@ -801,11 +801,8 @@ void MainWindow::cancelEdit()
 
 void MainWindow::applyEdit()
 {
-    m_d->m_crop->setEnabled(true);
-    m_d->m_insertText->setEnabled(true);
-
     switch (m_d->m_editMode) {
-    case MainWindowPrivate::EditMode::Crop: {
+    case MainWindowPrivate::EditMode::Crop: {    
         const auto rect = m_d->m_view->selectedRect();
 
         if (!rect.isNull() && rect != m_d->m_view->currentFrame()->imageRect()) {
