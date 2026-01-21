@@ -17,7 +17,8 @@
 //
 
 //! Settings.
-class Settings {
+class Settings
+{
     Settings();
     ~Settings();
 

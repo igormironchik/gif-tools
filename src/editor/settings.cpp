@@ -7,9 +7,9 @@
 #include "settings.hpp"
 
 // Qt include.
-#include <QSettings>
 #include <QCheckBox>
 #include <QDialogButtonBox>
+#include <QSettings>
 
 //
 // Settings
@@ -22,7 +22,6 @@ Settings::Settings()
 
 Settings::~Settings()
 {
-
 }
 
 Settings &Settings::instance()

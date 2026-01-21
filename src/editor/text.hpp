@@ -32,7 +32,7 @@ public:
     TextFrame(Frame *parent = nullptr);
     ~TextFrame() noexcept override;
 
-    using Documents = QMap<qsizetype, QTextDocument*>;
+    using Documents = QMap<qsizetype, QTextDocument *>;
 
     const Documents &text() const;
 

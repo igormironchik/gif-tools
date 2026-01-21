@@ -31,8 +31,8 @@
 #include <QRunnable>
 #include <QStackedWidget>
 #include <QStandardPaths>
-#include <QThreadPool>
 #include <QTextDocument>
+#include <QThreadPool>
 #include <QTimer>
 #include <QToolBar>
 #include <QVector>
@@ -806,7 +806,7 @@ void MainWindow::cancelEdit()
 void MainWindow::applyEdit()
 {
     switch (m_d->m_editMode) {
-    case MainWindowPrivate::EditMode::Crop: {    
+    case MainWindowPrivate::EditMode::Crop: {
         const auto rect = m_d->m_view->selectedRect();
 
         if (!rect.isNull() && rect != m_d->m_view->currentFrame()->imageRect()) {

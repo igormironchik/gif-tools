@@ -4,8 +4,8 @@
 */
 
 // GIF editor include.
-#include "frame.hpp"
 #include "text.hpp"
+#include "frame.hpp"
 #include "texteditor.hpp"
 
 // Qt include.

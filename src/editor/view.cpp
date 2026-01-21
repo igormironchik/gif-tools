@@ -138,8 +138,9 @@ void View::startCrop()
 {
     if (!m_d->m_crop) {
         m_d->m_crop = new CropFrame(m_d->m_currentFrame);
-        m_d->m_crop->setStartMessage(tr("Select a region for cropping with the mouse, when ready press Enter. "
-                                        "Press Escape for cancelling."));
+        m_d->m_crop->setStartMessage(
+            tr("Select a region for cropping with the mouse, when ready press Enter. "
+               "Press Escape for cancelling."));
         connect(m_d->m_crop, &CropFrame::applyEdit, this, &View::applyEdit);
         m_d->m_crop->setGeometry(QRect(0, 0, m_d->m_currentFrame->width(), m_d->m_currentFrame->height()));
         m_d->m_crop->show();
@@ -161,13 +162,14 @@ void View::startText()
 {
     if (!m_d->m_text) {
         m_d->m_text = new TextFrame(m_d->m_currentFrame);
-        m_d->m_text->setStartMessage(tr("Select a region for text with the mouse, when ready press Enter or use "
-                                        "context menu. You can switch between text mode and rectangle selection with "
-                                        "context meny at any time. You can choose any frame from the tape to apply "
-                                        "text on that frame. Text may be different on each frame. If you clicked on "
-                                        "the frame, but don't want the text to be on it - uncheck this frame on the "
-                                        "tape. When ready click \"Apply\" button on the tool bar. "
-                                        "Press Escape for cancelling."));
+        m_d->m_text->setStartMessage(
+            tr("Select a region for text with the mouse, when ready press Enter or use "
+               "context menu. You can switch between text mode and rectangle selection with "
+               "context meny at any time. You can choose any frame from the tape to apply "
+               "text on that frame. Text may be different on each frame. If you clicked on "
+               "the frame, but don't want the text to be on it - uncheck this frame on the "
+               "tape. When ready click \"Apply\" button on the tool bar. "
+               "Press Escape for cancelling."));
         m_d->m_text->setGeometry(QRect(0, 0, m_d->m_currentFrame->width(), m_d->m_currentFrame->height()));
         m_d->m_text->show();
         m_d->m_text->raise();
