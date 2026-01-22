@@ -50,6 +50,12 @@ public slots:
     void disableMouse();
     void enableMouse();
 
+private slots:
+    void onMenu();
+    void about();
+    void aboutQt();
+    void licenses();
+
 protected:
     void mousePressEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
@@ -66,6 +72,7 @@ private:
     QToolButton *m_recordButton = nullptr;
     QToolButton *m_settingsButton = nullptr;
     QToolButton *m_transparentForMouseButton = nullptr;
+    QToolButton *m_help = nullptr;
     CloseButton *m_closeButton = nullptr;
     QLabel *m_msg = nullptr;
     QProgressBar *m_progress = nullptr;
