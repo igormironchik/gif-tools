@@ -558,8 +558,7 @@ MainWindow::~MainWindow() noexcept
 void MainWindow::closeEvent(QCloseEvent *e)
 {
     Settings::instance().setAppWinMaximized(isMaximized());
-    Settings::instance().setAppWinRect(QRect(windowHandle()->x(), windowHandle()->y(),
-                                             width(), height()));
+    Settings::instance().setAppWinRect(QRect(windowHandle()->x(), windowHandle()->y(), width(), height()));
 
     if (m_d->m_busyFlag) {
         const auto btn = QMessageBox::question(this,
@@ -900,16 +899,15 @@ void MainWindow::applyEdit()
 
 void MainWindow::about()
 {
-    QMessageBox dlg(
-        QMessageBox::Information,
-        tr("About GIF editor"),
-            tr("GIF editor.<br /><br />"
-               "Author - Igor Mironchik (<a href=\"mailto:igor.mironchik@gmail.com\">"
-               "igor.mironchik at gmail.com</a>).<br /><br />"
-               "Copyright (c) 2026 Igor Mironchik.<br /><br />"
-               "Licensed under GNU GPL 3.0."),
-        QMessageBox::NoButton,
-        this);
+    QMessageBox dlg(QMessageBox::Information,
+                    tr("About GIF editor"),
+                    tr("GIF editor.<br /><br />"
+                       "Author - Igor Mironchik (<a href=\"mailto:igor.mironchik@gmail.com\">"
+                       "igor.mironchik at gmail.com</a>).<br /><br />"
+                       "Copyright (c) 2026 Igor Mironchik.<br /><br />"
+                       "Licensed under GNU GPL 3.0."),
+                    QMessageBox::NoButton,
+                    this);
     QIcon icon = dlg.windowIcon();
     dlg.setIconPixmap(icon.pixmap(QSize(64, 64), dlg.devicePixelRatio()));
     dlg.setTextFormat(Qt::RichText);
