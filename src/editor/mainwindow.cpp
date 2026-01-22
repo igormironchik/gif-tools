@@ -900,12 +900,21 @@ void MainWindow::applyEdit()
 
 void MainWindow::about()
 {
-    QMessageBox::about(this,
-                       tr("About GIF editor"),
-                       tr("GIF editor.\n\n"
-                          "Author - Igor Mironchik (igor.mironchik at gmail dot com).\n\n"
-                          "Copyright (c) 2026 Igor Mironchik.\n\n"
-                          "Licensed under GNU GPL 3.0."));
+    QMessageBox dlg(
+        QMessageBox::Information,
+        tr("About GIF editor"),
+            tr("GIF editor.<br /><br />"
+               "Author - Igor Mironchik (<a href=\"mailto:igor.mironchik@gmail.com\">"
+               "igor.mironchik at gmail.com</a>).<br /><br />"
+               "Copyright (c) 2026 Igor Mironchik.<br /><br />"
+               "Licensed under GNU GPL 3.0."),
+        QMessageBox::NoButton,
+        this);
+    QIcon icon = dlg.windowIcon();
+    dlg.setIconPixmap(icon.pixmap(QSize(64, 64), dlg.devicePixelRatio()));
+    dlg.setTextFormat(Qt::RichText);
+
+    dlg.exec();
 }
 
 void MainWindow::aboutQt()
