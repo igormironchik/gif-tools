@@ -41,6 +41,8 @@ private slots:
     void crop(bool on);
     //! Insert text.
     void insertText(bool on);
+    //! Draw rectangle.
+    void drawRect(bool on);
     //! Cancel edit.
     void cancelEdit();
     //! Apply edit.

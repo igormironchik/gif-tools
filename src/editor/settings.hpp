@@ -37,6 +37,18 @@ public:
     bool isAppWinMaximized() const;
     //! Set whether application's window maximized.
     void setAppWinMaximized(bool on = true);
+    //! \return Pen color.
+    QColor penColor() const;
+    //! Set pen color.
+    void setPenColor(const QColor &c);
+    //! \return Brush color.
+    QColor brushColor() const;
+    //! Set brush color.
+    void setBrushColor(const QColor &c);
+    //! \return Pen width.
+    int penWidth() const;
+    //! Set pen width.
+    void setPenWidth(int w);
 
 private:
     void readCfg();
@@ -49,6 +61,12 @@ private:
     QRect m_appWinRect = {-1, -1, -1, -1};
     //! Is application's window maximized?
     bool m_isAppWinMaximized = false;
+    //! Pen color.
+    QColor m_penColor = Qt::black;
+    //! Brush color.
+    QColor m_brushColor = Qt::transparent;
+    //! Pen widht.
+    int m_penWidth = 2;
 }; // class Settings
 
 //

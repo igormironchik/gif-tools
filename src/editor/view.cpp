@@ -6,6 +6,7 @@
 // GIF editor include.
 #include "view.hpp"
 #include "crop.hpp"
+#include "drawrect.hpp"
 #include "frame.hpp"
 #include "frameontape.hpp"
 #include "tape.hpp"
@@ -59,6 +60,7 @@ public:
                                    parent))
         , m_crop(nullptr)
         , m_text(nullptr)
+        , m_rect(nullptr)
         , m_scroll(nullptr)
         , m_q(parent)
     {
@@ -72,6 +74,8 @@ public:
     CropFrame *m_crop;
     //! Text.
     TextFrame *m_text;
+    //! Rect.
+    RectFrame *m_rect;
     //! Scroll area for tape.
     ScrollArea *m_scroll;
     //! Parent.
@@ -129,6 +133,8 @@ QRect View::selectedRect() const
         return m_d->m_crop->cropRect();
     } else if (m_d->m_text) {
         return m_d->m_text->selectionRect();
+    } else if (m_d->m_rect) {
+        return m_d->m_rect->selectionRect();
     } else {
         return QRect();
     }
@@ -187,6 +193,11 @@ CropFrame *View::cropFrame() const
     return m_d->m_crop;
 }
 
+RectFrame *View::rectFrame() const
+{
+    return m_d->m_rect;
+}
+
 void View::stopText()
 {
     if (m_d->m_text) {
@@ -194,6 +205,33 @@ void View::stopText()
         m_d->m_text->clear();
         m_d->m_text->deleteLater();
         m_d->m_text = nullptr;
+    }
+}
+
+void View::startRect()
+{
+    if (!m_d->m_rect) {
+        m_d->m_rect = new RectFrame(m_d->m_currentFrame);
+        m_d->m_rect->setStartMessage(
+            tr("Select a region for drawing a rectangle with the mouse, when ready press Enter. "
+               "You can choose any frame from the tape to apply "
+               "rectangle on that frame. If you clicked on "
+               "the frame, but don't want the rectangle to be on it - uncheck this frame on the "
+               "tape.Press Escape for cancelling."));
+        connect(m_d->m_rect, &RectFrame::applyEdit, this, &View::applyEdit);
+        m_d->m_rect->setGeometry(QRect(0, 0, m_d->m_currentFrame->width(), m_d->m_currentFrame->height()));
+        m_d->m_rect->show();
+        m_d->m_rect->raise();
+        m_d->m_rect->start();
+    }
+}
+
+void View::stopRect()
+{
+    if (m_d->m_rect) {
+        m_d->m_rect->stop();
+        m_d->m_rect->deleteLater();
+        m_d->m_rect = nullptr;
     }
 }
 

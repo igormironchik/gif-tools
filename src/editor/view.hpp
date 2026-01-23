@@ -19,6 +19,7 @@
 class Tape;
 class TextFrame;
 class CropFrame;
+class RectFrame;
 
 //
 // View
@@ -52,6 +53,8 @@ public:
     TextFrame *textFrame() const;
     //! \return Crop frame widget.
     CropFrame *cropFrame() const;
+    //! \return Rect frame widget.
+    RectFrame *rectFrame() const;
 
 public slots:
     //! Start crop.
@@ -62,6 +65,10 @@ public slots:
     void startText();
     //! Stop text.
     void stopText();
+    //! Start rect.
+    void startRect();
+    //! Stop rect.
+    void stopRect();
     //! Enter in text typing mode.
     void startTextEditing();
     //! Scroll to frame.
