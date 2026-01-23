@@ -99,7 +99,7 @@ FrameOnTape::FrameOnTape(const ImageRef &img,
     m_d->m_frame = new Frame(
         img,
         Frame::ResizeMode::FitToHeight,
-        parent,
+        this,
         height - qMax(m_d->m_label->sizeHint().height(), m_d->m_checkBox->sizeHint().height()) - frameWidth() * 2);
 
     m_d->m_vlayout->addWidget(m_d->m_frame);
@@ -204,6 +204,8 @@ void FrameOnTape::setModified(bool on)
             m_d->m_modifiedLabel->show();
         } else {
             m_d->m_modifiedLabel->hide();
+            m_d->m_modifiedLabel->deleteLater();
+            m_d->m_modifiedLabel = nullptr;
         }
     }
 }
