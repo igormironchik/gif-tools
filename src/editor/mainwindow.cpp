@@ -948,6 +948,10 @@ void MainWindow::cancelEdit()
         break;
     }
 
+    for (int i = 1; i <= m_d->m_view->tape()->count(); ++i) {
+        m_d->m_view->tape()->frame(i)->setModified(false);
+    }
+
     m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
 
     QApplication::processEvents();

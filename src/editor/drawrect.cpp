@@ -7,6 +7,8 @@
 #include "drawrect.hpp"
 #include "frame.hpp"
 #include "settings.hpp"
+#include "tape.hpp"
+#include "frameontape.hpp"
 
 // Qt include.
 #include <QColorDialog>
@@ -18,12 +20,14 @@
 // RectFrame
 //
 
-RectFrame::RectFrame(Frame *parent)
+RectFrame::RectFrame(Tape *tape, Frame *parent)
     : RectangleSelection(parent)
+    , m_tape(tape)
 {
     m_frames.insert(parent->image().m_pos);
 
     connect(parent, &Frame::imagePosChanged, this, &RectFrame::imagePosChanged);
+    connect(this, &RectangleSelection::started, this, &RectFrame::onStarted);
 }
 
 RectFrame::~RectFrame() noexcept
@@ -53,9 +57,15 @@ void RectFrame::brushColor()
     }
 }
 
+void RectFrame::onStarted()
+{
+    m_tape->frame(m_d->m_frame->image().m_pos + 1)->setModified(true);
+}
+
 void RectFrame::imagePosChanged(qsizetype idx)
 {
     m_frames.insert(idx);
+    m_tape->frame(idx + 1)->setModified(true);
 }
 
 void RectFrame::drawRect(QPainter &p,

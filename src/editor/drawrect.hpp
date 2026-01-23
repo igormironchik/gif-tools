@@ -9,6 +9,8 @@
 // GIF editor include.
 #include "rectangle.hpp"
 
+class Tape;
+
 //
 // RectFrame
 //
@@ -22,7 +24,7 @@ signals:
     void applyEdit();
 
 public:
-    RectFrame(Frame *parent = nullptr);
+    explicit RectFrame(Tape *tape, Frame *parent = nullptr);
     ~RectFrame() noexcept override;
 
     static void drawRect(QPainter &p,
@@ -37,6 +39,9 @@ public slots:
     void brushColor();
 
 private slots:
+    void onStarted();
+
+private slots:
     void imagePosChanged(qsizetype idx);
 
 protected:
@@ -47,6 +52,7 @@ private:
     Q_DISABLE_COPY(RectFrame)
 
     QSet<qsizetype> m_frames;
+    Tape *m_tape = nullptr;
 }; // class RectFrame
 
 #endif // GIF_EDITOR_DRAWRECT_HPP_INCLUDED

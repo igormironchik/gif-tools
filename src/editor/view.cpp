@@ -167,7 +167,7 @@ void View::stopCrop()
 void View::startText()
 {
     if (!m_d->m_text) {
-        m_d->m_text = new TextFrame(m_d->m_currentFrame);
+        m_d->m_text = new TextFrame(tape(), m_d->m_currentFrame);
         m_d->m_text->setStartMessage(
             tr("Select a region for text with the mouse, when ready press Enter or use "
                "context menu. You can switch between text mode and rectangle selection with "
@@ -211,7 +211,7 @@ void View::stopText()
 void View::startRect()
 {
     if (!m_d->m_rect) {
-        m_d->m_rect = new RectFrame(m_d->m_currentFrame);
+        m_d->m_rect = new RectFrame(tape(), m_d->m_currentFrame);
         m_d->m_rect->setStartMessage(
             tr("Select a region for drawing a rectangle with the mouse, when ready press Enter. "
                "You can choose any frame from the tape to apply "

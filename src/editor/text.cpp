@@ -7,6 +7,8 @@
 #include "text.hpp"
 #include "frame.hpp"
 #include "texteditor.hpp"
+#include "frameontape.hpp"
+#include "tape.hpp"
 
 // Qt include.
 #include <QAbstractTextDocumentLayout>
@@ -19,8 +21,9 @@
 // TextFrame
 //
 
-TextFrame::TextFrame(Frame *parent)
+TextFrame::TextFrame(Tape *tape, Frame *parent)
     : RectangleSelection(parent)
+    , m_tape(tape)
 {
     connect(parent, &Frame::resized, this, &TextFrame::frameResized);
     connect(parent, &Frame::imagePosChanged, this, &TextFrame::imagePosChanged);
@@ -56,6 +59,7 @@ void TextFrame::imagePosChanged(qsizetype idx)
         auto cursor = m_editor->textCursor();
         cursor.movePosition(QTextCursor::End);
         m_editor->setTextCursor(cursor);
+        m_tape->frame(idx + 1)->setModified(true);
     }
 }
 
@@ -65,6 +69,8 @@ void TextFrame::startTextEditing()
         m_editor = new TextEdit(static_cast<QWidget *>(parent()));
         setFontSize(12);
         connect(m_editor, &TextEdit::switchToSelectMode, this, &TextFrame::switchToSelectMode);
+
+        m_tape->frame(m_d->m_frame->image().m_pos + 1)->setModified(true);
     }
 
     if (m_d->m_menu) {

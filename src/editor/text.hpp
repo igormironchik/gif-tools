@@ -14,6 +14,7 @@ class QTextDocument;
 QT_END_NAMESPACE
 
 class TextEdit;
+class Tape;
 
 //
 // TextFrame
@@ -29,7 +30,7 @@ signals:
     void switchToTextSelectionRectMode();
 
 public:
-    TextFrame(Frame *parent = nullptr);
+    explicit TextFrame(Tape *tape, Frame *parent = nullptr);
     ~TextFrame() noexcept override;
 
     using Documents = QMap<qsizetype, QTextDocument *>;
@@ -68,6 +69,7 @@ private:
     Q_DISABLE_COPY(TextFrame)
 
     TextEdit *m_editor = nullptr;
+    Tape *m_tape = nullptr;
     Documents m_map;
 }; // class TextFrame
 

@@ -65,6 +65,10 @@ public:
     //! Set current flag.
     void setCurrent(bool on = true);
 
+public slots:
+    //! Set modified flag.
+    void setModified(bool on = true);
+
 protected:
     void contextMenuEvent(QContextMenuEvent *e) override;
 

@@ -14,6 +14,7 @@
 #include <QLabel>
 #include <QMenu>
 #include <QVBoxLayout>
+#include <QLabel>
 
 //
 // FrameOnTapePrivate
@@ -28,10 +29,12 @@ public:
                        FrameOnTape *parent)
         : m_counter(counter)
         , m_current(false)
+        , m_modified(false)
         , m_label(new QLabel(parent))
         , m_checkBox(new QCheckBox(parent))
         , m_vlayout(new QVBoxLayout(parent))
         , m_frame(nullptr)
+        , m_modifiedLabel(nullptr)
         , m_q(parent)
     {
         m_checkBox->setChecked(true);
@@ -49,6 +52,8 @@ public:
     int m_counter;
     //! Is current?
     bool m_current;
+    //! Is modified?
+    bool m_modified;
     //! Counter label.
     QLabel *m_label;
     //! Check box.
@@ -57,6 +62,8 @@ public:
     QVBoxLayout *m_vlayout;
     //! Frame.
     Frame *m_frame;
+    //! Modified lable.
+    QLabel *m_modifiedLabel;
     //! Parent.
     FrameOnTape *m_q;
 }; // class FrameOnTapePrivate
@@ -172,6 +179,33 @@ bool FrameOnTape::isCurrent() const
 void FrameOnTape::setCurrent(bool on)
 {
     m_d->setCurrent(on);
+}
+
+void FrameOnTape::setModified(bool on)
+{
+    m_d->m_modified = on;
+
+    if (m_d->m_modified && !m_d->m_modifiedLabel) {
+        m_d->m_modifiedLabel = new QLabel(m_d->m_frame);
+        m_d->m_modifiedLabel->setFrameStyle(QFrame::NoFrame);
+        m_d->m_modifiedLabel->setMargin(0);
+        m_d->m_modifiedLabel->setIndent(0);
+        m_d->m_modifiedLabel->setContentsMargins(0, 0, 0, 0);
+        const auto pixmap = QPixmap(":/img/vcs-locally-modified.png");
+        m_d->m_modifiedLabel->setPixmap(pixmap);
+        auto r = m_d->m_frame->rect();
+        const auto p = r.topRight();
+        m_d->m_modifiedLabel->move(p.x() - pixmap.width(), p.y());
+        m_d->m_modifiedLabel->raise();
+    }
+
+    if (m_d->m_modifiedLabel) {
+        if (m_d->m_modified) {
+            m_d->m_modifiedLabel->show();
+        } else {
+            m_d->m_modifiedLabel->hide();
+        }
+    }
 }
 
 void FrameOnTape::contextMenuEvent(QContextMenuEvent *e)
