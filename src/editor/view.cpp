@@ -217,7 +217,7 @@ void View::startRect()
                "You can choose any frame from the tape to apply "
                "rectangle on that frame. If you clicked on "
                "the frame, but don't want the rectangle to be on it - uncheck this frame on the "
-               "tape.Press Escape for cancelling."));
+               "tape. Press Escape for cancelling."));
         connect(m_d->m_rect, &RectFrame::applyEdit, this, &View::applyEdit);
         m_d->m_rect->setGeometry(QRect(0, 0, m_d->m_currentFrame->width(), m_d->m_currentFrame->height()));
         m_d->m_rect->show();
