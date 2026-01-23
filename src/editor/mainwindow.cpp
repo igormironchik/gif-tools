@@ -908,6 +908,7 @@ void MainWindow::drawRect(bool on)
 
         connect(m_d->m_penColor, &QAction::triggered, m_d->m_view->rectFrame(), &RectFrame::penColor);
         connect(m_d->m_brushColor, &QAction::triggered, m_d->m_view->rectFrame(), &RectFrame::brushColor);
+        connect(m_d->m_view->rectFrame(), &RectFrame::started, this, &MainWindow::onRectSelectionStarted);
     } else {
         m_d->m_view->stopRect();
 
