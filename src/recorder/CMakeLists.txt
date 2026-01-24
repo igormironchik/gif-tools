@@ -40,3 +40,5 @@ target_link_libraries(gif-recorder qgiflib gif-widgets Qt6::Widgets Qt6::Gui Qt6
 if(UNIX)
     target_link_libraries(gif-recorder Xtst Xfixes X11)
 endif()
+
+install(TARGETS gif-recorder)

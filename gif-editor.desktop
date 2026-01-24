@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=GIF Editor
+GenericName=GIF Editor
+Type=Application
+Exec=gif-editor
+Icon=gif-tools
+Categories=Utility;ImageEditor;
+MimeType=image/gif;

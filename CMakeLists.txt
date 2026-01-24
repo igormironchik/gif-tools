@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.19)
 
 project(gif-tools)
 
-set(GIF_TOOLS_VERSION_NUMBER "1.0.0")
+set(GIF_TOOLS_VERSION_NUMBER "1.0.1")
 set(HomeDir "@HomeDir@")
 string(TIMESTAMP GIF_CURRENT_DATE "%Y-%m-%d")
 
@@ -34,6 +34,9 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_MACOSX_RPATH TRUE)
 
 link_directories(${CMAKE_BINARY_DIR}/lib)
+
+install(FILES "gif-editor.desktop" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/applications/")
+install(FILES "gif-recorder.desktop" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/applications/")
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release"

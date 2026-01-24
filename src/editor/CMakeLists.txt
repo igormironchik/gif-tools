@@ -54,3 +54,5 @@ include_directories(${ImageMagick_INCLUDE_DIRS}
 add_executable(gif-editor WIN32 ${SRC})
 
 target_link_libraries(gif-editor qgiflib gif-widgets Qt6::Widgets Qt6::Gui Qt6::Core)
+
+install(TARGETS gif-editor)

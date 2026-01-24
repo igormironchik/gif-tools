@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=GIF Recorder
+GenericName=GIF Recorder
+Type=Application
+Exec=gif-recorder
+Icon=gif-tools
+Categories=Utility;
