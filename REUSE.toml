@@ -4,7 +4,7 @@ SPDX-PackageSupplier = "Igor Mironchik <igor.mironchik@gmail.com>"
 SPDX-PackageDownloadLocation = "https://github.com/igormironchik/gif-tools"
 
 [[annotations]]
-path = ["editor.png", "recorder.png", "src/recorder/*.ui", "src/shared/icon.ico", "src/editor/gif-editor.rc", "src/recorder/gif-recorder.rc", "src/editor/resources.qrc", "src/recorder/resources.qrc", "README.md", ".gitignore", ".github/**", ".gitmodules", "REUSE.toml", "installer/**", "script/**", "apply-clang-format.sh", "config.xml.in", "package.xml.in", "src/editor/settings.ui"]
+path = ["editor.png", "recorder.png", "src/recorder/*.ui", "src/shared/icon.ico", "src/editor/gif-editor.rc", "src/recorder/gif-recorder.rc", "src/editor/resources.qrc", "src/recorder/resources.qrc", "README.md", ".gitignore", ".github/**", ".gitmodules", "REUSE.toml", "installer/**", "script/**", "apply-clang-format.sh", "config.xml.in", "package.xml.in", "src/editor/settings.ui", "gif-editor.desktop", "gif-recorder.desktop"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Igor Mironchik <igor.mironchik@gmail.com>"
 SPDX-License-Identifier = "GPL-3.0-or-later"
