@@ -8,4 +8,4 @@ qt_version=$(cat $PWD/script/qt.version)
 
 echo "Installing Qt..."
 
-aqt install-qt --outputdir ./Qt linux desktop $qt_version linux_gcc_64 -m qtimageformats qtsvg qtgui || exit 1
+aqt install-qt --outputdir ./Qt linux desktop $qt_version linux_gcc_64 -m qtimageformats || exit 1
