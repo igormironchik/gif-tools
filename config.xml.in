@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+    <Name>GIF Tools</Name>
+    <Version>@GIF_TOOLS_VERSION_NUMBER@</Version>
+    <Title>GIF Tools Installer</Title>
+    <Publisher>Igor Mironchik</Publisher>
+    <StartMenuDir>GIF Tools</StartMenuDir>
+    <TargetDir>@HomeDir@/GIF Tools</TargetDir>
+    <WizardDefaultWidth>1000</WizardDefaultWidth>
+    <WizardDefaultHeight>650</WizardDefaultHeight>
+</Installer>

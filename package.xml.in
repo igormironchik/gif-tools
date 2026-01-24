@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>GIF Tools</DisplayName>
+    <Description>Install GIF Tools.</Description>
+    <Version>@GIF_TOOLS_VERSION_NUMBER@</Version>
+    <ReleaseDate>@GIF_CURRENT_DATE@</ReleaseDate>
+    <Default>true</Default>
+    <Licenses>
+        <License name="GNU GPL 3.0" file="license.txt" />
+    </Licenses>
+    <Script>installscript.qs</Script>
+</Package>

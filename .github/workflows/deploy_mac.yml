@@ -1,0 +1,45 @@
+
+name: "deploy_mac"
+
+on:
+  workflow_dispatch:
+  
+env:
+  CONAN_HOME: "${{ github.workspace }}/.conan2"
+
+jobs:
+  macos:
+    name: macos
+    runs-on: macos-14
+
+    strategy:
+      fail-fast: true
+      matrix:
+        language: ['cpp']
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - run: chmod a+x ./script/macos/install-qt.sh
+
+    - run: chmod a+x ./script/macos/build.sh
+
+    - run: chmod a+x ./script/macos/deploy.sh
+
+    - name: Install Qt
+      run: ./script/macos/install-qt.sh
+
+    - name: Build
+      run: ./script/macos/build.sh
+
+    - name: Deploy
+      run: ./script/macos/deploy.sh
+
+    - name: Upload installer
+      uses: actions/upload-artifact@v4
+      with:
+        name: GIF_MacOS_x64.Installer.app
+        path: GIF_MacOS_x64.Installer.app

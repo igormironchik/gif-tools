@@ -1,0 +1,45 @@
+
+name: "deploy_linux"
+
+on:
+  workflow_dispatch:
+  
+env:
+  CONAN_HOME: "${{ github.workspace }}/.conan2"
+
+jobs:
+  linux:
+    name: linux
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        language: ['cpp']
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        
+    - run: chmod a+x ./script/linux/install-qt.sh
+
+    - run: chmod a+x ./script/linux/build.sh
+
+    - run: chmod a+x ./script/linux/deploy.sh
+
+    - name: Install Qt
+      run: ./script/linux/install-qt.sh
+
+    - name: Build
+      run: ./script/linux/build.sh
+
+    - name: Deploy
+      run: ./script/linux/deploy.sh
+      
+    - name: Upload installer
+      uses: actions/upload-artifact@v4
+      with:
+        name: GIF_Linux_x64.Installer
+        path: GIF_Linux_x64.Installer
