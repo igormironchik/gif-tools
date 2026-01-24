@@ -8,7 +8,7 @@ echo "Installing Qt..."
 
 set /P qt_version=<%CD%\script\qt.version
 
-aqt install-qt --outputdir Qt windows desktop %qt_version% win64_msvc2022_64 -m qtimageformats
+aqt install-qt --outputdir Qt windows desktop %qt_version% win64_msvc2022_64 -m qtimageformats qtsvg qtgui
 
 IF %ERRORLEVEL% NEQ 0 (
 	exit /B %ERRORLEVEL%
