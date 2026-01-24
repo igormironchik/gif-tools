@@ -4,5 +4,5 @@ GenericName=GIF Editor
 Type=Application
 Exec=gif-editor
 Icon=gif-tools
-Categories=Utility;ImageEditor;
+Categories=Utility;Graphics;
 MimeType=image/gif;
