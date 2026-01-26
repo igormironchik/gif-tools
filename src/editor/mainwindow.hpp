@@ -25,6 +25,10 @@ public:
     MainWindow();
     ~MainWindow() noexcept override;
 
+public slots:
+    //! Open GIF.
+    void openFile(const QString &fileName, bool afterShowEvent = false);
+
 private slots:
     //! Open GIF.
     void openGif();

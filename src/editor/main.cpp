@@ -5,6 +5,7 @@
 
 // Qt include.
 #include <QApplication>
+#include <QCommandLineParser>
 #include <QLocale>
 #include <QTranslator>
 
@@ -40,9 +41,24 @@ int main(int argc,
         app.installTranslator(&appTranslator);
     }
 
+    QCommandLineParser parser;
+    parser.setApplicationDescription(QStringLiteral("GIF editor."));
+    parser.addHelpOption();
+    parser.addPositionalArgument(QStringLiteral("gif"), QStringLiteral("GIF file to open."));
+
+    parser.process(app);
+
+    const auto args = parser.positionalArguments();
+
+    const auto fileName = (args.isEmpty() ? QString() : args.at(0));
+
     MainWindow w;
     w.resize(800, 600);
     w.show();
+
+    if (!fileName.isEmpty()) {
+        w.openFile(fileName, true);
+    }
 
     return app.exec();
 }

@@ -419,6 +419,10 @@ public:
     bool m_quitFlag;
     //! Play/stop flag.
     bool m_playing;
+    //! Was show evemt?
+    bool m_shownAlready = false;
+    //! File name to open after show event.
+    QString m_fileNameToOpenAfterShow;
     //! Stacked widget.
     QStackedWidget *m_stack;
     //! Busy indicator.
@@ -671,10 +675,8 @@ void MainWindow::closeEvent(QCloseEvent *e)
 
 void MainWindow::showEvent(QShowEvent *e)
 {
-    static auto s_alreadyShown = false;
-
-    if (!s_alreadyShown) {
-        s_alreadyShown = true;
+    if (!m_d->m_shownAlready) {
+        m_d->m_shownAlready = true;
 
         const auto r = Settings::instance().appWinRect();
 
@@ -688,22 +690,24 @@ void MainWindow::showEvent(QShowEvent *e)
         if (Settings::instance().isAppWinMaximized()) {
             showMaximized();
         }
+
+        if (!m_d->m_fileNameToOpenAfterShow.isEmpty()) {
+            QTimer::singleShot(0, [this]() { this->openFile(this->m_d->m_fileNameToOpenAfterShow); });
+        }
     }
 
     e->accept();
 }
 
-void MainWindow::openGif()
+void MainWindow::openFile(const QString &fileName, bool afterShowEvent)
 {
-    static const auto pictureLocations = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
+    if (afterShowEvent && !m_d->m_shownAlready) {
+        m_d->m_fileNameToOpenAfterShow = fileName;
 
-    const auto fileName =
-        QFileDialog::getOpenFileName(this,
-                                     tr("Open GIF..."),
-                                     (!pictureLocations.isEmpty() ? pictureLocations.first() : QString()),
-                                     tr("GIF (*.gif)"));
+        return;
+    }
 
-    if (!fileName.isEmpty()) {
+    if (!fileName.isEmpty() && QFileInfo(fileName).suffix().toLower() == QStringLiteral("gif")) {
         if (isWindowModified()) {
             const auto btn = QMessageBox::question(this,
                                                    tr("GIF was changed..."),
@@ -722,6 +726,19 @@ void MainWindow::openGif()
 
         m_d->ready();
     }
+}
+
+void MainWindow::openGif()
+{
+    static const auto pictureLocations = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
+
+    const auto fileName =
+        QFileDialog::getOpenFileName(this,
+                                     tr("Open GIF..."),
+                                     (!pictureLocations.isEmpty() ? pictureLocations.first() : QString()),
+                                     tr("GIF (*.gif)"));
+
+    openFile(fileName);
 }
 
 namespace /* anonymous */
