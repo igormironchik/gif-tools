@@ -16,6 +16,10 @@
 #include <QMenu>
 #include <QPainter>
 
+// C++ include.
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 //
 // ArrowFrame
 //
