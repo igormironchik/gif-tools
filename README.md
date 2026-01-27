@@ -20,6 +20,10 @@ files are very small by size, as this is a GIF format, what it was designed.
 
 Try it for yourself. Enjoy.
 
+# Example
+
+You can see at recorded GIFs with these tools [here](https://igormironchik.github.io/markdown-tools/).
+
 # Plans
 
 When `KDE` will be fully switched to `Wayland` and refused from `X11` I will
