@@ -387,6 +387,11 @@ QRect RectangleSelection::availableRect() const
     return m_d->m_frame->imageRect();
 }
 
+const QPoint &RectangleSelection::releasePoint() const
+{
+    return m_d->m_releasePos;
+}
+
 void RectangleSelection::start()
 {
     m_d->m_started = true;
@@ -547,7 +552,8 @@ void RectangleSelection::mouseMoveEvent(QMouseEvent *e)
     if (m_d->m_mouseEnabled) {
         if (m_d->m_clicked) {
             if (!m_d->m_cursorOverriden) {
-                m_d->m_selected.setBottomRight(m_d->boundToAvailable(e->pos()));
+                m_d->m_releasePos = m_d->boundToAvailable(e->pos());
+                m_d->m_selected.setBottomRight(m_d->m_releasePos);
 
                 m_d->m_nothing = false;
             } else {

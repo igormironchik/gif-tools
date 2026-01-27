@@ -6,6 +6,7 @@
 // GIF editor include.
 #include "view.hpp"
 #include "crop.hpp"
+#include "drawarrow.hpp"
 #include "drawrect.hpp"
 #include "frame.hpp"
 #include "frameontape.hpp"
@@ -61,6 +62,7 @@ public:
         , m_crop(nullptr)
         , m_text(nullptr)
         , m_rect(nullptr)
+        , m_arrow(nullptr)
         , m_scroll(nullptr)
         , m_q(parent)
     {
@@ -76,6 +78,8 @@ public:
     TextFrame *m_text;
     //! Rect.
     RectFrame *m_rect;
+    //! Arrow.
+    ArrowFrame *m_arrow;
     //! Scroll area for tape.
     ScrollArea *m_scroll;
     //! Parent.
@@ -135,6 +139,8 @@ QRect View::selectedRect() const
         return m_d->m_text->selectionRect();
     } else if (m_d->m_rect) {
         return m_d->m_rect->selectionRect();
+    } else if (m_d->m_arrow) {
+        return m_d->m_arrow->selectionRect();
     } else {
         return QRect();
     }
@@ -198,6 +204,11 @@ RectFrame *View::rectFrame() const
     return m_d->m_rect;
 }
 
+ArrowFrame *View::arrowFrame() const
+{
+    return m_d->m_arrow;
+}
+
 void View::stopText()
 {
     if (m_d->m_text) {
@@ -232,6 +243,33 @@ void View::stopRect()
         m_d->m_rect->stop();
         m_d->m_rect->deleteLater();
         m_d->m_rect = nullptr;
+    }
+}
+
+void View::startArrow()
+{
+    if (!m_d->m_arrow) {
+        m_d->m_arrow = new ArrowFrame(tape(), m_d->m_currentFrame);
+        m_d->m_arrow->setStartMessage(
+            tr("Select a region for drawing an arrow with the mouse, when ready press Enter. "
+               "You can choose any frame from the tape to apply "
+               "arrow on that frame. If you clicked on "
+               "the frame, but don't want the arrow to be on it - uncheck this frame on the "
+               "tape. Press Escape for cancelling."));
+        connect(m_d->m_arrow, &ArrowFrame::applyEdit, this, &View::applyEdit);
+        m_d->m_arrow->setGeometry(QRect(0, 0, m_d->m_currentFrame->width(), m_d->m_currentFrame->height()));
+        m_d->m_arrow->show();
+        m_d->m_arrow->raise();
+        m_d->m_arrow->start();
+    }
+}
+
+void View::stopArrow()
+{
+    if (m_d->m_arrow) {
+        m_d->m_arrow->stop();
+        m_d->m_arrow->deleteLater();
+        m_d->m_arrow = nullptr;
     }
 }
 

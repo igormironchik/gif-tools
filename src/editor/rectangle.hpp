@@ -87,6 +87,8 @@ public:
     QRect m_available;
     //! Mouse pos.
     QPoint m_mousePos;
+    //! Mouse position where mouse was released.
+    QPoint m_releasePos;
     //! Selecting started.
     bool m_started;
     //! Nothing selected yet.
@@ -131,6 +133,8 @@ public:
     QRect selectionRect() const;
     //! \return Available rectangle.
     QRect availableRect() const;
+    //! \return Point where mouse was released.
+    const QPoint &releasePoint() const;
 
 public slots:
     //! Start.

@@ -30,7 +30,8 @@ signals:
     void switchToTextSelectionRectMode();
 
 public:
-    explicit TextFrame(Tape *tape, Frame *parent = nullptr);
+    explicit TextFrame(Tape *tape,
+                       Frame *parent = nullptr);
     ~TextFrame() noexcept override;
 
     using Documents = QMap<qsizetype, QTextDocument *>;

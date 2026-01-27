@@ -6,9 +6,9 @@
 // GIF editor include.
 #include "drawrect.hpp"
 #include "frame.hpp"
+#include "frameontape.hpp"
 #include "settings.hpp"
 #include "tape.hpp"
-#include "frameontape.hpp"
 
 // Qt include.
 #include <QColorDialog>
@@ -20,7 +20,8 @@
 // RectFrame
 //
 
-RectFrame::RectFrame(Tape *tape, Frame *parent)
+RectFrame::RectFrame(Tape *tape,
+                     Frame *parent)
     : RectangleSelection(parent)
     , m_tape(tape)
 {

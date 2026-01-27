@@ -27,7 +27,8 @@ public:
 
 public slots:
     //! Open GIF.
-    void openFile(const QString &fileName, bool afterShowEvent = false);
+    void openFile(const QString &fileName,
+                  bool afterShowEvent = false);
 
 private slots:
     //! Open GIF.
@@ -47,6 +48,8 @@ private slots:
     void insertText(bool on);
     //! Draw rectangle.
     void drawRect(bool on);
+    //! Draw arrow.
+    void drawArrow(bool on);
     //! Cancel edit.
     void cancelEdit();
     //! Apply edit.

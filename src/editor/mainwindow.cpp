@@ -8,6 +8,7 @@
 #include "about.hpp"
 #include "busyindicator.hpp"
 #include "crop.hpp"
+#include "drawarrow.hpp"
 #include "drawrect.hpp"
 #include "frame.hpp"
 #include "frameontape.hpp"
@@ -217,6 +218,60 @@ private:
     const QVector<qsizetype> &m_unchecked;
 }; // class ApplyRect
 
+class ApplyArrow final : public QRunnable
+{
+public:
+    ApplyArrow(BusyIndicator *receiver,
+               QGifLib::Gif *container,
+               const QRect &rect,
+               ArrowFrame::Orientation o,
+               const QSet<qsizetype> &frames,
+               const QVector<qsizetype> &unchecked)
+        : m_container(container)
+        , m_rect(rect)
+        , m_receiver(receiver)
+        , m_frames(frames)
+        , m_unchecked(unchecked)
+        , m_orientation(o)
+    {
+        setAutoDelete(false);
+    }
+
+    void run() override
+    {
+        const auto index = m_receiver->metaObject()->indexOfProperty("percent");
+        auto property = m_receiver->metaObject()->property(index);
+
+        int current = 0;
+        const auto count = m_frames.size();
+        const auto fileNames = m_container->fileNames();
+
+        property.write(m_receiver, 0);
+
+        for (const auto idx : std::as_const(m_frames)) {
+            if (!m_unchecked.contains(idx + 1)) {
+                QImage img(fileNames.at(idx));
+                QPainter p(&img);
+                ArrowFrame::drawArrow(p, m_rect, m_orientation);
+                img.save(fileNames.at(idx));
+            }
+
+            ++current;
+            property.write(m_receiver, qRound(((double)current / (double)count) * 100.0));
+        }
+
+        property.write(m_receiver, 100);
+    }
+
+private:
+    QGifLib::Gif *m_container;
+    QRect m_rect;
+    BusyIndicator *m_receiver;
+    const QSet<qsizetype> &m_frames;
+    const QVector<qsizetype> &m_unchecked;
+    ArrowFrame::Orientation m_orientation;
+}; // class ApplyRect
+
 } /* namespace anonymous */
 
 //
@@ -239,6 +294,7 @@ public:
         , m_crop(nullptr)
         , m_insertText(nullptr)
         , m_drawRect(nullptr)
+        , m_drawArrow(nullptr)
         , m_playStop(nullptr)
         , m_save(nullptr)
         , m_saveAs(nullptr)
@@ -258,6 +314,7 @@ public:
         , m_editToolBar(nullptr)
         , m_textToolBar(nullptr)
         , m_drawToolBar(nullptr)
+        , m_drawArrowToolBar(nullptr)
         , m_q(parent)
     {
         m_busy->setRadius(75);
@@ -268,7 +325,8 @@ public:
         Unknow,
         Crop,
         Text,
-        Rect
+        Rect,
+        Arrow
     }; // enum class EditMode
 
     //! Clear view.
@@ -306,6 +364,7 @@ public:
         m_crop->setEnabled(false);
         m_insertText->setEnabled(false);
         m_drawRect->setEnabled(false);
+        m_drawArrow->setEnabled(false);
         m_save->setEnabled(false);
         m_saveAs->setEnabled(false);
         m_open->setEnabled(false);
@@ -325,6 +384,7 @@ public:
         m_crop->setEnabled(true);
         m_insertText->setEnabled(true);
         m_drawRect->setEnabled(true);
+        m_drawArrow->setEnabled(true);
 
         if (!m_currentGif.isEmpty()) {
             if (m_q->isWindowModified()) {
@@ -403,6 +463,7 @@ public:
         m_crop->setEnabled(true);
         m_insertText->setEnabled(true);
         m_drawRect->setEnabled(true);
+        m_drawArrow->setEnabled(true);
         m_playStop->setEnabled(true);
         m_saveAs->setEnabled(true);
     }
@@ -437,6 +498,8 @@ public:
     QAction *m_insertText;
     //! Draw rect.
     QAction *m_drawRect;
+    //! Draw arrow.
+    QAction *m_drawArrow;
     //! Play/stop action.
     QAction *m_playStop;
     //! Save action.
@@ -475,6 +538,8 @@ public:
     QToolBar *m_textToolBar;
     //! Draw toolbar.
     QToolBar *m_drawToolBar;
+    //! Draw arror toolbar.
+    QToolBar *m_drawArrowToolBar;
     //! Play timer.
     QTimer *m_playTimer;
     //! Parent.
@@ -544,10 +609,18 @@ MainWindow::MainWindow()
     m_d->m_drawRect->setChecked(false);
     m_d->m_drawRect->setEnabled(false);
 
+    m_d->m_drawArrow = new QAction(QIcon(QStringLiteral(":/img/draw-path.png")), tr("Draw arrow"), this);
+    m_d->m_drawArrow->setShortcut(tr("Ctrl+A"));
+    m_d->m_drawArrow->setShortcutContext(Qt::ApplicationShortcut);
+    m_d->m_drawArrow->setCheckable(true);
+    m_d->m_drawArrow->setChecked(false);
+    m_d->m_drawArrow->setEnabled(false);
+
     auto actionsGroup = new QActionGroup(this);
     actionsGroup->addAction(m_d->m_crop);
     actionsGroup->addAction(m_d->m_insertText);
     actionsGroup->addAction(m_d->m_drawRect);
+    actionsGroup->addAction(m_d->m_drawArrow);
     actionsGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
 
     m_d->m_playStop = new QAction(QIcon(QStringLiteral(":/img/media-playback-start.png")), tr("Play"), this);
@@ -571,6 +644,7 @@ MainWindow::MainWindow()
     connect(m_d->m_crop, &QAction::toggled, this, &MainWindow::crop);
     connect(m_d->m_insertText, &QAction::toggled, this, &MainWindow::insertText);
     connect(m_d->m_drawRect, &QAction::toggled, this, &MainWindow::drawRect);
+    connect(m_d->m_drawArrow, &QAction::toggled, this, &MainWindow::drawArrow);
     connect(m_d->m_playStop, &QAction::triggered, this, &MainWindow::playStop);
     connect(m_d->m_applyEdit, &QAction::triggered, this, &MainWindow::applyEdit);
     connect(m_d->m_cancelEdit, &QAction::triggered, this, &MainWindow::cancelEdit);
@@ -581,6 +655,7 @@ MainWindow::MainWindow()
     edit->addAction(m_d->m_crop);
     edit->addAction(m_d->m_insertText);
     edit->addAction(m_d->m_drawRect);
+    edit->addAction(m_d->m_drawArrow);
 
     m_d->m_editToolBar = new QToolBar(tr("Tools"), this);
     m_d->m_editToolBar->addAction(m_d->m_playStop);
@@ -588,6 +663,7 @@ MainWindow::MainWindow()
     m_d->m_editToolBar->addAction(m_d->m_crop);
     m_d->m_editToolBar->addAction(m_d->m_insertText);
     m_d->m_editToolBar->addAction(m_d->m_drawRect);
+    m_d->m_editToolBar->addAction(m_d->m_drawArrow);
 
     addToolBar(Qt::LeftToolBarArea, m_d->m_editToolBar);
 
@@ -626,6 +702,14 @@ MainWindow::MainWindow()
     addToolBar(Qt::LeftToolBarArea, m_d->m_drawToolBar);
 
     m_d->m_drawToolBar->hide();
+
+    m_d->m_drawArrowToolBar = new QToolBar(tr("Drawing"), this);
+
+    m_d->m_drawArrowToolBar->addAction(m_d->m_penColor);
+
+    addToolBar(Qt::LeftToolBarArea, m_d->m_drawArrowToolBar);
+
+    m_d->m_drawArrowToolBar->hide();
 
     auto settings = menuBar()->addMenu(tr("&Settings"));
     settings->addAction(QIcon(QStringLiteral(":/img/configure.png")), tr("Settings"), this, &MainWindow::onSettings);
@@ -692,14 +776,17 @@ void MainWindow::showEvent(QShowEvent *e)
         }
 
         if (!m_d->m_fileNameToOpenAfterShow.isEmpty()) {
-            QTimer::singleShot(0, [this]() { this->openFile(this->m_d->m_fileNameToOpenAfterShow); });
+            QTimer::singleShot(0, [this]() {
+                this->openFile(this->m_d->m_fileNameToOpenAfterShow);
+            });
         }
     }
 
     e->accept();
 }
 
-void MainWindow::openFile(const QString &fileName, bool afterShowEvent)
+void MainWindow::openFile(const QString &fileName,
+                          bool afterShowEvent)
 {
     if (afterShowEvent && !m_d->m_shownAlready) {
         m_d->m_fileNameToOpenAfterShow = fileName;
@@ -937,6 +1024,30 @@ void MainWindow::drawRect(bool on)
     }
 }
 
+void MainWindow::drawArrow(bool on)
+{
+    if (on) {
+        m_d->enableFileActions(false);
+
+        m_d->m_editMode = MainWindowPrivate::EditMode::Arrow;
+
+        m_d->m_view->startArrow();
+
+        m_d->m_drawArrowToolBar->show();
+
+        connect(m_d->m_penColor, &QAction::triggered, m_d->m_view->arrowFrame(), &ArrowFrame::penColor);
+        connect(m_d->m_view->arrowFrame(), &ArrowFrame::started, this, &MainWindow::onRectSelectionStarted);
+    } else {
+        m_d->m_view->stopArrow();
+
+        m_d->m_drawArrowToolBar->hide();
+
+        m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
+
+        m_d->enableFileActions();
+    }
+}
+
 void MainWindow::cancelEdit()
 {
     m_d->m_view->stopCrop();
@@ -944,6 +1055,7 @@ void MainWindow::cancelEdit()
     m_d->m_crop->setEnabled(true);
     m_d->m_insertText->setEnabled(true);
     m_d->m_drawRect->setEnabled(true);
+    m_d->m_drawArrow->setEnabled(true);
 
     m_d->enableFileActions();
 
@@ -960,6 +1072,11 @@ void MainWindow::cancelEdit()
     case MainWindowPrivate::EditMode::Rect: {
         m_d->m_drawToolBar->hide();
         m_d->m_drawRect->setChecked(false);
+    } break;
+
+    case MainWindowPrivate::EditMode::Arrow: {
+        m_d->m_drawArrowToolBar->hide();
+        m_d->m_drawArrow->setChecked(false);
     } break;
 
     default:
@@ -1036,7 +1153,8 @@ void MainWindow::applyEdit()
         }
     } break;
 
-    case MainWindowPrivate::EditMode::Rect: {
+    case MainWindowPrivate::EditMode::Rect:
+    case MainWindowPrivate::EditMode::Arrow: {
         const auto rect = m_d->m_view->selectedRect();
 
         if (!rect.isNull()) {
@@ -1054,8 +1172,26 @@ void MainWindow::applyEdit()
                 }
             }
 
-            ApplyRect apply(m_d->m_busy, &m_d->m_frames, rect, m_d->m_view->rectFrame()->frames(), unchecked);
-            QThreadPool::globalInstance()->start(&apply);
+            switch (m_d->m_editMode) {
+            case MainWindowPrivate::EditMode::Rect: {
+                ApplyRect apply(m_d->m_busy, &m_d->m_frames, rect, m_d->m_view->rectFrame()->frames(), unchecked);
+                QThreadPool::globalInstance()->start(&apply);
+            } break;
+
+            case MainWindowPrivate::EditMode::Arrow: {
+                ApplyArrow apply(m_d->m_busy,
+                                 &m_d->m_frames,
+                                 rect,
+                                 m_d->m_view->arrowFrame()->orientation(),
+                                 m_d->m_view->arrowFrame()->frames(),
+                                 unchecked);
+                QThreadPool::globalInstance()->start(&apply);
+            } break;
+
+            default: {
+                break;
+            }
+            }
 
             m_d->waitThreadPool();
 
@@ -1183,12 +1319,19 @@ void MainWindow::onRectSelectionStarted()
     if (m_d->m_crop->isChecked()) {
         m_d->m_insertText->setEnabled(false);
         m_d->m_drawRect->setEnabled(false);
+        m_d->m_drawArrow->setEnabled(false);
     } else if (m_d->m_insertText->isChecked()) {
         m_d->m_crop->setEnabled(false);
         m_d->m_drawRect->setEnabled(false);
+        m_d->m_drawArrow->setEnabled(false);
     } else if (m_d->m_drawRect->isChecked()) {
         m_d->m_crop->setEnabled(false);
         m_d->m_insertText->setEnabled(false);
+        m_d->m_drawArrow->setEnabled(false);
+    } else if (m_d->m_drawArrow->isChecked()) {
+        m_d->m_crop->setEnabled(false);
+        m_d->m_insertText->setEnabled(false);
+        m_d->m_drawRect->setEnabled(false);
     }
 }
 

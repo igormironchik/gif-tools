@@ -24,7 +24,8 @@ signals:
     void applyEdit();
 
 public:
-    explicit RectFrame(Tape *tape, Frame *parent = nullptr);
+    explicit RectFrame(Tape *tape,
+                       Frame *parent = nullptr);
     ~RectFrame() noexcept override;
 
     static void drawRect(QPainter &p,

@@ -6,9 +6,9 @@
 // GIF editor include.
 #include "text.hpp"
 #include "frame.hpp"
-#include "texteditor.hpp"
 #include "frameontape.hpp"
 #include "tape.hpp"
+#include "texteditor.hpp"
 
 // Qt include.
 #include <QAbstractTextDocumentLayout>
@@ -21,7 +21,8 @@
 // TextFrame
 //
 
-TextFrame::TextFrame(Tape *tape, Frame *parent)
+TextFrame::TextFrame(Tape *tape,
+                     Frame *parent)
     : RectangleSelection(parent)
     , m_tape(tape)
 {

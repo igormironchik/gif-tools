@@ -14,7 +14,6 @@
 #include <QLabel>
 #include <QMenu>
 #include <QVBoxLayout>
-#include <QLabel>
 
 //
 // FrameOnTapePrivate
