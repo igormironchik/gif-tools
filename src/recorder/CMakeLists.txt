@@ -7,9 +7,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6Core REQUIRED)
-find_package(Qt6Widgets REQUIRED)
-find_package(Qt6Gui REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui Concurrent)
 
 set(SRC main.cpp
 	mainwindow.hpp
@@ -35,7 +33,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../shared
 
 add_executable(gif-recorder WIN32 ${SRC})
 
-target_link_libraries(gif-recorder qgiflib gif-widgets Qt6::Widgets Qt6::Gui Qt6::Core)
+target_link_libraries(gif-recorder qgiflib gif-widgets Qt6::Concurrent Qt6::Widgets Qt6::Gui Qt6::Core)
 
 if(UNIX)
     target_link_libraries(gif-recorder Xtst Xfixes X11)

@@ -29,12 +29,12 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QPalette>
+#include <QPromise>
 #include <QResizeEvent>
-#include <QRunnable>
 #include <QScreen>
 #include <QSpacerItem>
 #include <QStandardPaths>
-#include <QThreadPool>
+#include <QtConcurrent>
 
 #ifdef Q_OS_LINUX
 #include <X11/Xlib.h>
@@ -449,13 +449,9 @@ void MainWindow::onRecord()
             }
 
             save(fileName);
+        } else {
+            clear();
         }
-
-        m_frames.clear();
-        m_dir.remove();
-        m_counter = 0;
-        m_elapsed.invalidate();
-        m_delays.clear();
     } else {
         m_skipQuitEvent = true;
         m_title->recordButton()->setText(tr("Stop"));
@@ -765,42 +761,22 @@ void MainWindow::makeFrame()
 namespace /* anonymous */
 {
 
-class WriteGIF final : public QRunnable
+void writeGIF(QPromise<void> &,
+              MainWindow *progressReceiver,
+              const QStringList &frames,
+              const QVector<int> &delays,
+              const QString &fileName)
 {
-public:
-    WriteGIF(MainWindow *progressReceiver,
-             const QStringList &frames,
-             const QVector<int> &delays,
-             const QString &fileName)
-        : m_frames(frames)
-        , m_delays(delays)
-        , m_fileName(fileName)
-        , m_progressReceiver(progressReceiver)
-    {
-        setAutoDelete(false);
+    QGifLib::Gif gif;
+
+    QObject::connect(&gif, &QGifLib::Gif::writeProgress, progressReceiver, &MainWindow::onWritePercent);
+
+    if (!gif.write(fileName, frames, delays, 0)) {
+        int methodIndex = progressReceiver->metaObject()->indexOfMethod("onWritePercent(int)");
+        QMetaMethod method = progressReceiver->metaObject()->method(methodIndex);
+        method.invoke(progressReceiver, Qt::QueuedConnection, 100);
     }
-
-    ~WriteGIF() noexcept override = default;
-
-    void run() override
-    {
-        QGifLib::Gif gif;
-
-        QObject::connect(&gif, &QGifLib::Gif::writeProgress, m_progressReceiver, &MainWindow::onWritePercent);
-
-        if (!gif.write(m_fileName, m_frames, m_delays, 0)) {
-            int methodIndex = m_progressReceiver->metaObject()->indexOfMethod("onWritePercent(int)");
-            QMetaMethod method = m_progressReceiver->metaObject()->method(methodIndex);
-            method.invoke(m_progressReceiver, Qt::QueuedConnection, 100);
-        }
-    }
-
-private:
-    const QStringList &m_frames;
-    const QVector<int> &m_delays;
-    QString m_fileName;
-    MainWindow *m_progressReceiver = nullptr;
-}; // class WriteGIF
+}
 
 } /* namespase anonymous */
 
@@ -811,24 +787,31 @@ void MainWindow::save(const QString &fileName)
 
     m_title->msg()->setText(tr("Writing GIF... Please wait."));
 
-    QApplication::processEvents();
-
     m_busy = true;
 
-    WriteGIF runnable(this, m_frames, m_delays, fileName);
-    QThreadPool::globalInstance()->start(&runnable);
+    connect(&m_watcher, &QFutureWatcher<void>::finished, this, &MainWindow::onGIFSaved);
+    auto future = QtConcurrent::run(writeGIF, this, m_frames, m_delays, fileName);
+    m_watcher.setFuture(future);
+}
 
-    while (!QThreadPool::globalInstance()->waitForDone(10)) {
-        QApplication::processEvents();
-    }
-
+void MainWindow::onGIFSaved()
+{
     m_busy = false;
 
     m_title->recordButton()->setEnabled(true);
     m_title->settingsButton()->setEnabled(true);
     m_title->msg()->setText({});
 
+    clear();
+}
+
+void MainWindow::clear()
+{
     m_frames.clear();
+    m_dir.remove();
+    m_counter = 0;
+    m_elapsed.invalidate();
+    m_delays.clear();
 }
 
 void MainWindow::closeEvent(QCloseEvent *e)

@@ -10,6 +10,7 @@
 #include <QBitmap>
 #include <QElapsedTimer>
 #include <QFrame>
+#include <QFutureWatcher>
 #include <QLabel>
 #include <QProgressBar>
 #include <QTemporaryDir>
@@ -158,6 +159,7 @@ private slots:
     void onKeyReleased(const QString &key);
     void onResizeRequested();
     void onTransparentForMouse(bool checked);
+    void onGIFSaved();
 
 private:
     void makeFrame();
@@ -166,6 +168,7 @@ private:
     void makeAndSetMask();
     void drawRect(QPainter *p,
                   const QColor &c);
+    void clear();
 
 private:
     Q_DISABLE_COPY(MainWindow)
@@ -201,4 +204,5 @@ private:
     QRegion m_bottom;
     QRegion m_bottomRight;
     QColor m_color;
+    QFutureWatcher<void> m_watcher;
 }; // class MainWindow
