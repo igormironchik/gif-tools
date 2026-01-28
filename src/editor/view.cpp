@@ -230,6 +230,7 @@ void View::startRect()
                "the frame, but don't want the rectangle to be on it - uncheck this frame on the "
                "tape. Press Escape for cancelling."));
         connect(m_d->m_rect, &RectFrame::applyEdit, this, &View::applyEdit);
+        connect(this, &View::doRepaint, m_d->m_rect, qOverload<>(&RectFrame::update));
         m_d->m_rect->setGeometry(QRect(0, 0, m_d->m_currentFrame->width(), m_d->m_currentFrame->height()));
         m_d->m_rect->show();
         m_d->m_rect->raise();
@@ -257,6 +258,7 @@ void View::startArrow()
                "the frame, but don't want the arrow to be on it - uncheck this frame on the "
                "tape. Press Escape for cancelling."));
         connect(m_d->m_arrow, &ArrowFrame::applyEdit, this, &View::applyEdit);
+        connect(this, &View::doRepaint, m_d->m_arrow, qOverload<>(&ArrowFrame::update));
         m_d->m_arrow->setGeometry(QRect(0, 0, m_d->m_currentFrame->width(), m_d->m_currentFrame->height()));
         m_d->m_arrow->show();
         m_d->m_arrow->raise();

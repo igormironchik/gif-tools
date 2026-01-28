@@ -33,12 +33,6 @@ public:
 
     const QSet<qsizetype> &frames() const;
 
-public slots:
-    //! Pen color.
-    void penColor();
-    //! Brush color.
-    void brushColor();
-
 private slots:
     void onStarted();
 

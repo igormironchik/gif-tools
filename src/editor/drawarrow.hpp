@@ -45,12 +45,6 @@ public:
     //! \return Orientation.
     Orientation orientation() const;
 
-public slots:
-    //! Pen color.
-    void penColor();
-    //! Rotate.
-    void rotate();
-
 private slots:
     void onStarted();
     void imagePosChanged(qsizetype idx);

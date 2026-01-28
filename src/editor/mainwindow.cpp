@@ -17,12 +17,12 @@
 #include "text.hpp"
 #include "view.hpp"
 
-#include <QTextBlock>
 // Qt include.
 #include <QAction>
 #include <QActionGroup>
 #include <QApplication>
 #include <QCloseEvent>
+#include <QColorDialog>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMenuBar>
@@ -31,12 +31,14 @@
 #include <QPainter>
 #include <QResizeEvent>
 #include <QRunnable>
+#include <QSpinBox>
 #include <QStackedWidget>
 #include <QStandardPaths>
 #include <QTextDocument>
 #include <QThreadPool>
 #include <QTimer>
 #include <QToolBar>
+#include <QToolButton>
 #include <QVector>
 #include <QWindow>
 
@@ -311,10 +313,14 @@ public:
         , m_finishText(nullptr)
         , m_penColor(nullptr)
         , m_brushColor(nullptr)
+        , m_penWidth(nullptr)
         , m_editToolBar(nullptr)
         , m_textToolBar(nullptr)
         , m_drawToolBar(nullptr)
         , m_drawArrowToolBar(nullptr)
+        , m_penWidthBox(nullptr)
+        , m_penWidthBtnOnDrawToolBar(nullptr)
+        , m_penWidthBtnOnDrawArrowToolBar(nullptr)
         , m_q(parent)
     {
         m_busy->setRadius(75);
@@ -532,6 +538,8 @@ public:
     QAction *m_penColor;
     //! Brush color.
     QAction *m_brushColor;
+    //! Pen width.
+    QAction *m_penWidth;
     //! Edit toolbar.
     QToolBar *m_editToolBar;
     //! Text toolbar.
@@ -542,6 +550,12 @@ public:
     QToolBar *m_drawArrowToolBar;
     //! Play timer.
     QTimer *m_playTimer;
+    //! Pen width box.
+    QSpinBox *m_penWidthBox;
+    //! Pen width tool button on draw tool bar.
+    QToolButton *m_penWidthBtnOnDrawToolBar;
+    //! Pen width tool button on draw arrow tool bar.
+    QToolButton *m_penWidthBtnOnDrawArrowToolBar;
     //! Parent.
     MainWindow *m_q;
 }; // class MainWindowPrivate
@@ -695,17 +709,25 @@ MainWindow::MainWindow()
 
     m_d->m_penColor = new QAction(QIcon(QStringLiteral(":/img/format-stroke-color.png")), tr("Stroke color"), this);
     m_d->m_brushColor = new QAction(QIcon(QStringLiteral(":/img/fill-color.png")), tr("Fill color"), this);
+    m_d->m_penWidth = new QAction(QIcon(QStringLiteral(":/img/distribute-horizontal-x.png")), tr("Pen width"), this);
+    m_d->m_penWidth->setCheckable(true);
+    m_d->m_penWidthBtnOnDrawToolBar = new QToolButton(this);
+    m_d->m_penWidthBtnOnDrawToolBar->setDefaultAction(m_d->m_penWidth);
 
     m_d->m_drawToolBar->addAction(m_d->m_penColor);
     m_d->m_drawToolBar->addAction(m_d->m_brushColor);
+    m_d->m_drawToolBar->addWidget(m_d->m_penWidthBtnOnDrawToolBar);
 
     addToolBar(Qt::LeftToolBarArea, m_d->m_drawToolBar);
 
     m_d->m_drawToolBar->hide();
 
     m_d->m_drawArrowToolBar = new QToolBar(tr("Drawing"), this);
+    m_d->m_penWidthBtnOnDrawArrowToolBar = new QToolButton(this);
+    m_d->m_penWidthBtnOnDrawArrowToolBar->setDefaultAction(m_d->m_penWidth);
 
     m_d->m_drawArrowToolBar->addAction(m_d->m_penColor);
+    m_d->m_drawArrowToolBar->addWidget(m_d->m_penWidthBtnOnDrawArrowToolBar);
 
     addToolBar(Qt::LeftToolBarArea, m_d->m_drawArrowToolBar);
 
@@ -729,6 +751,9 @@ MainWindow::MainWindow()
     setCentralWidget(m_d->m_stack);
 
     connect(m_d->m_view->tape(), &Tape::checkStateChanged, this, &MainWindow::frameChecked);
+    connect(m_d->m_penWidth, &QAction::toggled, this, &MainWindow::penWidth);
+    connect(m_d->m_penColor, &QAction::triggered, this, &MainWindow::penColor);
+    connect(m_d->m_brushColor, &QAction::triggered, this, &MainWindow::brushColor);
 }
 
 MainWindow::~MainWindow() noexcept
@@ -949,6 +974,8 @@ void MainWindow::frameChecked(int,
 void MainWindow::crop(bool on)
 {
     if (on) {
+        hidePenWidthSpinBox();
+
         m_d->enableFileActions(false);
 
         m_d->m_editMode = MainWindowPrivate::EditMode::Crop;
@@ -965,9 +992,48 @@ void MainWindow::crop(bool on)
     }
 }
 
+void MainWindow::penWidth(bool on)
+{
+    if (on) {
+        if (!m_d->m_penWidthBox) {
+            m_d->m_penWidthBox = new QSpinBox(this);
+            m_d->m_penWidthBox->setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+            m_d->m_penWidthBox->setMinimum(1);
+            m_d->m_penWidthBox->setMaximum(10);
+
+            connect(m_d->m_penWidthBox, &QSpinBox::valueChanged, [this](int v) {
+                Settings::instance().setPenWidth(v);
+                emit this->m_d->m_view->doRepaint();
+            });
+        }
+
+        m_d->m_penWidthBox->setValue(Settings::instance().penWidth());
+
+        if (m_d->m_penWidthBtnOnDrawToolBar->isVisible()) {
+            m_d->m_penWidthBox->move(m_d->m_drawToolBar->mapToGlobal(
+                QPoint(m_d->m_penWidthBtnOnDrawToolBar->x() + m_d->m_penWidthBtnOnDrawToolBar->width(),
+                       m_d->m_penWidthBtnOnDrawToolBar->y() + 1)));
+        } else {
+            m_d->m_penWidthBox->move(m_d->m_drawArrowToolBar->mapToGlobal(
+                QPoint(m_d->m_penWidthBtnOnDrawArrowToolBar->x() + m_d->m_penWidthBtnOnDrawArrowToolBar->width(),
+                       m_d->m_penWidthBtnOnDrawArrowToolBar->y() + 1)));
+        }
+
+        m_d->m_penWidthBox->show();
+    } else {
+        if (m_d->m_penWidthBox) {
+            m_d->m_penWidthBox->hide();
+            m_d->m_penWidthBox->deleteLater();
+            m_d->m_penWidthBox = nullptr;
+        }
+    }
+}
+
 void MainWindow::insertText(bool on)
 {
     if (on) {
+        hidePenWidthSpinBox();
+
         m_d->enableFileActions(false);
 
         m_d->m_editMode = MainWindowPrivate::EditMode::Text;
@@ -1002,6 +1068,8 @@ void MainWindow::insertText(bool on)
 void MainWindow::drawRect(bool on)
 {
     if (on) {
+        hidePenWidthSpinBox();
+
         m_d->enableFileActions(false);
 
         m_d->m_editMode = MainWindowPrivate::EditMode::Rect;
@@ -1010,8 +1078,6 @@ void MainWindow::drawRect(bool on)
 
         m_d->m_drawToolBar->show();
 
-        connect(m_d->m_penColor, &QAction::triggered, m_d->m_view->rectFrame(), &RectFrame::penColor);
-        connect(m_d->m_brushColor, &QAction::triggered, m_d->m_view->rectFrame(), &RectFrame::brushColor);
         connect(m_d->m_view->rectFrame(), &RectFrame::started, this, &MainWindow::onRectSelectionStarted);
     } else {
         m_d->m_view->stopRect();
@@ -1027,6 +1093,8 @@ void MainWindow::drawRect(bool on)
 void MainWindow::drawArrow(bool on)
 {
     if (on) {
+        hidePenWidthSpinBox();
+
         m_d->enableFileActions(false);
 
         m_d->m_editMode = MainWindowPrivate::EditMode::Arrow;
@@ -1035,7 +1103,6 @@ void MainWindow::drawArrow(bool on)
 
         m_d->m_drawArrowToolBar->show();
 
-        connect(m_d->m_penColor, &QAction::triggered, m_d->m_view->arrowFrame(), &ArrowFrame::penColor);
         connect(m_d->m_view->arrowFrame(), &ArrowFrame::started, this, &MainWindow::onRectSelectionStarted);
     } else {
         m_d->m_view->stopArrow();
@@ -1056,6 +1123,8 @@ void MainWindow::cancelEdit()
     m_d->m_insertText->setEnabled(true);
     m_d->m_drawRect->setEnabled(true);
     m_d->m_drawArrow->setEnabled(true);
+
+    hidePenWidthSpinBox();
 
     m_d->enableFileActions();
 
@@ -1385,4 +1454,42 @@ void MainWindow::onSettings()
     SettingsDlg dlg(this);
 
     dlg.exec();
+}
+
+void MainWindow::hidePenWidthSpinBox()
+{
+    if (m_d->m_penWidthBtnOnDrawToolBar->isChecked()) {
+        m_d->m_penWidthBtnOnDrawToolBar->setChecked(false);
+    }
+
+    if (m_d->m_penWidthBtnOnDrawArrowToolBar->isChecked()) {
+        m_d->m_penWidthBtnOnDrawArrowToolBar->setChecked(false);
+    }
+}
+
+void MainWindow::penColor()
+{
+    hidePenWidthSpinBox();
+
+    QColorDialog dlg(Settings::instance().penColor(), this);
+
+    if (dlg.exec() == QDialog::Accepted) {
+        Settings::instance().setPenColor(dlg.currentColor());
+
+        emit m_d->m_view->doRepaint();
+    }
+}
+
+void MainWindow::brushColor()
+{
+    hidePenWidthSpinBox();
+
+    QColorDialog dlg(Settings::instance().brushColor(), this);
+    dlg.setOption(QColorDialog::ShowAlphaChannel, true);
+
+    if (dlg.exec() == QDialog::Accepted) {
+        Settings::instance().setBrushColor(dlg.currentColor());
+
+        emit m_d->m_view->doRepaint();
+    }
 }

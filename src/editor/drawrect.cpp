@@ -11,7 +11,6 @@
 #include "tape.hpp"
 
 // Qt include.
-#include <QColorDialog>
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QPainter>
@@ -33,29 +32,6 @@ RectFrame::RectFrame(Tape *tape,
 
 RectFrame::~RectFrame() noexcept
 {
-}
-
-void RectFrame::penColor()
-{
-    QColorDialog dlg(Settings::instance().penColor(), this);
-
-    if (dlg.exec() == QDialog::Accepted) {
-        Settings::instance().setPenColor(dlg.currentColor());
-
-        update();
-    }
-}
-
-void RectFrame::brushColor()
-{
-    QColorDialog dlg(Settings::instance().brushColor(), this);
-    dlg.setOption(QColorDialog::ShowAlphaChannel, true);
-
-    if (dlg.exec() == QDialog::Accepted) {
-        Settings::instance().setBrushColor(dlg.currentColor());
-
-        update();
-    }
 }
 
 void RectFrame::onStarted()

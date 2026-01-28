@@ -36,6 +36,8 @@ class View final : public QWidget
 signals:
     //! Apply editing.
     void applyEdit();
+    //! Reaint is needed.
+    void doRepaint();
 
 public:
     explicit View(const QGifLib::Gif &data,

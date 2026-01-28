@@ -11,7 +11,6 @@
 #include "tape.hpp"
 
 // Qt include.
-#include <QColorDialog>
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QPainter>
@@ -36,21 +35,6 @@ ArrowFrame::ArrowFrame(Tape *tape,
 }
 
 ArrowFrame::~ArrowFrame() noexcept
-{
-}
-
-void ArrowFrame::penColor()
-{
-    QColorDialog dlg(Settings::instance().penColor(), this);
-
-    if (dlg.exec() == QDialog::Accepted) {
-        Settings::instance().setPenColor(dlg.currentColor());
-
-        update();
-    }
-}
-
-void ArrowFrame::rotate()
 {
 }
 

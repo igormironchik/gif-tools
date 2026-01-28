@@ -44,6 +44,8 @@ private slots:
                       bool on);
     //! Crop.
     void crop(bool on);
+    //! Change pen width.
+    void penWidth(bool on);
     //! Insert text.
     void insertText(bool on);
     //! Draw rectangle.
@@ -74,6 +76,13 @@ private slots:
     void applyText();
     //! Show setting dlg.
     void onSettings();
+    //! Change pen color.
+    void penColor();
+    //! Change brush color.
+    void brushColor();
+
+private:
+    void hidePenWidthSpinBox();
 
 protected:
     void resizeEvent(QResizeEvent *e) override;
