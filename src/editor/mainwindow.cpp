@@ -1023,6 +1023,8 @@ void MainWindow::applyEdit()
 {
     m_d->m_unchecked.clear();
 
+    hidePenWidthSpinBox();
+
     switch (m_d->m_editMode) {
     case MainWindowPrivate::EditMode::Crop: {
         const auto rect = m_d->m_view->selectedRect();
@@ -1226,6 +1228,8 @@ void MainWindow::onRectSelectionStarted()
 void MainWindow::applyText()
 {
     m_d->m_unchecked.clear();
+
+    hidePenWidthSpinBox();
 
     const auto rect = m_d->m_view->selectedRect();
 
