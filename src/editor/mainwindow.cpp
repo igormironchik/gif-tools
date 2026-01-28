@@ -57,9 +57,9 @@ namespace /* anonymous */
 {
 
 void writeGIFFunc(BusyIndicator *receiver,
-              const QStringList &files,
-              const QVector<int> &delays,
-              const QString &fileName)
+                  const QStringList &files,
+                  const QVector<int> &delays,
+                  const QString &fileName)
 {
     QGifLib::Gif gif;
 
@@ -69,16 +69,16 @@ void writeGIFFunc(BusyIndicator *receiver,
 }
 
 void readGIFFunc(QPromise<void> &,
-             QGifLib::Gif *container,
-             const QString &fileName)
+                 QGifLib::Gif *container,
+                 const QString &fileName)
 {
     container->load(fileName);
 }
 
 void cropGIFFunc(QPromise<void> &,
-             BusyIndicator *receiver,
-             QGifLib::Gif *container,
-             const QRect &rect)
+                 BusyIndicator *receiver,
+                 QGifLib::Gif *container,
+                 const QRect &rect)
 {
     const auto index = receiver->metaObject()->indexOfProperty("percent");
     auto property = receiver->metaObject()->property(index);
@@ -98,11 +98,11 @@ void cropGIFFunc(QPromise<void> &,
 }
 
 void applyTextFunc(QPromise<void> &,
-               BusyIndicator *receiver,
-               QGifLib::Gif *container,
-               const QRect &rect,
-               const TextFrame::Documents &docs,
-               const QVector<qsizetype> &unchecked)
+                   BusyIndicator *receiver,
+                   QGifLib::Gif *container,
+                   const QRect &rect,
+                   const TextFrame::Documents &docs,
+                   const QVector<qsizetype> &unchecked)
 {
     const auto index = receiver->metaObject()->indexOfProperty("percent");
     auto property = receiver->metaObject()->property(index);
@@ -134,11 +134,11 @@ void applyTextFunc(QPromise<void> &,
 }
 
 void applyRectFunc(QPromise<void> &,
-               BusyIndicator *receiver,
-               QGifLib::Gif *container,
-               const QRect &rect,
-               const QSet<qsizetype> &frames,
-               const QVector<qsizetype> &unchecked)
+                   BusyIndicator *receiver,
+                   QGifLib::Gif *container,
+                   const QRect &rect,
+                   const QSet<qsizetype> &frames,
+                   const QVector<qsizetype> &unchecked)
 {
     const auto index = receiver->metaObject()->indexOfProperty("percent");
     auto property = receiver->metaObject()->property(index);
@@ -165,12 +165,12 @@ void applyRectFunc(QPromise<void> &,
 }
 
 void applyArrowFunc(QPromise<void> &,
-                BusyIndicator *receiver,
-                QGifLib::Gif *container,
-                const QRect &rect,
-                ArrowFrame::Orientation o,
-                const QSet<qsizetype> &frames,
-                const QVector<qsizetype> &unchecked)
+                    BusyIndicator *receiver,
+                    QGifLib::Gif *container,
+                    const QRect &rect,
+                    ArrowFrame::Orientation o,
+                    const QSet<qsizetype> &frames,
+                    const QVector<qsizetype> &unchecked)
 {
     const auto index = receiver->metaObject()->indexOfProperty("percent");
     auto property = receiver->metaObject()->property(index);
