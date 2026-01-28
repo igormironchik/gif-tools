@@ -56,7 +56,8 @@
 namespace /* anonymous */
 {
 
-void writeGIFFunc(BusyIndicator *receiver,
+void writeGIFFunc(QPromise<void> &,
+                  BusyIndicator *receiver,
                   const QStringList &files,
                   const QVector<int> &delays,
                   const QString &fileName)
