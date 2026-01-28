@@ -8,7 +8,7 @@ you can easily record a problem, with mouse clicks, key presses, I think
 this is very helpful for a developer to see a real record of a problem in bug report.
 
 In editor QA can add a text (even making an animation is possible) or highlight something
-important with rectangle, it's a very easy tool. When editing tool in editor will be
+important with rectangle, draw arrow, it's a very easy tool. When editing tool in editor will be
 chosen user will see a description text how to use this or that tool, these messages can
 be turned off in settings dialogue.
 
