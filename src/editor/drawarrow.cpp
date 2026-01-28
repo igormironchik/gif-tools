@@ -190,7 +190,9 @@ void ArrowFrame::drawArrow(QPainter &p,
                            const QRect &r,
                            Orientation o)
 {
-    p.setPen(QPen(Settings::instance().penColor(), Settings::instance().penWidth()));
+    QPen pen(Settings::instance().penColor(), Settings::instance().penWidth());
+    pen.setJoinStyle(Qt::MiterJoin);
+    p.setPen(pen);
     p.setBrush(Settings::instance().penColor());
     p.setRenderHint(QPainter::Antialiasing, true);
 
