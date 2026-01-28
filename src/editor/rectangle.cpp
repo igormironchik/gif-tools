@@ -526,6 +526,8 @@ void RectangleSelection::paintEvent(QPaintEvent *)
 
 void RectangleSelection::mousePressEvent(QMouseEvent *e)
 {
+    emit clicked();
+
     if (m_d->m_mouseEnabled) {
         if (e->button() == Qt::LeftButton) {
             m_d->m_clicked = true;

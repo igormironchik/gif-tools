@@ -120,6 +120,7 @@ class RectangleSelection : public QWidget
 
 signals:
     void started();
+    void clicked();
 
 public:
     RectangleSelection(Frame *parent = nullptr);

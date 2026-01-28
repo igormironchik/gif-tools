@@ -1079,6 +1079,7 @@ void MainWindow::drawRect(bool on)
         m_d->m_drawToolBar->show();
 
         connect(m_d->m_view->rectFrame(), &RectFrame::started, this, &MainWindow::onRectSelectionStarted);
+        connect(m_d->m_view->rectFrame(), &RectFrame::clicked, this, &MainWindow::hidePenWidthSpinBox);
     } else {
         m_d->m_view->stopRect();
 
@@ -1104,6 +1105,7 @@ void MainWindow::drawArrow(bool on)
         m_d->m_drawArrowToolBar->show();
 
         connect(m_d->m_view->arrowFrame(), &ArrowFrame::started, this, &MainWindow::onRectSelectionStarted);
+        connect(m_d->m_view->arrowFrame(), &ArrowFrame::clicked, this, &MainWindow::hidePenWidthSpinBox);
     } else {
         m_d->m_view->stopArrow();
 
@@ -1458,12 +1460,26 @@ void MainWindow::onSettings()
 
 void MainWindow::hidePenWidthSpinBox()
 {
+    QPointF scenePos(-1, -1);
+
     if (m_d->m_penWidthBtnOnDrawToolBar->isChecked()) {
         m_d->m_penWidthBtnOnDrawToolBar->setChecked(false);
+
+        QHoverEvent ev(QEvent::HoverLeave,
+                       scenePos,
+                       m_d->m_penWidthBtnOnDrawToolBar->mapToGlobal(scenePos.toPoint()),
+                       {0, 0});
+        QApplication::sendEvent(m_d->m_penWidthBtnOnDrawToolBar, &ev);
     }
 
     if (m_d->m_penWidthBtnOnDrawArrowToolBar->isChecked()) {
         m_d->m_penWidthBtnOnDrawArrowToolBar->setChecked(false);
+
+        QHoverEvent ev(QEvent::HoverLeave,
+                       scenePos,
+                       m_d->m_penWidthBtnOnDrawArrowToolBar->mapToGlobal(scenePos.toPoint()),
+                       {0, 0});
+        QApplication::sendEvent(m_d->m_penWidthBtnOnDrawArrowToolBar, &ev);
     }
 }
 

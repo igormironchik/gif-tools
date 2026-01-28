@@ -80,8 +80,7 @@ private slots:
     void penColor();
     //! Change brush color.
     void brushColor();
-
-private:
+    //! Hide pen width spin box.
     void hidePenWidthSpinBox();
 
 protected:
