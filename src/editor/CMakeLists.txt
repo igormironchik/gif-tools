@@ -7,9 +7,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6Core REQUIRED)
-find_package(Qt6Widgets REQUIRED)
-find_package(Qt6Gui REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui Concurrent)
 
 set(SRC main.cpp
 	about.cpp
@@ -55,6 +53,6 @@ include_directories(${ImageMagick_INCLUDE_DIRS}
 
 add_executable(gif-editor WIN32 ${SRC})
 
-target_link_libraries(gif-editor qgiflib gif-widgets Qt6::Widgets Qt6::Gui Qt6::Core)
+target_link_libraries(gif-editor qgiflib gif-widgets Qt6::Concurrent Qt6::Widgets Qt6::Gui Qt6::Core)
 
 install(TARGETS gif-editor)

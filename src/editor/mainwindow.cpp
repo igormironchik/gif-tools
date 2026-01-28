@@ -25,12 +25,13 @@
 #include <QColorDialog>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QFutureWatcher>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QMetaMethod>
 #include <QPainter>
+#include <QPromise>
 #include <QResizeEvent>
-#include <QRunnable>
 #include <QSpinBox>
 #include <QStackedWidget>
 #include <QStandardPaths>
@@ -41,6 +42,7 @@
 #include <QToolButton>
 #include <QVector>
 #include <QWindow>
+#include <QtConcurrent>
 
 // C++ include.
 #include <algorithm>
@@ -54,225 +56,145 @@
 namespace /* anonymous */
 {
 
-class ReadGIF final : public QRunnable
+void writeGIFFunc(BusyIndicator *receiver,
+              const QStringList &files,
+              const QVector<int> &delays,
+              const QString &fileName)
 {
-public:
-    ReadGIF(QGifLib::Gif *container,
-            const QString &fileName)
-        : m_container(container)
-        , m_fileName(fileName)
-    {
-        setAutoDelete(false);
-    }
+    QGifLib::Gif gif;
 
-    void run() override
-    {
-        m_container->load(m_fileName);
-    }
+    QObject::connect(&gif, &QGifLib::Gif::writeProgress, receiver, &BusyIndicator::setPercent);
 
-private:
-    QGifLib::Gif *m_container;
-    QString m_fileName;
-}; // class ReadGIF
+    gif.write(fileName, files, delays, 0);
+}
 
-class CropGIF final : public QRunnable
+void readGIFFunc(QPromise<void> &,
+             QGifLib::Gif *container,
+             const QString &fileName)
 {
-public:
-    CropGIF(BusyIndicator *receiver,
-            QGifLib::Gif *container,
-            const QRect &rect)
-        : m_container(container)
-        , m_rect(rect)
-        , m_receiver(receiver)
-    {
-        setAutoDelete(false);
-    }
+    container->load(fileName);
+}
 
-    void run() override
-    {
-        const auto index = m_receiver->metaObject()->indexOfProperty("percent");
-        auto property = m_receiver->metaObject()->property(index);
-
-        int current = 0;
-        const auto count = m_container->fileNames().size();
-
-        property.write(m_receiver, 0);
-
-        for (const auto &fileName : m_container->fileNames()) {
-            QImage(fileName).copy(m_rect).save(fileName);
-            ++current;
-            property.write(m_receiver, qRound(((double)current / (double)count) * 100.0));
-        }
-
-        property.write(m_receiver, 100);
-    }
-
-private:
-    QGifLib::Gif *m_container;
-    QRect m_rect;
-    BusyIndicator *m_receiver;
-}; // class CropGIF
-
-class ApplyText final : public QRunnable
+void cropGIFFunc(QPromise<void> &,
+             BusyIndicator *receiver,
+             QGifLib::Gif *container,
+             const QRect &rect)
 {
-public:
-    ApplyText(BusyIndicator *receiver,
-              QGifLib::Gif *container,
-              const QRect &rect,
-              const TextFrame::Documents &docs,
-              const QVector<qsizetype> &unchecked)
-        : m_container(container)
-        , m_rect(rect)
-        , m_receiver(receiver)
-        , m_docs(docs)
-        , m_unchecked(unchecked)
-    {
-        setAutoDelete(false);
+    const auto index = receiver->metaObject()->indexOfProperty("percent");
+    auto property = receiver->metaObject()->property(index);
+
+    int current = 0;
+    const auto count = container->fileNames().size();
+
+    property.write(receiver, 0);
+
+    for (const auto &fileName : container->fileNames()) {
+        QImage(fileName).copy(rect).save(fileName);
+        ++current;
+        property.write(receiver, qRound(((double)current / (double)count) * 100.0));
     }
 
-    void run() override
-    {
-        const auto index = m_receiver->metaObject()->indexOfProperty("percent");
-        auto property = m_receiver->metaObject()->property(index);
+    property.write(receiver, 100);
+}
 
-        int current = 0;
-        const auto count = m_docs.size();
-        const auto fileNames = m_container->fileNames();
-
-        property.write(m_receiver, 0);
-
-        for (const auto idx : m_docs.keys()) {
-            if (!m_unchecked.contains(idx + 1)) {
-                QImage img(fileNames.at(idx));
-                QPainter p(&img);
-                QTextDocument *doc = m_docs[idx]->clone();
-                doc->setPageSize(m_rect.size().toSizeF());
-                doc->setTextWidth(m_rect.width());
-                p.translate(m_rect.topLeft());
-                doc->drawContents(&p);
-                doc->deleteLater();
-                img.save(fileNames.at(idx));
-            }
-
-            ++current;
-            property.write(m_receiver, qRound(((double)current / (double)count) * 100.0));
-        }
-
-        property.write(m_receiver, 100);
-    }
-
-private:
-    QGifLib::Gif *m_container;
-    QRect m_rect;
-    BusyIndicator *m_receiver;
-    const TextFrame::Documents &m_docs;
-    const QVector<qsizetype> &m_unchecked;
-}; // class ApplyText
-
-class ApplyRect final : public QRunnable
-{
-public:
-    ApplyRect(BusyIndicator *receiver,
-              QGifLib::Gif *container,
-              const QRect &rect,
-              const QSet<qsizetype> &frames,
-              const QVector<qsizetype> &unchecked)
-        : m_container(container)
-        , m_rect(rect)
-        , m_receiver(receiver)
-        , m_frames(frames)
-        , m_unchecked(unchecked)
-    {
-        setAutoDelete(false);
-    }
-
-    void run() override
-    {
-        const auto index = m_receiver->metaObject()->indexOfProperty("percent");
-        auto property = m_receiver->metaObject()->property(index);
-
-        int current = 0;
-        const auto count = m_frames.size();
-        const auto fileNames = m_container->fileNames();
-
-        property.write(m_receiver, 0);
-
-        for (const auto idx : std::as_const(m_frames)) {
-            if (!m_unchecked.contains(idx + 1)) {
-                QImage img(fileNames.at(idx));
-                QPainter p(&img);
-                RectFrame::drawRect(p, m_rect);
-                img.save(fileNames.at(idx));
-            }
-
-            ++current;
-            property.write(m_receiver, qRound(((double)current / (double)count) * 100.0));
-        }
-
-        property.write(m_receiver, 100);
-    }
-
-private:
-    QGifLib::Gif *m_container;
-    QRect m_rect;
-    BusyIndicator *m_receiver;
-    const QSet<qsizetype> &m_frames;
-    const QVector<qsizetype> &m_unchecked;
-}; // class ApplyRect
-
-class ApplyArrow final : public QRunnable
-{
-public:
-    ApplyArrow(BusyIndicator *receiver,
+void applyTextFunc(QPromise<void> &,
+               BusyIndicator *receiver,
                QGifLib::Gif *container,
                const QRect &rect,
-               ArrowFrame::Orientation o,
-               const QSet<qsizetype> &frames,
+               const TextFrame::Documents &docs,
                const QVector<qsizetype> &unchecked)
-        : m_container(container)
-        , m_rect(rect)
-        , m_receiver(receiver)
-        , m_frames(frames)
-        , m_unchecked(unchecked)
-        , m_orientation(o)
-    {
-        setAutoDelete(false);
-    }
+{
+    const auto index = receiver->metaObject()->indexOfProperty("percent");
+    auto property = receiver->metaObject()->property(index);
 
-    void run() override
-    {
-        const auto index = m_receiver->metaObject()->indexOfProperty("percent");
-        auto property = m_receiver->metaObject()->property(index);
+    int current = 0;
+    const auto count = docs.size();
+    const auto fileNames = container->fileNames();
 
-        int current = 0;
-        const auto count = m_frames.size();
-        const auto fileNames = m_container->fileNames();
+    property.write(receiver, 0);
 
-        property.write(m_receiver, 0);
-
-        for (const auto idx : std::as_const(m_frames)) {
-            if (!m_unchecked.contains(idx + 1)) {
-                QImage img(fileNames.at(idx));
-                QPainter p(&img);
-                ArrowFrame::drawArrow(p, m_rect, m_orientation);
-                img.save(fileNames.at(idx));
-            }
-
-            ++current;
-            property.write(m_receiver, qRound(((double)current / (double)count) * 100.0));
+    for (const auto idx : docs.keys()) {
+        if (!unchecked.contains(idx + 1)) {
+            QImage img(fileNames.at(idx));
+            QPainter p(&img);
+            QTextDocument *doc = docs[idx]->clone();
+            doc->setPageSize(rect.size().toSizeF());
+            doc->setTextWidth(rect.width());
+            p.translate(rect.topLeft());
+            doc->drawContents(&p);
+            doc->deleteLater();
+            img.save(fileNames.at(idx));
         }
 
-        property.write(m_receiver, 100);
+        ++current;
+        property.write(receiver, qRound(((double)current / (double)count) * 100.0));
     }
 
-private:
-    QGifLib::Gif *m_container;
-    QRect m_rect;
-    BusyIndicator *m_receiver;
-    const QSet<qsizetype> &m_frames;
-    const QVector<qsizetype> &m_unchecked;
-    ArrowFrame::Orientation m_orientation;
-}; // class ApplyRect
+    property.write(receiver, 100);
+}
+
+void applyRectFunc(QPromise<void> &,
+               BusyIndicator *receiver,
+               QGifLib::Gif *container,
+               const QRect &rect,
+               const QSet<qsizetype> &frames,
+               const QVector<qsizetype> &unchecked)
+{
+    const auto index = receiver->metaObject()->indexOfProperty("percent");
+    auto property = receiver->metaObject()->property(index);
+
+    int current = 0;
+    const auto count = frames.size();
+    const auto fileNames = container->fileNames();
+
+    property.write(receiver, 0);
+
+    for (const auto idx : std::as_const(frames)) {
+        if (!unchecked.contains(idx + 1)) {
+            QImage img(fileNames.at(idx));
+            QPainter p(&img);
+            RectFrame::drawRect(p, rect);
+            img.save(fileNames.at(idx));
+        }
+
+        ++current;
+        property.write(receiver, qRound(((double)current / (double)count) * 100.0));
+    }
+
+    property.write(receiver, 100);
+}
+
+void applyArrowFunc(QPromise<void> &,
+                BusyIndicator *receiver,
+                QGifLib::Gif *container,
+                const QRect &rect,
+                ArrowFrame::Orientation o,
+                const QSet<qsizetype> &frames,
+                const QVector<qsizetype> &unchecked)
+{
+    const auto index = receiver->metaObject()->indexOfProperty("percent");
+    auto property = receiver->metaObject()->property(index);
+
+    int current = 0;
+    const auto count = frames.size();
+    const auto fileNames = container->fileNames();
+
+    property.write(receiver, 0);
+
+    for (const auto idx : std::as_const(frames)) {
+        if (!unchecked.contains(idx + 1)) {
+            QImage img(fileNames.at(idx));
+            QPainter p(&img);
+            ArrowFrame::drawArrow(p, rect, o);
+            img.save(fileNames.at(idx));
+        }
+
+        ++current;
+        property.write(receiver, qRound(((double)current / (double)count) * 100.0));
+    }
+
+    property.write(receiver, 100);
+}
 
 } /* namespace anonymous */
 
@@ -405,13 +327,6 @@ public:
 
         m_editToolBar->show();
     }
-    //! Wait for thread pool.
-    void waitThreadPool()
-    {
-        while (!QThreadPool::globalInstance()->waitForDone(5)) {
-            QApplication::processEvents();
-        }
-    }
     //! Set modified state.
     void setModified(bool on)
     {
@@ -450,28 +365,9 @@ public:
 
         m_currentGif = fileName;
 
-        ReadGIF read(&m_frames, fileName);
-        QThreadPool::globalInstance()->start(&read);
-
-        waitThreadPool();
-
-        QFileInfo info(fileName);
-
-        m_q->setWindowTitle(MainWindow::tr("GIF Editor - %1[*]").arg(info.fileName()));
-
-        initTape();
-
-        if (m_frames.count()) {
-            m_view->tape()->setCurrentFrame(1);
-            m_view->scrollTo(1);
-        }
-
-        m_crop->setEnabled(true);
-        m_insertText->setEnabled(true);
-        m_drawRect->setEnabled(true);
-        m_drawArrow->setEnabled(true);
-        m_playStop->setEnabled(true);
-        m_saveAs->setEnabled(true);
+        m_q->connect(&m_watcher, &QFutureWatcher<void>::finished, m_q, &MainWindow::gifLoaded);
+        auto future = QtConcurrent::run(readGIFFunc, &m_frames, fileName);
+        m_watcher.setFuture(future);
     }
 
     //! Current file name.
@@ -490,6 +386,10 @@ public:
     bool m_shownAlready = false;
     //! File name to open after show event.
     QString m_fileNameToOpenAfterShow;
+    //! Future watcher.
+    QFutureWatcher<void> m_watcher;
+    //! Unchecked frames.
+    QVector<qsizetype> m_unchecked;
     //! Stacked widget.
     QStackedWidget *m_stack;
     //! Busy indicator.
@@ -835,8 +735,6 @@ void MainWindow::openFile(const QString &fileName,
         m_d->busy();
 
         m_d->openGif(fileName);
-
-        m_d->ready();
     }
 }
 
@@ -852,42 +750,6 @@ void MainWindow::openGif()
 
     openFile(fileName);
 }
-
-namespace /* anonymous */
-{
-
-class WriteGIF final : public QRunnable
-{
-public:
-    WriteGIF(BusyIndicator *receiver,
-             const QStringList &files,
-             const QVector<int> &delays,
-             const QString &fileName)
-        : m_files(files)
-        , m_delays(delays)
-        , m_fileName(fileName)
-        , m_receiver(receiver)
-    {
-        setAutoDelete(false);
-    }
-
-    void run() override
-    {
-        QGifLib::Gif gif;
-
-        QObject::connect(&gif, &QGifLib::Gif::writeProgress, m_receiver, &BusyIndicator::setPercent);
-
-        gif.write(m_fileName, m_files, m_delays, 0);
-    }
-
-private:
-    const QStringList &m_files;
-    const QVector<int> &m_delays;
-    QString m_fileName;
-    BusyIndicator *m_receiver;
-}; // class WriteGIF
-
-} /* namespace anonymous */
 
 void MainWindow::saveGif()
 {
@@ -908,19 +770,14 @@ void MainWindow::saveGif()
         if (!toSave.empty()) {
             m_d->m_busy->setShowPercent(true);
 
-            WriteGIF runnable(m_d->m_busy, toSave, delays, m_d->m_currentGif);
-            QThreadPool::globalInstance()->start(&runnable);
-
-            m_d->waitThreadPool();
-
-            m_d->m_busy->setShowPercent(false);
-
-            m_d->openGif(m_d->m_currentGif);
+            connect(&m_d->m_watcher, &QFutureWatcher<void>::finished, this, &MainWindow::gifSaved);
+            auto future = QtConcurrent::run(writeGIFFunc, m_d->m_busy, toSave, delays, m_d->m_currentGif);
+            m_d->m_watcher.setFuture(future);
         } else {
+            m_d->ready();
+
             QMessageBox::information(this, tr("Can't save GIF..."), tr("Can't save GIF image with no frames."));
         }
-
-        m_d->ready();
     } catch (const std::bad_alloc &) {
         m_d->ready();
 
@@ -1159,12 +1016,12 @@ void MainWindow::cancelEdit()
     }
 
     m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
-
-    QApplication::processEvents();
 }
 
 void MainWindow::applyEdit()
 {
+    m_d->m_unchecked.clear();
+
     switch (m_d->m_editMode) {
     case MainWindowPrivate::EditMode::Crop: {
         const auto rect = m_d->m_view->selectedRect();
@@ -1172,43 +1029,17 @@ void MainWindow::applyEdit()
         if (!rect.isNull() && rect != m_d->m_view->currentFrame()->imageRect()) {
             m_d->busy();
 
-            QVector<int> unchecked;
-
             for (int i = 1; i <= m_d->m_view->tape()->count(); ++i) {
                 if (!m_d->m_view->tape()->frame(i)->isChecked()) {
-                    unchecked.append(i);
+                    m_d->m_unchecked.append(i);
                 }
             }
 
-            QApplication::processEvents();
-
             m_d->m_busy->setShowPercent(true);
 
-            CropGIF crop(m_d->m_busy, &m_d->m_frames, rect);
-            QThreadPool::globalInstance()->start(&crop);
-
-            m_d->waitThreadPool();
-
-            m_d->m_busy->setShowPercent(false);
-
-            const auto current = m_d->m_view->tape()->currentFrame()->counter();
-            m_d->m_view->tape()->clear();
-
-            QApplication::processEvents();
-
-            m_d->initTape();
-
-            m_d->m_view->tape()->setCurrentFrame(current);
-
-            for (const auto &i : std::as_const(unchecked)) {
-                m_d->m_view->tape()->frame(i)->setChecked(false);
-            }
-
-            m_d->setModified(true);
-
-            cancelEdit();
-
-            m_d->ready();
+            connect(&m_d->m_watcher, &QFutureWatcher<void>::finished, this, &MainWindow::gifCropped);
+            auto future = QtConcurrent::run(cropGIFFunc, m_d->m_busy, &m_d->m_frames, rect);
+            m_d->m_watcher.setFuture(future);
         } else {
             cancelEdit();
         }
@@ -1231,57 +1062,42 @@ void MainWindow::applyEdit()
         if (!rect.isNull()) {
             m_d->busy();
 
-            QApplication::processEvents();
-
             m_d->m_busy->setShowPercent(true);
-
-            QVector<qsizetype> unchecked;
 
             for (qsizetype i = 1; i <= m_d->m_view->tape()->count(); ++i) {
                 if (!m_d->m_view->tape()->frame(i)->isChecked()) {
-                    unchecked.append(i);
+                    m_d->m_unchecked.append(i);
                 }
             }
 
+            connect(&m_d->m_watcher, &QFutureWatcher<void>::finished, this, &MainWindow::graphicsApplied);
+
             switch (m_d->m_editMode) {
             case MainWindowPrivate::EditMode::Rect: {
-                ApplyRect apply(m_d->m_busy, &m_d->m_frames, rect, m_d->m_view->rectFrame()->frames(), unchecked);
-                QThreadPool::globalInstance()->start(&apply);
+                auto future = QtConcurrent::run(applyRectFunc,
+                                                m_d->m_busy,
+                                                &m_d->m_frames,
+                                                rect,
+                                                m_d->m_view->rectFrame()->frames(),
+                                                m_d->m_unchecked);
+                m_d->m_watcher.setFuture(future);
             } break;
 
             case MainWindowPrivate::EditMode::Arrow: {
-                ApplyArrow apply(m_d->m_busy,
-                                 &m_d->m_frames,
-                                 rect,
-                                 m_d->m_view->arrowFrame()->orientation(),
-                                 m_d->m_view->arrowFrame()->frames(),
-                                 unchecked);
-                QThreadPool::globalInstance()->start(&apply);
+                auto future = QtConcurrent::run(applyArrowFunc,
+                                                m_d->m_busy,
+                                                &m_d->m_frames,
+                                                rect,
+                                                m_d->m_view->arrowFrame()->orientation(),
+                                                m_d->m_view->arrowFrame()->frames(),
+                                                m_d->m_unchecked);
+                m_d->m_watcher.setFuture(future);
             } break;
 
             default: {
                 break;
             }
             }
-
-            m_d->waitThreadPool();
-
-            m_d->m_busy->setShowPercent(false);
-
-            const auto current = m_d->m_view->tape()->currentFrame()->counter();
-            m_d->m_view->tape()->clear();
-
-            QApplication::processEvents();
-
-            m_d->initTape();
-
-            m_d->m_view->tape()->setCurrentFrame(current);
-
-            m_d->setModified(true);
-
-            cancelEdit();
-
-            m_d->ready();
         } else {
             cancelEdit();
         }
@@ -1408,44 +1224,29 @@ void MainWindow::onRectSelectionStarted()
 
 void MainWindow::applyText()
 {
+    m_d->m_unchecked.clear();
+
     const auto rect = m_d->m_view->selectedRect();
 
     if (!rect.isNull()) {
         m_d->busy();
 
-        QApplication::processEvents();
-
         m_d->m_busy->setShowPercent(true);
-
-        QVector<qsizetype> unchecked;
 
         for (qsizetype i = 1; i <= m_d->m_view->tape()->count(); ++i) {
             if (!m_d->m_view->tape()->frame(i)->isChecked()) {
-                unchecked.append(i);
+                m_d->m_unchecked.append(i);
             }
         }
 
-        ApplyText apply(m_d->m_busy, &m_d->m_frames, rect, m_d->m_view->textFrame()->text(), unchecked);
-        QThreadPool::globalInstance()->start(&apply);
-
-        m_d->waitThreadPool();
-
-        m_d->m_busy->setShowPercent(false);
-
-        const auto current = m_d->m_view->tape()->currentFrame()->counter();
-        m_d->m_view->tape()->clear();
-
-        QApplication::processEvents();
-
-        m_d->initTape();
-
-        m_d->m_view->tape()->setCurrentFrame(current);
-
-        m_d->setModified(true);
-
-        cancelEdit();
-
-        m_d->ready();
+        connect(&m_d->m_watcher, &QFutureWatcher<void>::finished, this, &MainWindow::graphicsApplied);
+        auto future = QtConcurrent::run(applyTextFunc,
+                                        m_d->m_busy,
+                                        &m_d->m_frames,
+                                        rect,
+                                        m_d->m_view->textFrame()->text(),
+                                        m_d->m_unchecked);
+        m_d->m_watcher.setFuture(future);
     } else {
         cancelEdit();
     }
@@ -1508,4 +1309,82 @@ void MainWindow::brushColor()
 
         emit m_d->m_view->doRepaint();
     }
+}
+
+void MainWindow::gifLoaded()
+{
+    disconnect(&m_d->m_watcher, 0, this, 0);
+
+    QFileInfo info(m_d->m_currentGif);
+
+    setWindowTitle(MainWindow::tr("GIF Editor - %1[*]").arg(info.fileName()));
+
+    m_d->initTape();
+
+    if (m_d->m_frames.count()) {
+        m_d->m_view->tape()->setCurrentFrame(1);
+        m_d->m_view->scrollTo(1);
+    }
+
+    m_d->m_crop->setEnabled(true);
+    m_d->m_insertText->setEnabled(true);
+    m_d->m_drawRect->setEnabled(true);
+    m_d->m_drawArrow->setEnabled(true);
+    m_d->m_playStop->setEnabled(true);
+    m_d->m_saveAs->setEnabled(true);
+
+    m_d->ready();
+}
+
+void MainWindow::gifSaved()
+{
+    disconnect(&m_d->m_watcher, 0, this, 0);
+
+    m_d->m_busy->setShowPercent(false);
+
+    m_d->openGif(m_d->m_currentGif);
+}
+
+void MainWindow::gifCropped()
+{
+    disconnect(&m_d->m_watcher, 0, this, 0);
+
+    m_d->m_busy->setShowPercent(false);
+
+    const auto current = m_d->m_view->tape()->currentFrame()->counter();
+    m_d->m_view->tape()->clear();
+
+    m_d->initTape();
+
+    m_d->m_view->tape()->setCurrentFrame(current);
+
+    for (const auto &i : std::as_const(m_d->m_unchecked)) {
+        m_d->m_view->tape()->frame(i)->setChecked(false);
+    }
+
+    m_d->setModified(true);
+
+    cancelEdit();
+
+    m_d->ready();
+}
+
+void MainWindow::graphicsApplied()
+{
+    disconnect(&m_d->m_watcher, 0, this, 0);
+
+    m_d->m_busy->setShowPercent(false);
+
+    const auto current = m_d->m_view->tape()->currentFrame()->counter();
+    m_d->m_view->tape()->clear();
+
+    m_d->initTape();
+
+    m_d->m_view->tape()->setCurrentFrame(current);
+
+    m_d->setModified(true);
+
+    cancelEdit();
+
+    m_d->ready();
 }

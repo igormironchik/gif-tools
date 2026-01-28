@@ -82,6 +82,14 @@ private slots:
     void brushColor();
     //! Hide pen width spin box.
     void hidePenWidthSpinBox();
+    //! GIF loaded.
+    void gifLoaded();
+    //! GIF saved.
+    void gifSaved();
+    //! GIF cropped.
+    void gifCropped();
+    //! Graphics applied.
+    void graphicsApplied();
 
 protected:
     void resizeEvent(QResizeEvent *e) override;
@@ -89,6 +97,8 @@ protected:
     void showEvent(QShowEvent *e) override;
 
 private:
+    friend class MainWindowPrivate;
+
     Q_DISABLE_COPY(MainWindow)
 
     QScopedPointer<MainWindowPrivate> m_d;
