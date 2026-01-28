@@ -870,13 +870,11 @@ void MainWindow::penWidth(bool on)
         if (m_d->m_penWidthBtnOnDrawToolBar->isVisible()) {
             m_d->m_penWidthBox->move(m_d->m_drawToolBar->mapToGlobal(
                 QPoint(m_d->m_penWidthBtnOnDrawToolBar->x() + m_d->m_penWidthBtnOnDrawToolBar->width() + 1,
-                       m_d->m_penWidthBtnOnDrawToolBar->y()
-                           + (m_d->m_penWidthBtnOnDrawToolBar->height() - m_d->m_penWidthBox->height()) / 2)));
+                       m_d->m_penWidthBtnOnDrawToolBar->y())));
         } else {
             m_d->m_penWidthBox->move(m_d->m_drawArrowToolBar->mapToGlobal(
                 QPoint(m_d->m_penWidthBtnOnDrawArrowToolBar->x() + m_d->m_penWidthBtnOnDrawArrowToolBar->width() + 1,
-                       m_d->m_penWidthBtnOnDrawArrowToolBar->y()
-                           + (m_d->m_penWidthBtnOnDrawArrowToolBar->height() - m_d->m_penWidthBox->height()) / 2)));
+                       m_d->m_penWidthBtnOnDrawArrowToolBar->y())));
         }
 
         m_d->m_penWidthBox->show();
