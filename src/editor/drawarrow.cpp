@@ -250,7 +250,7 @@ void ArrowFrame::paintEvent(QPaintEvent *e)
 {
     QPainter p(this);
 
-    if (m_orientationDefined) {
+    if (m_d->m_started && !m_d->m_nothing) {
         drawArrow(p, selectionRectScaled(), orientation());
     }
 
