@@ -392,6 +392,11 @@ const QPoint &RectangleSelection::releasePoint() const
     return m_d->m_releasePos;
 }
 
+bool RectangleSelection::isSomethingSelected() const
+{
+    return m_d->m_started && !m_d->m_nothing;
+}
+
 void RectangleSelection::start()
 {
     m_d->m_started = true;
@@ -447,7 +452,7 @@ void RectangleSelection::paintEvent(QPaintEvent *)
     p.setPen(Qt::black);
     p.setBrush(dark);
 
-    if (m_d->m_started && !m_d->m_nothing) {
+    if (isSomethingSelected()) {
         QPainterPath path;
         path.addRect(QRectF(m_d->m_available).adjusted(0, 0, -1, -1));
 
@@ -483,7 +488,7 @@ void RectangleSelection::paintEvent(QPaintEvent *)
             p.drawRect(m_d->topRightHandleRect());
             p.drawRect(m_d->bottomRightHandleRect());
             p.drawRect(m_d->bottomLeftHandleRect());
-        } else if (m_d->m_started && !m_d->m_nothing && m_d->m_handle != RectangleSelectionPrivate::Handle::Unknown) {
+        } else if (isSomethingSelected() && m_d->m_handle != RectangleSelectionPrivate::Handle::Unknown) {
             switch (m_d->m_handle) {
             case RectangleSelectionPrivate::Handle::TopLeft:
                 p.drawRect(m_d->topLeftHandleRect());

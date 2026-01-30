@@ -28,8 +28,6 @@ ArrowFrame::ArrowFrame(Tape *tape,
     : RectangleSelection(parent)
     , m_tape(tape)
 {
-    m_frames.insert(parent->image().m_pos);
-
     connect(parent, &Frame::imagePosChanged, this, &ArrowFrame::imagePosChanged);
     connect(this, &RectangleSelection::started, this, &ArrowFrame::onStarted);
 }
@@ -52,6 +50,7 @@ bool equalPoints(const QPoint &p1,
 void ArrowFrame::onStarted()
 {
     m_tape->frame(m_d->m_frame->image().m_pos + 1)->setModified(true);
+    m_frames.insert(m_d->m_frame->image().m_pos);
 
     if (!m_orientationDefined) {
         m_orientationDefined = true;
@@ -164,8 +163,10 @@ void ArrowFrame::onStarted()
 
 void ArrowFrame::imagePosChanged(qsizetype idx)
 {
-    m_frames.insert(idx);
-    m_tape->frame(idx + 1)->setModified(true);
+    if (isSomethingSelected()) {
+        m_frames.insert(idx);
+        m_tape->frame(idx + 1)->setModified(true);
+    }
 }
 
 void ArrowFrame::drawArrowHead(QPainter &p,
@@ -236,7 +237,7 @@ void ArrowFrame::paintEvent(QPaintEvent *e)
 {
     QPainter p(this);
 
-    if (m_d->m_started && !m_d->m_nothing) {
+    if (isSomethingSelected()) {
         drawArrow(p, selectionRectScaled(), orientation());
     }
 

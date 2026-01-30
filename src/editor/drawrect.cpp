@@ -24,8 +24,6 @@ RectFrame::RectFrame(Tape *tape,
     : RectangleSelection(parent)
     , m_tape(tape)
 {
-    m_frames.insert(parent->image().m_pos);
-
     connect(parent, &Frame::imagePosChanged, this, &RectFrame::imagePosChanged);
     connect(this, &RectangleSelection::started, this, &RectFrame::onStarted);
 }
@@ -37,12 +35,15 @@ RectFrame::~RectFrame() noexcept
 void RectFrame::onStarted()
 {
     m_tape->frame(m_d->m_frame->image().m_pos + 1)->setModified(true);
+    m_frames.insert(m_d->m_frame->image().m_pos);
 }
 
 void RectFrame::imagePosChanged(qsizetype idx)
 {
-    m_frames.insert(idx);
-    m_tape->frame(idx + 1)->setModified(true);
+    if (isSomethingSelected()) {
+        m_frames.insert(idx);
+        m_tape->frame(idx + 1)->setModified(true);
+    }
 }
 
 void RectFrame::drawRect(QPainter &p,
@@ -66,7 +67,7 @@ void RectFrame::paintEvent(QPaintEvent *e)
 {
     QPainter p(this);
 
-    if (m_d->m_started && !m_d->m_nothing) {
+    if (isSomethingSelected()) {
         drawRect(p, selectionRectScaled());
     }
 

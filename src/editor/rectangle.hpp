@@ -136,6 +136,8 @@ public:
     QRect availableRect() const;
     //! \return Point where mouse was released.
     const QPoint &releasePoint() const;
+    //! \return Whether the rectangle was selected.
+    bool isSomethingSelected() const;
 
 public slots:
     //! Start.
