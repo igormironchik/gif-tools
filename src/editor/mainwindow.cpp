@@ -208,7 +208,7 @@ class MainWindowPrivate
 {
 public:
     MainWindowPrivate(MainWindow *parent)
-        : m_frames(QDir::tempPath())
+        : m_frames(QDir::tempPath() + QDir::separator() + QStringLiteral("gif-editor"))
         , m_editMode(EditMode::Unknow)
         , m_busyFlag(false)
         , m_quitFlag(false)

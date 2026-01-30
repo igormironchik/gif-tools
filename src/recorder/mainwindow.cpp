@@ -469,7 +469,7 @@ void MainWindow::onRecord()
         update();
 
         m_timer->start(1000 / m_fps);
-        m_dir = QTemporaryDir(QDir::tempPath());
+        m_dir = QTemporaryDir(QDir::tempPath() + QDir::separator() + QStringLiteral("gif-recorder"));
         m_elapsed.start();
         makeFrame();
     }
