@@ -23,6 +23,7 @@
 #include <QApplication>
 #include <QCloseEvent>
 #include <QColorDialog>
+#include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFutureWatcher>
@@ -207,7 +208,8 @@ class MainWindowPrivate
 {
 public:
     MainWindowPrivate(MainWindow *parent)
-        : m_editMode(EditMode::Unknow)
+        : m_frames(QDir::tempPath())
+        , m_editMode(EditMode::Unknow)
         , m_busyFlag(false)
         , m_quitFlag(false)
         , m_playing(false)

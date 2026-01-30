@@ -19,6 +19,7 @@
 // Qt include.
 #include <QApplication>
 #include <QCloseEvent>
+#include <QDir>
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QHBoxLayout>
@@ -468,7 +469,7 @@ void MainWindow::onRecord()
         update();
 
         m_timer->start(1000 / m_fps);
-        m_dir = QTemporaryDir("./");
+        m_dir = QTemporaryDir(QDir::tempPath());
         m_elapsed.start();
         makeFrame();
     }
