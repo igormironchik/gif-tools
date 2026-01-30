@@ -10,7 +10,9 @@ this is very helpful for a developer to see a real record of a problem in bug re
 In editor QA can add a text (even making an animation is possible) or highlight something
 important with rectangle, draw arrow, it's a very easy tool. When editing tool in editor will be
 chosen user will see a description text how to use this or that tool, these messages can
-be turned off in settings dialogue.
+be turned off in settings dialogue. In editor GIF player is implemented, with possibility to
+pause a GIF, that can be very helpful for developers to see what QA highlighted with
+a rectangle or arrow. Really-really easy and helpful tool.
 
 GIF recorder produces not the best quantization for 256 colors in GIF, but this tool
 doesn't skip frames, and everything is seen, minor issues in quantization are seen only
