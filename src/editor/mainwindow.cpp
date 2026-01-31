@@ -27,6 +27,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFutureWatcher>
+#include <QLabel>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QMetaMethod>
@@ -36,8 +37,10 @@
 #include <QSpinBox>
 #include <QStackedWidget>
 #include <QStandardPaths>
+#include <QStatusBar>
 #include <QTextDocument>
 #include <QThreadPool>
+#include <QTime>
 #include <QTimer>
 #include <QToolBar>
 #include <QToolButton>
@@ -246,6 +249,7 @@ public:
         , m_penWidthBox(nullptr)
         , m_penWidthBtnOnDrawToolBar(nullptr)
         , m_penWidthBtnOnDrawArrowToolBar(nullptr)
+        , m_status(nullptr)
         , m_q(parent)
     {
         m_busy->setRadius(75);
@@ -286,6 +290,8 @@ public:
     //! Busy state.
     void busy()
     {
+        m_q->statusBar()->hide();
+
         m_busyFlag = true;
 
         m_stack->setCurrentWidget(m_busy);
@@ -306,6 +312,8 @@ public:
     //! Ready state.
     void ready()
     {
+        m_q->statusBar()->show();
+
         m_busyFlag = false;
 
         m_stack->setCurrentWidget(m_view);
@@ -377,6 +385,8 @@ public:
     QString m_currentGif;
     //! Frames.
     QGifLib::Gif m_frames;
+    //! Timings.
+    QVector<int> m_timings;
     //! Edit mode.
     EditMode m_editMode;
     //! Busy flag.
@@ -459,12 +469,17 @@ public:
     QToolButton *m_penWidthBtnOnDrawToolBar;
     //! Pen width tool button on draw arrow tool bar.
     QToolButton *m_penWidthBtnOnDrawArrowToolBar;
+    //! Status bar label.
+    QLabel *m_status;
     //! Parent.
     MainWindow *m_q;
 }; // class MainWindowPrivate
 
 void MainWindowPrivate::clearView()
 {
+    m_timings.clear();
+    m_timings.push_back(0);
+
     m_view->currentFrame()->clearImage();
     m_view->tape()->clear();
     m_frames.clean();
@@ -656,9 +671,14 @@ MainWindow::MainWindow()
     setCentralWidget(m_d->m_stack);
 
     connect(m_d->m_view->tape(), &Tape::checkStateChanged, this, &MainWindow::frameChecked);
+    connect(m_d->m_view->tape(), &Tape::currentFrameChanged, this, &MainWindow::onFrameSelected);
     connect(m_d->m_penWidth, &QAction::toggled, this, &MainWindow::penWidth);
     connect(m_d->m_penColor, &QAction::triggered, this, &MainWindow::penColor);
     connect(m_d->m_brushColor, &QAction::triggered, this, &MainWindow::brushColor);
+
+    m_d->m_status = new QLabel(statusBar());
+    statusBar()->addWidget(m_d->m_status);
+    statusBar()->hide();
 }
 
 MainWindow::~MainWindow() noexcept
@@ -1335,6 +1355,14 @@ void MainWindow::gifLoaded()
 
     m_d->initTape();
 
+    int ms = 0;
+
+    for (qsizetype i = 1; i < m_d->m_frames.count(); ++i) {
+        ms += m_d->m_frames.delay(i);
+
+        m_d->m_timings.push_back(ms);
+    }
+
     if (m_d->m_frames.count()) {
         m_d->m_view->tape()->setCurrentFrame(1);
         m_d->m_view->scrollTo(1);
@@ -1401,4 +1429,14 @@ void MainWindow::graphicsApplied()
     cancelEdit();
 
     m_d->ready();
+}
+
+void MainWindow::onFrameSelected(int idx)
+{
+    if (idx) {
+        m_d->m_status->setText(
+            tr("<b>Time:</b> %1")
+                .arg(
+                    QTime::fromMSecsSinceStartOfDay(m_d->m_timings[idx - 1]).toString(QStringLiteral("hh:mm:ss.zzz"))));
+    }
 }

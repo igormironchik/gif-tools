@@ -90,6 +90,8 @@ private slots:
     void gifCropped();
     //! Graphics applied.
     void graphicsApplied();
+    //! Frame selected.
+    void onFrameSelected(int idx);
 
 protected:
     void resizeEvent(QResizeEvent *e) override;

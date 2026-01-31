@@ -852,8 +852,7 @@ void MainWindow::drawRect(QPainter *p,
                    90 * 16,
                    180 * 16);
         // right
-        p->drawPie(QRectF(QPointF(r.x() + r.width() - s_handleRadius,
-                                  r.y() + r.height() / 2 - s_handleRadius),
+        p->drawPie(QRectF(QPointF(r.x() + r.width() - s_handleRadius, r.y() + r.height() / 2 - s_handleRadius),
                           QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
                    90 * 16,
                    -180 * 16);
@@ -863,8 +862,7 @@ void MainWindow::drawRect(QPainter *p,
                    0,
                    180 * 16);
         // bottom
-        p->drawPie(QRectF(QPointF(r.x() + r.width() / 2 - s_handleRadius,
-                                  r.y() + r.height() - s_handleRadius),
+        p->drawPie(QRectF(QPointF(r.x() + r.width() / 2 - s_handleRadius, r.y() + r.height() - s_handleRadius),
                           QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
                    0,
                    -180 * 16);
@@ -874,11 +872,10 @@ void MainWindow::drawRect(QPainter *p,
                    0,
                    270 * 16);
         // bottom-right
-        p->drawPie(
-            QRectF(QPointF(r.x() + r.width() - s_handleRadius, r.y() + r.height() - s_handleRadius),
-                   QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
-            90 * 16,
-            -270 * 16);
+        p->drawPie(QRectF(QPointF(r.x() + r.width() - s_handleRadius, r.y() + r.height() - s_handleRadius),
+                          QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
+                   90 * 16,
+                   -270 * 16);
         // bottom-left
         p->drawPie(QRectF(QPointF(r.x() - s_handleRadius, r.y() + r.height() - s_handleRadius),
                           QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
