@@ -46,6 +46,17 @@ supported.
 | ![](editor.png) | ![](recorder.png) |
 | --- | --- |
 
+# Getting from repository
+
+After cloning update git submodules with:
+
+```bash
+git submodule update --init --recursive
+```
+
+# Building
+
+In dependencies is Qt 6 only. Use CMake or QtCreator to build this project in usual fashion.
 
 # Known issues
 
