@@ -1174,8 +1174,13 @@ void MainWindow::playStop()
     } else {
         m_d->m_playStop->setText(tr("Stop"));
         m_d->m_playStop->setIcon(QIcon(":/img/media-playback-stop.png"));
-        const auto &img = m_d->m_view->tape()->currentFrame()->image();
-        m_d->m_playTimer->start(static_cast<int>(img.m_gif.delay(img.m_pos)));
+
+        const auto next = m_d->nextCheckedFrame(m_d->m_view->tape()->currentFrame()->counter());
+
+        if (next != -1) {
+            const auto &img = m_d->m_view->tape()->frame(next)->image();
+            m_d->m_playTimer->start(m_d->m_frames.delay(img.m_pos));
+        }
     }
 
     m_d->m_playing = !m_d->m_playing;
