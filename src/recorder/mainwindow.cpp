@@ -838,52 +838,54 @@ void MainWindow::drawRect(QPainter *p,
                           const QColor &c)
 {
     p->setBrush(Qt::NoBrush);
-    p->setPen(c);
-    p->drawRect(m_rect);
+    p->setPen(QPen(c, 1));
+    const auto r = m_rect.adjusted(-1, -1, 0, 0);
+    p->drawRect(r);
 
     p->setBrush(c);
+    p->setRenderHint(QPainter::Antialiasing, true);
 
     if (m_current == Unknown) {
         // left
-        p->drawPie(QRectF(QPointF(m_rect.x() - s_handleRadius, m_rect.y() + m_rect.height() / 2 - s_handleRadius),
+        p->drawPie(QRectF(QPointF(r.x() - s_handleRadius, r.y() + r.height() / 2 - s_handleRadius),
                           QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
                    90 * 16,
                    180 * 16);
         // right
-        p->drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() - s_handleRadius,
-                                  m_rect.y() + m_rect.height() / 2 - s_handleRadius),
+        p->drawPie(QRectF(QPointF(r.x() + r.width() - s_handleRadius,
+                                  r.y() + r.height() / 2 - s_handleRadius),
                           QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
                    90 * 16,
                    -180 * 16);
         // top
-        p->drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() / 2 - s_handleRadius, m_rect.y() - s_handleRadius),
+        p->drawPie(QRectF(QPointF(r.x() + r.width() / 2 - s_handleRadius, r.y() - s_handleRadius),
                           QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
                    0,
                    180 * 16);
         // bottom
-        p->drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() / 2 - s_handleRadius,
-                                  m_rect.y() + m_rect.height() - s_handleRadius),
+        p->drawPie(QRectF(QPointF(r.x() + r.width() / 2 - s_handleRadius,
+                                  r.y() + r.height() - s_handleRadius),
                           QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
                    0,
                    -180 * 16);
         // top-left
-        p->drawPie(QRectF(QPointF(m_rect.x() - s_handleRadius, m_rect.y() - s_handleRadius),
+        p->drawPie(QRectF(QPointF(r.x() - s_handleRadius, r.y() - s_handleRadius),
                           QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
                    0,
                    270 * 16);
         // bottom-right
         p->drawPie(
-            QRectF(QPointF(m_rect.x() + m_rect.width() - s_handleRadius, m_rect.y() + m_rect.height() - s_handleRadius),
+            QRectF(QPointF(r.x() + r.width() - s_handleRadius, r.y() + r.height() - s_handleRadius),
                    QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
             90 * 16,
             -270 * 16);
         // bottom-left
-        p->drawPie(QRectF(QPointF(m_rect.x() - s_handleRadius, m_rect.y() + m_rect.height() - s_handleRadius),
+        p->drawPie(QRectF(QPointF(r.x() - s_handleRadius, r.y() + r.height() - s_handleRadius),
                           QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
                    90 * 16,
                    270 * 16);
         // top-right
-        p->drawPie(QRectF(QPointF(m_rect.x() + m_rect.width() - s_handleRadius, m_rect.y() - s_handleRadius),
+        p->drawPie(QRectF(QPointF(r.x() + r.width() - s_handleRadius, r.y() - s_handleRadius),
                           QSizeF(s_handleRadius * 2, s_handleRadius * 2)),
                    180 * 16,
                    -270 * 16);
@@ -893,14 +895,13 @@ void MainWindow::drawRect(QPainter *p,
 void MainWindow::paintEvent(QPaintEvent *e)
 {
     QPainter p(this);
-    p.setRenderHint(QPainter::Antialiasing, true);
+
+    QPainterPath path;
+    path.addRect(rect());
+    path.addRect(m_rect);
+    path.setFillRule(Qt::OddEvenFill);
 
     if (m_title->isMouseEnabled()) {
-        QPainterPath path;
-        path.addRect(rect());
-        path.addRect(m_rect);
-        path.setFillRule(Qt::OddEvenFill);
-
         p.setPen(Qt::NoPen);
 
         auto c = palette().color(QPalette::Window).darker(300);
@@ -912,6 +913,8 @@ void MainWindow::paintEvent(QPaintEvent *e)
         p.setBrush(QColor(255, 255, 255, 1));
         p.drawRect(m_rect);
     }
+
+    p.setClipPath(path);
 
     drawRect(&p, m_color);
 }
