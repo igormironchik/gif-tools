@@ -541,6 +541,8 @@ MainWindow::MainWindow()
     actionsGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
 
     m_d->m_playStop = new QAction(QIcon(QStringLiteral(":/img/media-playback-start.png")), tr("Play"), this);
+    m_d->m_playStop->setShortcut(Qt::Key_Space);
+    m_d->m_playStop->setShortcutContext(Qt::ApplicationShortcut);
     m_d->m_playStop->setEnabled(false);
 
     m_d->m_applyEdit = new QAction(this);
