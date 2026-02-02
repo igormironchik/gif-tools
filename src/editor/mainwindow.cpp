@@ -381,6 +381,20 @@ public:
         m_watcher.setFuture(future);
     }
 
+    void calculateTimings()
+    {
+        m_timings.clear();
+        m_timings.push_back(0);
+
+        int ms = 0;
+
+        for (qsizetype i = 0; i < m_frames.count(); ++i) {
+            ms += m_frames.delay(i);
+
+            m_timings.push_back(ms);
+        }
+    }
+
     //! Current file name.
     QString m_currentGif;
     //! Frames.
@@ -477,9 +491,6 @@ public:
 
 void MainWindowPrivate::clearView()
 {
-    m_timings.clear();
-    m_timings.push_back(0);
-
     m_view->currentFrame()->clearImage();
     m_view->tape()->clear();
     m_frames.clean();
@@ -672,6 +683,7 @@ MainWindow::MainWindow()
 
     connect(m_d->m_view->tape(), &Tape::checkStateChanged, this, &MainWindow::frameChecked);
     connect(m_d->m_view->tape(), &Tape::currentFrameChanged, this, &MainWindow::onFrameSelected);
+    connect(m_d->m_view->tape(), &Tape::frameChanged, this, &MainWindow::onFrameChanged);
     connect(m_d->m_penWidth, &QAction::toggled, this, &MainWindow::penWidth);
     connect(m_d->m_penColor, &QAction::triggered, this, &MainWindow::penColor);
     connect(m_d->m_brushColor, &QAction::triggered, this, &MainWindow::brushColor);
@@ -1195,12 +1207,8 @@ void MainWindow::playStop()
         m_d->m_playStop->setText(tr("Stop"));
         m_d->m_playStop->setIcon(QIcon(":/img/media-playback-stop.png"));
 
-        const auto next = m_d->nextCheckedFrame(m_d->m_view->tape()->currentFrame()->counter());
-
-        if (next != -1) {
-            const auto &img = m_d->m_view->tape()->frame(next)->image();
-            m_d->m_playTimer->start(m_d->m_frames.delay(img.m_pos));
-        }
+        const auto &img = m_d->m_view->tape()->frame(m_d->m_view->tape()->currentFrame()->counter())->image();
+        m_d->m_playTimer->start(m_d->m_frames.delay(img.m_pos));
     }
 
     m_d->m_playing = !m_d->m_playing;
@@ -1211,12 +1219,8 @@ void MainWindow::showNextFrame()
     const auto next = m_d->nextCheckedFrame(m_d->m_view->tape()->currentFrame()->counter());
 
     if (next != -1) {
-        const auto nextDelay = m_d->nextCheckedFrame(next);
-
-        if (nextDelay != -1) {
-            const auto &img = m_d->m_view->tape()->frame(nextDelay)->image();
-            m_d->m_playTimer->start(m_d->m_frames.delay(img.m_pos));
-        }
+        const auto &img = m_d->m_view->tape()->frame(next)->image();
+        m_d->m_playTimer->start(m_d->m_frames.delay(img.m_pos));
 
         m_d->m_view->tape()->setCurrentFrame(next);
         m_d->m_view->scrollTo(next);
@@ -1355,13 +1359,7 @@ void MainWindow::gifLoaded()
 
     m_d->initTape();
 
-    int ms = 0;
-
-    for (qsizetype i = 1; i < m_d->m_frames.count(); ++i) {
-        ms += m_d->m_frames.delay(i);
-
-        m_d->m_timings.push_back(ms);
-    }
+    m_d->calculateTimings();
 
     if (m_d->m_frames.count()) {
         m_d->m_view->tape()->setCurrentFrame(1);
@@ -1439,4 +1437,12 @@ void MainWindow::onFrameSelected(int idx)
                 .arg(
                     QTime::fromMSecsSinceStartOfDay(m_d->m_timings[idx - 1]).toString(QStringLiteral("hh:mm:ss.zzz"))));
     }
+}
+
+void MainWindow::onFrameChanged(int)
+{
+    m_d->setModified(true);
+    m_d->calculateTimings();
+
+    onFrameSelected(m_d->m_view->currentFrame()->image().m_pos + 1);
 }

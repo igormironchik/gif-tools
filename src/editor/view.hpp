@@ -40,7 +40,7 @@ signals:
     void doRepaint();
 
 public:
-    explicit View(const QGifLib::Gif &data,
+    explicit View(QGifLib::Gif &data,
                   QWidget *parent = nullptr);
     ~View() noexcept override;
 

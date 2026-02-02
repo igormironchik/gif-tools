@@ -92,6 +92,8 @@ private slots:
     void graphicsApplied();
     //! Frame selected.
     void onFrameSelected(int idx);
+    //! Frame changed.
+    void onFrameChanged(int idx);
 
 protected:
     void resizeEvent(QResizeEvent *e) override;

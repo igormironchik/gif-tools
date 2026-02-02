@@ -38,7 +38,10 @@ set(SRC main.cpp
     drawrect.hpp
     drawrect.cpp
     drawarrow.hpp
-    drawarrow.cpp)
+    drawarrow.cpp
+    delay.hpp
+    delay.cpp
+    delay.ui)
 
 qt6_add_resources(SRC resources.qrc)
 

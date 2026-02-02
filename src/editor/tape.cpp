@@ -93,6 +93,7 @@ void Tape::addFrame(const ImageRef &img)
     });
 
     connect(m_d->m_frames.back(), &FrameOnTape::checked, this, &Tape::checkStateChanged);
+    connect(m_d->m_frames.back(), &FrameOnTape::changed, this, &Tape::frameChanged);
 
     adjustSize();
 }

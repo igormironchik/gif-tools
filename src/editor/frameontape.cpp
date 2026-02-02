@@ -4,6 +4,7 @@
 */
 
 // GIF editor include.
+#include "delay.hpp"
 #include "frameontape.hpp"
 
 // Qt include.
@@ -225,6 +226,19 @@ void FrameOnTape::contextMenuEvent(QContextMenuEvent *e)
 
                 const auto img = this->m_d->m_frame->image().m_gif.at(this->m_d->m_frame->image().m_pos);
                 img.save(fileName);
+            }
+        });
+
+        menu.addSeparator();
+
+        menu.addAction(QIcon(QStringLiteral(":/img/distribute-horizontal-x.png")), tr("Set time delay after"),
+                       [this]() {
+            DelayDlg dlg(this->m_d->m_frame->image().m_gif.delay(this->m_d->m_frame->image().m_pos), this);
+
+            if (dlg.exec() == QDialog::Accepted) {
+                this->m_d->m_frame->image().m_gif.setDelay(this->m_d->m_frame->image().m_pos, dlg.delay());
+
+                emit this->changed(this->m_d->m_counter);
             }
         });
 

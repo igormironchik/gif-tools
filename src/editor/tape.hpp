@@ -34,6 +34,8 @@ signals:
     //! Frame checked/unchecked.
     void checkStateChanged(int idx,
                            bool checked);
+    //! State changed.
+    void frameChanged(int idx);
 
 public:
     Tape(QWidget *parent = nullptr);

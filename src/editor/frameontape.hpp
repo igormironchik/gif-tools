@@ -33,6 +33,8 @@ signals:
     //! Check/uncheck till end action activated.
     void checkTillEnd(int idx,
                       bool on);
+    //! State changed.
+    void changed(int idx);
 
 public:
     FrameOnTape(const ImageRef &img,

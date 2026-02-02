@@ -51,7 +51,7 @@ public:
 class ViewPrivate
 {
 public:
-    ViewPrivate(const QGifLib::Gif &data,
+    ViewPrivate(QGifLib::Gif &data,
                 View *parent)
         : m_tape(nullptr)
         , m_currentFrame(new Frame({data,
@@ -90,7 +90,7 @@ public:
 // View
 //
 
-View::View(const QGifLib::Gif &data,
+View::View(QGifLib::Gif &data,
            QWidget *parent)
     : QWidget(parent)
     , m_d(new ViewPrivate(data,

@@ -19,7 +19,7 @@
 
 //! Reference to full image.
 struct ImageRef final {
-    const QGifLib::Gif &m_gif;
+    QGifLib::Gif &m_gif;
     qsizetype m_pos;
     bool m_isEmpty;
 }; // struct ImageRef

@@ -790,6 +790,9 @@ void MainWindow::save(const QString &fileName)
 
     m_busy = true;
 
+    m_delays.removeFirst();
+    m_delays.push_back(0);
+
     connect(&m_watcher, &QFutureWatcher<void>::finished, this, &MainWindow::onGIFSaved);
     auto future = QtConcurrent::run(writeGIF, this, m_frames, m_delays, fileName);
     m_watcher.setFuture(future);
