@@ -49,8 +49,7 @@ if(WIN32)
     list(APPEND SRC gif-editor.rc)
 endif()
 
-include_directories(${ImageMagick_INCLUDE_DIRS}
-	${CMAKE_CURRENT_SOURCE_DIR}/../shared
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../shared
 	${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/qgiflib/src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/qgiflib/3rdparty/giflib)
 

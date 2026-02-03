@@ -15,6 +15,7 @@
 #include "settings.hpp"
 #include "tape.hpp"
 #include "text.hpp"
+#include "version.hpp"
 #include "view.hpp"
 
 // Qt include.
@@ -1152,10 +1153,12 @@ void MainWindow::about()
     QMessageBox dlg(QMessageBox::Information,
                     tr("About GIF editor"),
                     tr("GIF editor.<br /><br />"
+                       "Version: %1<br /><br />"
                        "Author - Igor Mironchik (<a href=\"mailto:igor.mironchik@gmail.com\">"
                        "igor.mironchik at gmail.com</a>).<br /><br />"
                        "Copyright (c) 2026 Igor Mironchik.<br /><br />"
-                       "Licensed under GNU GPL 3.0."),
+                       "Licensed under GNU GPL 3.0.")
+                        .arg(c_version),
                     QMessageBox::NoButton,
                     this);
     QIcon icon = dlg.windowIcon();

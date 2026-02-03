@@ -4,8 +4,8 @@
 */
 
 // GIF editor include.
-#include "delay.hpp"
 #include "frameontape.hpp"
+#include "delay.hpp"
 
 // Qt include.
 #include <QCheckBox>
@@ -231,16 +231,18 @@ void FrameOnTape::contextMenuEvent(QContextMenuEvent *e)
 
         menu.addSeparator();
 
-        menu.addAction(QIcon(QStringLiteral(":/img/distribute-horizontal-x.png")), tr("Set time delay after"),
-                       [this]() {
-            DelayDlg dlg(this->m_d->m_frame->image().m_gif.delay(this->m_d->m_frame->image().m_pos), this);
+        menu.addAction(
+            QIcon(QStringLiteral(":/img/distribute-horizontal-x.png")),
+            tr("Set time delay after"),
+            [this]() {
+                DelayDlg dlg(this->m_d->m_frame->image().m_gif.delay(this->m_d->m_frame->image().m_pos), this);
 
-            if (dlg.exec() == QDialog::Accepted) {
-                this->m_d->m_frame->image().m_gif.setDelay(this->m_d->m_frame->image().m_pos, dlg.delay());
+                if (dlg.exec() == QDialog::Accepted) {
+                    this->m_d->m_frame->image().m_gif.setDelay(this->m_d->m_frame->image().m_pos, dlg.delay());
 
-                emit this->changed(this->m_d->m_counter);
-            }
-        });
+                    emit this->changed(this->m_d->m_counter);
+                }
+            });
 
         menu.addSeparator();
     }

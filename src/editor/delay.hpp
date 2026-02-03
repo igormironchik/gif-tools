@@ -22,7 +22,8 @@ class DelayDlg : public QDialog
     Q_OBJECT
 
 public:
-    explicit DelayDlg(int ms, QWidget *parent = nullptr);
+    explicit DelayDlg(int ms,
+                      QWidget *parent = nullptr);
     ~DelayDlg() override;
 
     //! \return currently set delay.

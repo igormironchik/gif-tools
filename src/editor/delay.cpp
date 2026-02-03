@@ -13,7 +13,8 @@
 // DelayDlg
 //
 
-DelayDlg::DelayDlg(int ms, QWidget *parent)
+DelayDlg::DelayDlg(int ms,
+                   QWidget *parent)
 {
     m_ui.setupUi(this);
 

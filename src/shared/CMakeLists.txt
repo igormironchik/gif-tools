@@ -15,6 +15,8 @@ set(SRC license_dialog.hpp
 	license_dialog.ui
 	utils.hpp
     utils.cpp)
+    
+configure_file(version.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/version.hpp)
 
 qt6_add_resources(SRC qt.qrc)
 qt6_add_resources(SRC icon.qrc)
@@ -33,3 +35,4 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(gif-widgets STATIC ${SRC})
 
 target_link_libraries(gif-widgets Qt6::Widgets Qt6::Core)
+target_include_directories(gif-widgets INTERFACE ${CMAKE_CURRENT_BINARY_DIR})

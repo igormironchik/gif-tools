@@ -5,6 +5,7 @@
 
 // GIF editor include.
 #include "about.hpp"
+#include "version.hpp"
 
 // Qt include.
 #include <QHBoxLayout>
@@ -27,11 +28,12 @@ About::About(QWidget *parent)
     l->addWidget(p);
 
     auto t = new QLabel(this);
-    t->setText(
-        tr("GIF editor.\n\n"
-           "Author - Igor Mironchik (igor.mironchik at gmail dot com).\n\n"
-           "Copyright (c) 2026 Igor Mironchik.\n\n"
-           "Licensed under GNU GPL 3.0."));
+    t->setText(tr("GIF editor.\n\n"
+                  "Version: %1\n\n"
+                  "Author - Igor Mironchik (igor.mironchik at gmail dot com).\n\n"
+                  "Copyright (c) 2026 Igor Mironchik.\n\n"
+                  "Licensed under GNU GPL 3.0.")
+                   .arg(c_version));
     l->addWidget(t);
 
     l->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
