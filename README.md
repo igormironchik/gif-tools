@@ -61,3 +61,7 @@ In dependencies is Qt 6 only. Use CMake or QtCreator to build this project in us
 # Known issues
 
 * `Wayland` is not supported in recorder.
+* Non-primary monitors do not allow adjusting recording area, unable to move recording area
+from primary screen to secondary. https://github.com/igormironchik/gif-tools/issues/3
+I can't work on this problem because of hardware problems. This is a good first issue to start,
+pool request is welcome.
