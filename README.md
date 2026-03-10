@@ -61,7 +61,16 @@ In dependencies is Qt 6 only. Use CMake or QtCreator to build this project in us
 # Known issues
 
 * `Wayland` is not supported in recorder.
+
 * Non-primary monitors do not allow adjusting recording area, unable to move recording area
-from primary screen to secondary. https://github.com/igormironchik/gif-tools/issues/3
-I can't work on this problem because of hardware problems. This is a good first issue to start,
-pool request is welcome.
+from primary screen to secondary.
+[Corresponding issue](https://github.com/igormironchik/gif-tools/issues/3).
+I can't work on this problem because of hardware problems (I don't have second monitor, only
+one laptop). This is a good first issue to start, pool request is welcome. For wished to do this -
+short introduction in a few words - GIF recorder is a full screen application, and recording area
+is just a painting on full-screen semi-transparent widget, to solve this task entire screens
+available in the system should be occupied by main widget (this is a half of the solution). Second
+thing to check is how Qt will do screen grabbing from two or more screens at the same time,
+this should be tested on a multi-monitor system (keep in mind that on Linux tests should be done
+on X11, Wayland won't work now, support for Wayland will be in progress when KDE will bump version
+to 6.8.0 and drop X11 support).
