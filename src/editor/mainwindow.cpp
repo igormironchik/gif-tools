@@ -388,16 +388,25 @@ public:
         m_timings.push_back(0);
 
         int ms = 0;
+        int total = 0;
 
         for (qsizetype i = 0; i < m_frames.count(); ++i) {
             ms += m_frames.delay(i);
 
+            if (i != m_frames.count() - 1) {
+                total = ms;
+            }
+
             m_timings.push_back(ms);
         }
+
+        m_totalDuration = QTime::fromMSecsSinceStartOfDay(total).toString(QStringLiteral("hh:mm:ss.zzz"));
     }
 
     //! Current file name.
     QString m_currentGif;
+    //! Total duration of the GIF.
+    QString m_totalDuration;
     //! Frames.
     QGifLib::Gif m_frames;
     //! Timings.
@@ -1436,9 +1445,10 @@ void MainWindow::onFrameSelected(int idx)
 {
     if (idx) {
         m_d->m_status->setText(
-            tr("<b>Time:</b> %1")
+            tr("<b>Time:</b> %1 <b>Total Duration:</b> %2")
                 .arg(
-                    QTime::fromMSecsSinceStartOfDay(m_d->m_timings[idx - 1]).toString(QStringLiteral("hh:mm:ss.zzz"))));
+                    QTime::fromMSecsSinceStartOfDay(m_d->m_timings[idx - 1]).toString(QStringLiteral("hh:mm:ss.zzz")),
+                    m_d->m_totalDuration));
     }
 }
 
