@@ -101,6 +101,9 @@ protected:
     void showEvent(QShowEvent *e) override;
 
 private:
+    void gifSaved(bool failed);
+
+private:
     friend class MainWindowPrivate;
 
     Q_DISABLE_COPY(MainWindow)

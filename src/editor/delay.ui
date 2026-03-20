@@ -26,7 +26,7 @@
      <item>
       <widget class="QSpinBox" name="m_delay">
        <property name="maximum">
-        <number>9999</number>
+        <number>99999</number>
        </property>
       </widget>
      </item>

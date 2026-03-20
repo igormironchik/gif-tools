@@ -267,8 +267,8 @@ public:
 
     //! Clear view.
     void clearView();
-    //! Enable file actions.
-    void enableFileActions(bool on = true)
+    //! Enable/disable actions during editing.
+    void enableActionsOnEdit(bool on = true)
     {
         m_save->setEnabled(on);
         m_saveAs->setEnabled(on);
@@ -288,6 +288,30 @@ public:
             QApplication::processEvents();
         };
     }
+    //! Enable actions.
+    void enableActions()
+    {
+        m_crop->setEnabled(true);
+        m_insertText->setEnabled(true);
+        m_drawRect->setEnabled(true);
+        m_drawArrow->setEnabled(true);
+        m_save->setEnabled(true);
+        m_saveAs->setEnabled(true);
+        m_open->setEnabled(true);
+        m_playStop->setEnabled(true);
+        m_quit->setEnabled(true);
+    }
+    //! Disable actions on playing.
+    void disableActionsOnPlaying()
+    {
+        m_crop->setEnabled(false);
+        m_insertText->setEnabled(false);
+        m_drawRect->setEnabled(false);
+        m_drawArrow->setEnabled(false);
+        m_save->setEnabled(false);
+        m_saveAs->setEnabled(false);
+        m_open->setEnabled(false);
+    }
     //! Busy state.
     void busy()
     {
@@ -299,16 +323,14 @@ public:
 
         m_busy->setRunning(true);
 
-        m_crop->setEnabled(false);
-        m_insertText->setEnabled(false);
-        m_drawRect->setEnabled(false);
-        m_drawArrow->setEnabled(false);
-        m_save->setEnabled(false);
-        m_saveAs->setEnabled(false);
-        m_open->setEnabled(false);
+        disableActionsOnPlaying();
+
         m_quit->setEnabled(false);
 
         m_editToolBar->hide();
+        m_textToolBar->hide();
+        m_drawToolBar->hide();
+        m_drawArrowToolBar->hide();
     }
     //! Ready state.
     void ready()
@@ -321,21 +343,17 @@ public:
 
         m_busy->setRunning(false);
 
-        m_crop->setEnabled(true);
-        m_insertText->setEnabled(true);
-        m_drawRect->setEnabled(true);
-        m_drawArrow->setEnabled(true);
+        enableActions();
 
         if (!m_currentGif.isEmpty()) {
             if (m_q->isWindowModified()) {
                 m_save->setEnabled(true);
+            } else {
+                m_save->setEnabled(false);
             }
 
             m_saveAs->setEnabled(true);
         }
-
-        m_open->setEnabled(true);
-        m_quit->setEnabled(true);
 
         m_editToolBar->show();
     }
@@ -817,18 +835,22 @@ void MainWindow::saveGif()
         if (!toSave.empty()) {
             m_d->m_busy->setShowPercent(true);
 
-            connect(&m_d->m_watcher, &QFutureWatcher<void>::finished, this, &MainWindow::gifSaved);
+            connect(&m_d->m_watcher, &QFutureWatcher<void>::finished, this, qOverload<>(&MainWindow::gifSaved));
             auto future = QtConcurrent::run(writeGIFFunc, m_d->m_busy, toSave, delays, m_d->m_currentGif);
             m_d->m_watcher.setFuture(future);
         } else {
             m_d->ready();
 
             QMessageBox::information(this, tr("Can't save GIF..."), tr("Can't save GIF image with no frames."));
+
+            gifSaved(true);
         }
     } catch (const std::bad_alloc &) {
         m_d->ready();
 
         QMessageBox::critical(this, tr("Failed to save GIF..."), tr("Out of memory."));
+
+        gifSaved(true);
     }
 }
 
@@ -837,8 +859,9 @@ void MainWindow::saveGifAs()
     auto fileName = QFileDialog::getSaveFileName(this, tr("Choose file to save to..."), QString(), tr("GIF (*.gif)"));
 
     if (!fileName.isEmpty()) {
-        if (!fileName.endsWith(QStringLiteral(".gif"), Qt::CaseInsensitive))
+        if (!fileName.endsWith(QStringLiteral(".gif"), Qt::CaseInsensitive)) {
             fileName.append(QStringLiteral(".gif"));
+        }
 
         m_d->m_currentGif = fileName;
 
@@ -853,19 +876,29 @@ void MainWindow::saveGifAs()
 void MainWindow::quit()
 {
     if (!m_d->m_busyFlag && !m_d->m_quitFlag) {
+        auto delayQuit = false;
+
         if (isWindowModified()) {
             auto btn = QMessageBox::question(this,
                                              tr("GIF was changed..."),
                                              tr("GIF was changed. Do you want to save changes?"));
 
             if (btn == QMessageBox::Yes) {
+                if (m_d->m_playing) {
+                    playStop();
+                }
+
                 saveGif();
+
+                delayQuit = true;
             }
         }
 
         m_d->m_quitFlag = true;
 
-        QApplication::quit();
+        if (!delayQuit) {
+            QApplication::quit();
+        }
     }
 }
 
@@ -880,7 +913,7 @@ void MainWindow::crop(bool on)
     if (on) {
         hidePenWidthSpinBox();
 
-        m_d->enableFileActions(false);
+        m_d->enableActionsOnEdit(false);
 
         m_d->m_editMode = MainWindowPrivate::EditMode::Crop;
 
@@ -892,7 +925,7 @@ void MainWindow::crop(bool on)
 
         m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
 
-        m_d->enableFileActions();
+        m_d->enableActionsOnEdit();
     }
 }
 
@@ -938,7 +971,7 @@ void MainWindow::insertText(bool on)
     if (on) {
         hidePenWidthSpinBox();
 
-        m_d->enableFileActions(false);
+        m_d->enableActionsOnEdit(false);
 
         m_d->m_editMode = MainWindowPrivate::EditMode::Text;
 
@@ -965,7 +998,7 @@ void MainWindow::insertText(bool on)
 
         m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
 
-        m_d->enableFileActions();
+        m_d->enableActionsOnEdit();
     }
 }
 
@@ -974,7 +1007,7 @@ void MainWindow::drawRect(bool on)
     if (on) {
         hidePenWidthSpinBox();
 
-        m_d->enableFileActions(false);
+        m_d->enableActionsOnEdit(false);
 
         m_d->m_editMode = MainWindowPrivate::EditMode::Rect;
 
@@ -991,7 +1024,7 @@ void MainWindow::drawRect(bool on)
 
         m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
 
-        m_d->enableFileActions();
+        m_d->enableActionsOnEdit();
     }
 }
 
@@ -1000,7 +1033,7 @@ void MainWindow::drawArrow(bool on)
     if (on) {
         hidePenWidthSpinBox();
 
-        m_d->enableFileActions(false);
+        m_d->enableActionsOnEdit(false);
 
         m_d->m_editMode = MainWindowPrivate::EditMode::Arrow;
 
@@ -1017,7 +1050,7 @@ void MainWindow::drawArrow(bool on)
 
         m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
 
-        m_d->enableFileActions();
+        m_d->enableActionsOnEdit();
     }
 }
 
@@ -1032,7 +1065,7 @@ void MainWindow::cancelEdit()
 
     hidePenWidthSpinBox();
 
-    m_d->enableFileActions();
+    m_d->enableActionsOnEdit();
 
     switch (m_d->m_editMode) {
     case MainWindowPrivate::EditMode::Crop: {
@@ -1215,7 +1248,9 @@ void MainWindow::playStop()
         m_d->m_playTimer->stop();
         m_d->m_playStop->setText(tr("Play"));
         m_d->m_playStop->setIcon(QIcon(":/img/media-playback-start.png"));
+        m_d->enableActions();
     } else {
+        m_d->disableActionsOnPlaying();
         m_d->m_playStop->setText(tr("Stop"));
         m_d->m_playStop->setIcon(QIcon(":/img/media-playback-stop.png"));
 
@@ -1378,23 +1413,31 @@ void MainWindow::gifLoaded()
         m_d->m_view->scrollTo(1);
     }
 
-    m_d->m_crop->setEnabled(true);
-    m_d->m_insertText->setEnabled(true);
-    m_d->m_drawRect->setEnabled(true);
-    m_d->m_drawArrow->setEnabled(true);
-    m_d->m_playStop->setEnabled(true);
-    m_d->m_saveAs->setEnabled(true);
-
     m_d->ready();
 }
 
-void MainWindow::gifSaved()
+void MainWindow::gifSaved(bool failed)
 {
     disconnect(&m_d->m_watcher, 0, this, 0);
 
     m_d->m_busy->setShowPercent(false);
 
-    m_d->openGif(m_d->m_currentGif);
+    if (!m_d->m_quitFlag) {
+        if (!failed) {
+            m_d->openGif(m_d->m_currentGif);
+        } else {
+            m_d->ready();
+        }
+    } else {
+        m_d->m_busyFlag = false;
+
+        QApplication::quit();
+    }
+}
+
+void MainWindow::gifSaved()
+{
+    gifSaved(false);
 }
 
 void MainWindow::gifCropped()
