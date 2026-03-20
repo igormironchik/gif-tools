@@ -288,6 +288,15 @@ public:
             QApplication::processEvents();
         };
     }
+    //! Set state of "Save" action.
+    void setSaveAction()
+    {
+        if (m_q->isWindowModified()) {
+            m_save->setEnabled(true);
+        } else {
+            m_save->setEnabled(false);
+        }
+    }
     //! Enable actions.
     void enableActions()
     {
@@ -295,11 +304,15 @@ public:
         m_insertText->setEnabled(true);
         m_drawRect->setEnabled(true);
         m_drawArrow->setEnabled(true);
-        m_save->setEnabled(true);
-        m_saveAs->setEnabled(true);
         m_open->setEnabled(true);
         m_playStop->setEnabled(true);
         m_quit->setEnabled(true);
+
+        if (!m_currentGif.isEmpty()) {
+            setSaveAction();
+
+            m_saveAs->setEnabled(true);
+        }
     }
     //! Disable actions on playing.
     void disableActionsOnPlaying()
@@ -345,16 +358,6 @@ public:
 
         enableActions();
 
-        if (!m_currentGif.isEmpty()) {
-            if (m_q->isWindowModified()) {
-                m_save->setEnabled(true);
-            } else {
-                m_save->setEnabled(false);
-            }
-
-            m_saveAs->setEnabled(true);
-        }
-
         m_editToolBar->show();
     }
     //! Set modified state.
@@ -362,11 +365,7 @@ public:
     {
         m_q->setWindowModified(on);
 
-        if (on) {
-            m_save->setEnabled(true);
-        } else {
-            m_save->setEnabled(false);
-        }
+        setSaveAction();
     }
 
     //! \return Index of the next checked frame.
