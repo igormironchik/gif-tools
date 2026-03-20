@@ -51,6 +51,7 @@
 
 // C++ include.
 #include <algorithm>
+#include <cstdlib>
 #include <utility>
 #include <vector>
 
@@ -735,7 +736,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
                                                tr("GIF editor is busy.\nDo you want to terminate the application?"));
 
         if (btn == QMessageBox::Yes) {
-            exit(-1);
+            std::quick_exit(0);
         } else {
             e->ignore();
         }
