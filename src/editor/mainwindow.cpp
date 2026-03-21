@@ -75,11 +75,10 @@ void writeGIFFunc(QPromise<void> &,
     gif.write(fileName, files, delays, 0);
 }
 
-void readGIFFunc(QPromise<void> &,
-                 QGifLib::Gif *container,
+bool readGIFFunc(QGifLib::Gif *container,
                  const QString &fileName)
 {
-    container->load(fileName);
+    return container->load(fileName);
 }
 
 void cropGIFFunc(QPromise<void> &,
@@ -395,9 +394,9 @@ public:
 
         m_currentGif = fileName;
 
-        m_q->connect(&m_watcher, &QFutureWatcher<void>::finished, m_q, &MainWindow::gifLoaded);
+        m_q->connect(&m_readWatcher, &QFutureWatcher<bool>::finished, m_q, &MainWindow::gifLoaded);
         auto future = QtConcurrent::run(readGIFFunc, &m_frames, fileName);
-        m_watcher.setFuture(future);
+        m_readWatcher.setFuture(future);
     }
 
     void calculateTimings()
@@ -419,6 +418,22 @@ public:
         }
 
         m_totalDuration = QTime::fromMSecsSinceStartOfDay(total).toString(QStringLiteral("hh:mm:ss.zzz"));
+    }
+
+    void setActionsToInitialState()
+    {
+        m_save->setEnabled(false);
+        m_saveAs->setEnabled(false);
+        m_crop->setEnabled(false);
+        m_insertText->setEnabled(false);
+        m_drawRect->setEnabled(false);
+        m_drawArrow->setEnabled(false);
+        m_playStop->setEnabled(false);
+        m_applyEdit->setEnabled(false);
+        m_cancelEdit->setEnabled(false);
+
+        m_open->setEnabled(true);
+        m_quit->setEnabled(true);
     }
 
     //! Current file name.
@@ -443,6 +458,8 @@ public:
     QString m_fileNameToOpenAfterShow;
     //! Future watcher.
     QFutureWatcher<void> m_watcher;
+    //! Read GIF future watcher.
+    QFutureWatcher<bool> m_readWatcher;
     //! Unchecked frames.
     QVector<qsizetype> m_unchecked;
     //! Stacked widget.
@@ -556,36 +573,29 @@ MainWindow::MainWindow()
                                   this,
                                   &MainWindow::quit);
 
-    m_d->m_save->setEnabled(false);
-    m_d->m_saveAs->setEnabled(false);
-
     m_d->m_crop = new QAction(QIcon(QStringLiteral(":/img/transform-crop.png")), tr("Crop"), this);
     m_d->m_crop->setShortcut(tr("Ctrl+C"));
     m_d->m_crop->setShortcutContext(Qt::ApplicationShortcut);
     m_d->m_crop->setCheckable(true);
     m_d->m_crop->setChecked(false);
-    m_d->m_crop->setEnabled(false);
 
     m_d->m_insertText = new QAction(QIcon(QStringLiteral(":/img/insert-text.png")), tr("Insert text"), this);
     m_d->m_insertText->setShortcut(tr("Ctrl+T"));
     m_d->m_insertText->setShortcutContext(Qt::ApplicationShortcut);
     m_d->m_insertText->setCheckable(true);
     m_d->m_insertText->setChecked(false);
-    m_d->m_insertText->setEnabled(false);
 
     m_d->m_drawRect = new QAction(QIcon(QStringLiteral(":/img/draw-rectangle.png")), tr("Draw rectangle"), this);
     m_d->m_drawRect->setShortcut(tr("Ctrl+R"));
     m_d->m_drawRect->setShortcutContext(Qt::ApplicationShortcut);
     m_d->m_drawRect->setCheckable(true);
     m_d->m_drawRect->setChecked(false);
-    m_d->m_drawRect->setEnabled(false);
 
     m_d->m_drawArrow = new QAction(QIcon(QStringLiteral(":/img/draw-path.png")), tr("Draw arrow"), this);
     m_d->m_drawArrow->setShortcut(tr("Ctrl+A"));
     m_d->m_drawArrow->setShortcutContext(Qt::ApplicationShortcut);
     m_d->m_drawArrow->setCheckable(true);
     m_d->m_drawArrow->setChecked(false);
-    m_d->m_drawArrow->setEnabled(false);
 
     auto actionsGroup = new QActionGroup(this);
     actionsGroup->addAction(m_d->m_crop);
@@ -597,17 +607,14 @@ MainWindow::MainWindow()
     m_d->m_playStop = new QAction(QIcon(QStringLiteral(":/img/media-playback-start.png")), tr("Play"), this);
     m_d->m_playStop->setShortcut(Qt::Key_Space);
     m_d->m_playStop->setShortcutContext(Qt::ApplicationShortcut);
-    m_d->m_playStop->setEnabled(false);
 
     m_d->m_applyEdit = new QAction(this);
     m_d->m_applyEdit->setShortcut(Qt::Key_Return);
     m_d->m_applyEdit->setShortcutContext(Qt::ApplicationShortcut);
-    m_d->m_applyEdit->setEnabled(false);
 
     m_d->m_cancelEdit = new QAction(this);
     m_d->m_cancelEdit->setShortcut(Qt::Key_Escape);
     m_d->m_cancelEdit->setShortcutContext(Qt::ApplicationShortcut);
-    m_d->m_cancelEdit->setEnabled(false);
 
     addAction(m_d->m_applyEdit);
     addAction(m_d->m_cancelEdit);
@@ -719,6 +726,8 @@ MainWindow::MainWindow()
     m_d->m_status = new QLabel(statusBar());
     statusBar()->addWidget(m_d->m_status);
     statusBar()->hide();
+
+    m_d->setActionsToInitialState();
 }
 
 MainWindow::~MainWindow() noexcept
@@ -1398,22 +1407,40 @@ void MainWindow::brushColor()
 
 void MainWindow::gifLoaded()
 {
-    disconnect(&m_d->m_watcher, 0, this, 0);
+    disconnect(&m_d->m_readWatcher, 0, this, 0);
 
-    QFileInfo info(m_d->m_currentGif);
+    if (m_d->m_readWatcher.result()) {
+        QFileInfo info(m_d->m_currentGif);
 
-    setWindowTitle(MainWindow::tr("GIF Editor - %1[*]").arg(info.fileName()));
+        setWindowTitle(MainWindow::tr("GIF Editor - %1[*]").arg(info.fileName()));
 
-    m_d->initTape();
+        m_d->initTape();
 
-    m_d->calculateTimings();
+        m_d->calculateTimings();
 
-    if (m_d->m_frames.count()) {
-        m_d->m_view->tape()->setCurrentFrame(1);
-        m_d->m_view->scrollTo(1);
+        if (m_d->m_frames.count()) {
+            m_d->m_view->tape()->setCurrentFrame(1);
+            m_d->m_view->scrollTo(1);
+        }
+
+        m_d->ready();
+    } else {
+        m_d->m_busyFlag = false;
+
+        m_d->m_stack->setCurrentWidget(m_d->m_about);
+
+        m_d->m_busy->setRunning(false);
+
+        setWindowTitle(tr("GIF Editor"));
+
+        m_d->setActionsToInitialState();
+
+        QMessageBox::critical(this,
+                              tr("Unable to load GIF..."),
+                              tr("Unable to load GIF file. File \"%1\" is corrupted.").arg(m_d->m_currentGif));
+
+        m_d->m_currentGif.clear();
     }
-
-    m_d->ready();
 }
 
 void MainWindow::gifSaved(bool failed)
@@ -1489,9 +1516,8 @@ void MainWindow::onFrameSelected(int idx)
     if (idx) {
         m_d->m_status->setText(
             tr("<b>Time:</b> %1 <b>Total Duration:</b> %2")
-                .arg(
-                    QTime::fromMSecsSinceStartOfDay(m_d->m_timings[idx - 1]).toString(QStringLiteral("hh:mm:ss.zzz")),
-                    m_d->m_totalDuration));
+                .arg(QTime::fromMSecsSinceStartOfDay(m_d->m_timings[idx - 1]).toString(QStringLiteral("hh:mm:ss.zzz")),
+                     m_d->m_totalDuration));
     }
 }
 
