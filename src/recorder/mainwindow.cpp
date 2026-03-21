@@ -47,6 +47,9 @@
 #include <Windows.h>
 #endif
 
+// C++ include.
+#include <cstdlib>
+
 static const int s_handleRadius = 9;
 
 //
@@ -829,7 +832,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
                                                tr("GIF recorder is busy.\nDo you want to terminate the application?"));
 
         if (btn == QMessageBox::Yes) {
-            exit(-1);
+            std::quick_exit(0);
         } else {
             e->ignore();
         }
