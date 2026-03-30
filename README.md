@@ -46,6 +46,10 @@ supported.
 | ![](editor.png) | ![](recorder.png) |
 | --- | --- |
 
+# Installer
+
+Look at the release page for the installer for some Linux and Windows distributions.
+
 # Getting from repository
 
 After cloning update git submodules with:
