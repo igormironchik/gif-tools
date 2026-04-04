@@ -46,6 +46,7 @@
 #include <QToolBar>
 #include <QToolButton>
 #include <QVector>
+#include <QWidget>
 #include <QWindow>
 #include <QtConcurrent>
 
@@ -218,7 +219,9 @@ public:
         , m_quitFlag(false)
         , m_playing(false)
         , m_stack(new QStackedWidget(parent))
-        , m_busy(new BusyIndicator(m_stack))
+        , m_busyPage(new QWidget(m_stack))
+        , m_busy(new BusyIndicator(m_busyPage))
+        , m_busyStatusLabel(new QLabel(m_busyPage))
         , m_view(new View(m_frames,
                           m_stack))
         , m_about(new About(parent))
@@ -254,6 +257,19 @@ public:
         , m_q(parent)
     {
         m_busy->setRadius(75);
+        auto f = m_busyStatusLabel->font();
+        f.setPixelSize(35);
+        m_busyStatusLabel->setFont(f);
+
+        auto l = new QVBoxLayout(m_busyPage);
+        l->addItem(new QSpacerItem(10, 0, QSizePolicy::Fixed, QSizePolicy::Expanding));
+        l->addWidget(m_busy);
+        auto h = new QHBoxLayout;
+        h->addItem(new QSpacerItem(0, 10, QSizePolicy::Expanding, QSizePolicy::Fixed));
+        h->addWidget(m_busyStatusLabel);
+        h->addItem(new QSpacerItem(0, 10, QSizePolicy::Expanding, QSizePolicy::Fixed));
+        l->addLayout(h);
+        l->addItem(new QSpacerItem(10, 0, QSizePolicy::Fixed, QSizePolicy::Expanding));
     }
 
     //! Edit mode.
@@ -332,7 +348,7 @@ public:
 
         m_busyFlag = true;
 
-        m_stack->setCurrentWidget(m_busy);
+        m_stack->setCurrentWidget(m_busyPage);
 
         m_busy->setRunning(true);
 
@@ -351,6 +367,8 @@ public:
         m_q->statusBar()->show();
 
         m_busyFlag = false;
+
+        m_busyStatusLabel->clear();
 
         m_stack->setCurrentWidget(m_view);
 
@@ -393,6 +411,7 @@ public:
         setModified(false);
 
         m_currentGif = fileName;
+        m_busyStatusLabel->setText(MainWindow::tr("Loading GIF..."));
 
         m_q->connect(&m_readWatcher, &QFutureWatcher<bool>::finished, m_q, &MainWindow::gifLoaded);
         auto future = QtConcurrent::run(readGIFFunc, &m_frames, fileName);
@@ -464,8 +483,12 @@ public:
     QVector<qsizetype> m_unchecked;
     //! Stacked widget.
     QStackedWidget *m_stack;
+    //! Page with busy animation.
+    QWidget *m_busyPage;
     //! Busy indicator.
     BusyIndicator *m_busy;
+    //! Busy status label.
+    QLabel *m_busyStatusLabel;
     //! View.
     View *m_view;
     //! Widget about.
@@ -712,7 +735,7 @@ MainWindow::MainWindow()
 
     m_d->m_stack->addWidget(m_d->m_about);
     m_d->m_stack->addWidget(m_d->m_view);
-    m_d->m_stack->addWidget(m_d->m_busy);
+    m_d->m_stack->addWidget(m_d->m_busyPage);
 
     setCentralWidget(m_d->m_stack);
 
@@ -843,6 +866,7 @@ void MainWindow::saveGif()
 
         if (!toSave.empty()) {
             m_d->m_busy->setShowPercent(true);
+            m_d->m_busyStatusLabel->setText(tr("Saving GIF..."));
 
             connect(&m_d->m_watcher, &QFutureWatcher<void>::finished, this, qOverload<>(&MainWindow::gifSaved));
             auto future = QtConcurrent::run(writeGIFFunc, m_d->m_busy, toSave, delays, m_d->m_currentGif);
@@ -1119,6 +1143,7 @@ void MainWindow::applyEdit()
 
         if (!rect.isNull() && rect != m_d->m_view->currentFrame()->imageRect()) {
             m_d->busy();
+            m_d->m_busyStatusLabel->setText(tr("Cropping GIF..."));
 
             for (int i = 1; i <= m_d->m_view->tape()->count(); ++i) {
                 if (!m_d->m_view->tape()->frame(i)->isChecked()) {
@@ -1153,6 +1178,7 @@ void MainWindow::applyEdit()
         if (!rect.isNull()) {
             m_d->busy();
 
+
             m_d->m_busy->setShowPercent(true);
 
             for (qsizetype i = 1; i <= m_d->m_view->tape()->count(); ++i) {
@@ -1165,6 +1191,8 @@ void MainWindow::applyEdit()
 
             switch (m_d->m_editMode) {
             case MainWindowPrivate::EditMode::Rect: {
+                m_d->m_busyStatusLabel->setText(tr("Drawing rectangle..."));
+
                 auto future = QtConcurrent::run(applyRectFunc,
                                                 m_d->m_busy,
                                                 &m_d->m_frames,
@@ -1175,6 +1203,8 @@ void MainWindow::applyEdit()
             } break;
 
             case MainWindowPrivate::EditMode::Arrow: {
+                m_d->m_busyStatusLabel->setText(tr("Drawing arrow..."));
+
                 auto future = QtConcurrent::run(applyArrowFunc,
                                                 m_d->m_busy,
                                                 &m_d->m_frames,
@@ -1324,6 +1354,7 @@ void MainWindow::applyText()
 
     if (!rect.isNull()) {
         m_d->busy();
+        m_d->m_busyStatusLabel->setText(tr("Drawing text..."));
 
         m_d->m_busy->setShowPercent(true);
 
@@ -1414,6 +1445,10 @@ void MainWindow::gifLoaded()
 
         setWindowTitle(MainWindow::tr("GIF Editor - %1[*]").arg(info.fileName()));
 
+        m_d->m_busyStatusLabel->setText(tr("Preparing tape..."));
+
+        QApplication::processEvents();
+
         m_d->initTape();
 
         m_d->calculateTimings();
@@ -1473,6 +1508,10 @@ void MainWindow::gifCropped()
 
     m_d->m_busy->setShowPercent(false);
 
+    m_d->m_busyStatusLabel->setText(tr("Preparing tape..."));
+
+    QApplication::processEvents();
+
     const auto current = m_d->m_view->tape()->currentFrame()->counter();
     m_d->m_view->tape()->clear();
 
@@ -1496,6 +1535,10 @@ void MainWindow::graphicsApplied()
     disconnect(&m_d->m_watcher, 0, this, 0);
 
     m_d->m_busy->setShowPercent(false);
+
+    m_d->m_busyStatusLabel->setText(tr("Preparing tape..."));
+
+    QApplication::processEvents();
 
     const auto current = m_d->m_view->tape()->currentFrame()->counter();
     m_d->m_view->tape()->clear();
