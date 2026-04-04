@@ -1178,7 +1178,6 @@ void MainWindow::applyEdit()
         if (!rect.isNull()) {
             m_d->busy();
 
-
             m_d->m_busy->setShowPercent(true);
 
             for (qsizetype i = 1; i <= m_d->m_view->tape()->count(); ++i) {
