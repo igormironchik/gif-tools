@@ -33,6 +33,7 @@
 #include <QMessageBox>
 #include <QMetaMethod>
 #include <QPainter>
+#include <QPalette>
 #include <QPromise>
 #include <QResizeEvent>
 #include <QSpinBox>
@@ -260,6 +261,9 @@ public:
         auto f = m_busyStatusLabel->font();
         f.setPixelSize(35);
         m_busyStatusLabel->setFont(f);
+        auto p = m_busyStatusLabel->palette();
+        p.setColor(QPalette::WindowText, p.color(QPalette::Highlight));
+        m_busyStatusLabel->setPalette(p);
 
         auto l = new QVBoxLayout(m_busyPage);
         l->addItem(new QSpacerItem(10, 0, QSizePolicy::Fixed, QSizePolicy::Expanding));

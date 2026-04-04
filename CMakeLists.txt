@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.19)
 
 project(gif-tools)
 
-set(GIF_TOOLS_VERSION_NUMBER "1.0.17")
+set(GIF_TOOLS_VERSION_NUMBER "1.0.18")
 set(HomeDir "@HomeDir@")
 string(TIMESTAMP GIF_CURRENT_DATE "%Y-%m-%d")
 
