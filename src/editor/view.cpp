@@ -5,6 +5,7 @@
 
 // GIF editor include.
 #include "view.hpp"
+#include "constants.hpp"
 #include "crop.hpp"
 #include "drawarrow.hpp"
 #include "drawrect.hpp"
@@ -150,9 +151,7 @@ void View::startCrop()
 {
     if (!m_d->m_crop) {
         m_d->m_crop = new CropFrame(m_d->m_currentFrame);
-        m_d->m_crop->setStartMessage(
-            tr("Select a region for cropping with the mouse, when ready press Enter. "
-               "Press Escape for cancelling."));
+        m_d->m_crop->setStartMessage(s_cropHelp);
         connect(m_d->m_crop, &CropFrame::applyEdit, this, &View::applyEdit);
         m_d->m_crop->setGeometry(QRect(0, 0, m_d->m_currentFrame->width(), m_d->m_currentFrame->height()));
         m_d->m_crop->show();
@@ -174,14 +173,7 @@ void View::startText()
 {
     if (!m_d->m_text) {
         m_d->m_text = new TextFrame(tape(), m_d->m_currentFrame);
-        m_d->m_text->setStartMessage(
-            tr("Select a region for text with the mouse, when ready press Enter or use "
-               "context menu. You can switch between text mode and rectangle selection with "
-               "context meny at any time. You can choose any frame from the tape to apply "
-               "text on that frame. Text may be different on each frame. If you clicked on "
-               "the frame, but don't want the text to be on it - uncheck this frame on the "
-               "tape. When ready click \"Apply\" button on the tool bar. "
-               "Press Escape for cancelling."));
+        m_d->m_text->setStartMessage(s_textHelp);
         m_d->m_text->setGeometry(QRect(0, 0, m_d->m_currentFrame->width(), m_d->m_currentFrame->height()));
         m_d->m_text->show();
         m_d->m_text->raise();
@@ -223,12 +215,7 @@ void View::startRect()
 {
     if (!m_d->m_rect) {
         m_d->m_rect = new RectFrame(tape(), m_d->m_currentFrame);
-        m_d->m_rect->setStartMessage(
-            tr("Select a region for drawing a rectangle with the mouse, when ready press Enter. "
-               "You can choose any frame from the tape to apply "
-               "rectangle on that frame. If you clicked on "
-               "the frame, but don't want the rectangle to be on it - uncheck this frame on the "
-               "tape. Press Escape for cancelling."));
+        m_d->m_rect->setStartMessage(s_rectHelp);
         connect(m_d->m_rect, &RectFrame::applyEdit, this, &View::applyEdit);
         connect(this, &View::doRepaint, m_d->m_rect, qOverload<>(&RectFrame::update));
         m_d->m_rect->setGeometry(QRect(0, 0, m_d->m_currentFrame->width(), m_d->m_currentFrame->height()));
@@ -251,12 +238,7 @@ void View::startArrow()
 {
     if (!m_d->m_arrow) {
         m_d->m_arrow = new ArrowFrame(tape(), m_d->m_currentFrame);
-        m_d->m_arrow->setStartMessage(
-            tr("Select a region for drawing an arrow with the mouse, when ready press Enter. "
-               "You can choose any frame from the tape to apply "
-               "arrow on that frame. If you clicked on "
-               "the frame, but don't want the arrow to be on it - uncheck this frame on the "
-               "tape. Press Escape for cancelling."));
+        m_d->m_arrow->setStartMessage(s_arrowHelp);
         connect(m_d->m_arrow, &ArrowFrame::applyEdit, this, &View::applyEdit);
         connect(this, &View::doRepaint, m_d->m_arrow, qOverload<>(&ArrowFrame::update));
         m_d->m_arrow->setGeometry(QRect(0, 0, m_d->m_currentFrame->width(), m_d->m_currentFrame->height()));

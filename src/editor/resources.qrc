@@ -28,5 +28,6 @@
         <file>img/media-playback-start.png</file>
         <file>img/media-playback-stop.png</file>
         <file>img/distribute-horizontal-x.png</file>
+        <file>img/help-hint.png</file>
     </qresource>
 </RCC>
