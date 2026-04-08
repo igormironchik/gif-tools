@@ -79,14 +79,16 @@ TitleWidget::TitleWidget(MainWindow *mainWindow,
     m_progress->hide();
     layout->addWidget(m_progress);
     layout->addItem(new QSpacerItem(10, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
-    m_settingsButton->setIcon(QIcon(":/img/applications-system.png"));
+    m_settingsButton->setIcon(
+        QIcon::fromTheme(QStringLiteral("applications-system"), QIcon(":/img/applications-system.png")));
     m_settingsButton->setToolTip(tr("Settings"));
     m_transparentForMouseButton->setToolTip(tr("Turn on/off transparency for mouse events"));
     m_transparentForMouseButton->setCheckable(true);
     m_transparentForMouseButton->setChecked(false);
-    m_transparentForMouseButton->setIcon(QIcon(":/img/edit-select.png"));
+    m_transparentForMouseButton->setIcon(
+        QIcon::fromTheme(QStringLiteral("edit-select"), QIcon(":/img/edit-select.png")));
     m_help = new QToolButton(this);
-    m_help->setIcon(QIcon(":/img/help-about.png"));
+    m_help->setIcon(QIcon::fromTheme(QStringLiteral("help-about"), QIcon(":/img/help-about.png")));
     m_help->setToolTip(tr("Help"));
     layout->addWidget(m_transparentForMouseButton);
     layout->addWidget(m_settingsButton);
@@ -110,7 +112,11 @@ void TitleWidget::onMenu()
                    tr("About Qt"),
                    this,
                    &TitleWidget::aboutQt);
-    menu.addAction(QIcon(QStringLiteral(":/img/bookmarks-organize.png")), tr("Licenses"), this, &TitleWidget::licenses);
+    menu.addAction(
+        QIcon::fromTheme(QStringLiteral("bookmarks-organize"), QIcon(QStringLiteral(":/img/bookmarks-organize.png"))),
+        tr("Licenses"),
+        this,
+        &TitleWidget::licenses);
 
     menu.exec(mapToGlobal(m_help->pos() + QPoint(m_help->width(), m_help->height())));
 }
