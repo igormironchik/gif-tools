@@ -463,6 +463,7 @@ public:
 
         m_open->setEnabled(true);
         m_quit->setEnabled(true);
+        m_tipsAction->setEnabled(true);
 
         m_editMenu->setEnabled(false);
     }
