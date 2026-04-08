@@ -5,6 +5,7 @@
 
 // Qt include.
 #include <QApplication>
+#include <QTranslator>
 
 // GIF recorder include.
 #include "event_monitor.hpp"
@@ -28,6 +29,11 @@ int main(int argc,
     appIcon.addFile(QStringLiteral(":/icon/icon_22x22.png"));
     appIcon.addFile(QStringLiteral(":/icon/icon_16x16.png"));
     app.setWindowIcon(appIcon);
+
+    QTranslator appTranslator;
+    if (appTranslator.load(QStringLiteral("gif_") + QLocale::system().name(), QStringLiteral(":/tr/"))) {
+        QApplication::installTranslator(&appTranslator);
+    }
 
     EventMonitor m;
 
