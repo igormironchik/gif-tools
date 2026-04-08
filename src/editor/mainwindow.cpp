@@ -294,7 +294,7 @@ public:
     //! Enable/disable actions during editing.
     void enableActionsOnEdit(bool on = true)
     {
-        m_save->setEnabled(on);
+        m_save->setEnabled(on && m_q->isWindowModified());
         m_saveAs->setEnabled(on);
         m_open->setEnabled(on);
 
@@ -362,6 +362,8 @@ public:
 
         disableActionsOnPlaying();
 
+        cancelTips(false);
+
         m_quit->setEnabled(false);
 
         m_editToolBar->hide();
@@ -369,6 +371,27 @@ public:
         m_drawToolBar->hide();
         m_drawArrowToolBar->hide();
         m_tipsAction->setEnabled(false);
+    }
+    //! Cancel tips & tricks page if it's.
+    void cancelTips(bool restoreWidget)
+    {
+        if (m_currentUiState.m_currentStackWidget) {
+            m_cancelTips->setEnabled(false);
+            m_cancelEdit->setEnabled(m_currentUiState.m_isEditActionsEnabled);
+            m_applyEdit->setEnabled(m_currentUiState.m_isEditActionsEnabled);
+            m_editMenu->setEnabled(m_currentUiState.m_currentStackWidget != m_about);
+
+            if (restoreWidget) {
+                m_stack->setCurrentWidget(m_currentUiState.m_currentStackWidget);
+            }
+
+            m_drawArrowToolBar->setVisible(m_currentUiState.m_isDrawArrowToolBarShow);
+            m_drawToolBar->setVisible(m_currentUiState.m_isDrawToolBarShow);
+            m_editToolBar->setVisible(m_currentUiState.m_isEditToolBarShown);
+            m_textToolBar->setVisible(m_currentUiState.m_isTextToolBarShown);
+
+            m_currentUiState.m_currentStackWidget = nullptr;
+        }
     }
     //! Ready state.
     void ready()
@@ -1709,15 +1732,5 @@ void MainWindow::tips()
 
 void MainWindow::cancelTips()
 {
-    m_d->m_cancelTips->setEnabled(false);
-    m_d->m_cancelEdit->setEnabled(m_d->m_currentUiState.m_isEditActionsEnabled);
-    m_d->m_applyEdit->setEnabled(m_d->m_currentUiState.m_isEditActionsEnabled);
-    m_d->m_editMenu->setEnabled(m_d->m_currentUiState.m_currentStackWidget != m_d->m_about);
-
-    m_d->m_stack->setCurrentWidget(m_d->m_currentUiState.m_currentStackWidget);
-
-    m_d->m_drawArrowToolBar->setVisible(m_d->m_currentUiState.m_isDrawArrowToolBarShow);
-    m_d->m_drawToolBar->setVisible(m_d->m_currentUiState.m_isDrawToolBarShow);
-    m_d->m_editToolBar->setVisible(m_d->m_currentUiState.m_isEditToolBarShown);
-    m_d->m_textToolBar->setVisible(m_d->m_currentUiState.m_isTextToolBarShown);
+    m_d->cancelTips(true);
 }
