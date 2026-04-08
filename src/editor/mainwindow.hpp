@@ -94,6 +94,10 @@ private slots:
     void onFrameSelected(int idx);
     //! Frame changed.
     void onFrameChanged(int idx);
+    //! Tips & tricks.
+    void tips();
+    //! Cancel tips & tricks.
+    void cancelTips();
 
 protected:
     void resizeEvent(QResizeEvent *e) override;

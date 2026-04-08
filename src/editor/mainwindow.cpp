@@ -15,6 +15,7 @@
 #include "settings.hpp"
 #include "tape.hpp"
 #include "text.hpp"
+#include "tips.hpp"
 #include "version.hpp"
 #include "view.hpp"
 
@@ -226,6 +227,7 @@ public:
         , m_view(new View(m_frames,
                           m_stack))
         , m_about(new About(parent))
+        , m_tips(new Tips(parent))
         , m_crop(nullptr)
         , m_insertText(nullptr)
         , m_drawRect(nullptr)
@@ -236,6 +238,7 @@ public:
         , m_open(nullptr)
         , m_applyEdit(nullptr)
         , m_cancelEdit(nullptr)
+        , m_cancelTips(nullptr)
         , m_quit(nullptr)
         , m_boldText(nullptr)
         , m_italicText(nullptr)
@@ -247,6 +250,7 @@ public:
         , m_penColor(nullptr)
         , m_brushColor(nullptr)
         , m_penWidth(nullptr)
+        , m_tipsAction(nullptr)
         , m_editToolBar(nullptr)
         , m_textToolBar(nullptr)
         , m_drawToolBar(nullptr)
@@ -364,6 +368,7 @@ public:
         m_textToolBar->hide();
         m_drawToolBar->hide();
         m_drawArrowToolBar->hide();
+        m_tipsAction->setEnabled(false);
     }
     //! Ready state.
     void ready()
@@ -379,6 +384,7 @@ public:
         m_busy->setRunning(false);
 
         enableActions();
+        m_tipsAction->setEnabled(true);
 
         m_editToolBar->show();
     }
@@ -457,6 +463,8 @@ public:
 
         m_open->setEnabled(true);
         m_quit->setEnabled(true);
+
+        m_editMenu->setEnabled(false);
     }
 
     //! Current file name.
@@ -477,6 +485,22 @@ public:
     bool m_playing;
     //! Was show evemt?
     bool m_shownAlready = false;
+
+    //! State of the UI.
+    struct State {
+        bool m_isEditActionsEnabled = false;
+        bool m_isEditToolBarShown = false;
+        bool m_isTextToolBarShown = false;
+        bool m_isDrawToolBarShow = false;
+        bool m_isDrawArrowToolBarShow = false;
+
+        //! Current widget on stack.
+        QWidget *m_currentStackWidget = nullptr;
+    };
+
+    //! Current state of the UI. (Uses for tips only)
+    State m_currentUiState;
+
     //! File name to open after show event.
     QString m_fileNameToOpenAfterShow;
     //! Future watcher.
@@ -497,6 +521,8 @@ public:
     View *m_view;
     //! Widget about.
     About *m_about;
+    //! Tips & tricks widget.
+    Tips *m_tips;
     //! Crop action.
     QAction *m_crop;
     //! Insert text action.
@@ -517,6 +543,8 @@ public:
     QAction *m_applyEdit;
     //! Cancel edit action.
     QAction *m_cancelEdit;
+    //! Cancel tips.
+    QAction *m_cancelTips;
     //! Quit action.
     QAction *m_quit;
     //! Bold text action.
@@ -539,6 +567,8 @@ public:
     QAction *m_brushColor;
     //! Pen width.
     QAction *m_penWidth;
+    //! Tips & Tricks action.
+    QAction *m_tipsAction;
     //! Edit toolbar.
     QToolBar *m_editToolBar;
     //! Text toolbar.
@@ -557,6 +587,8 @@ public:
     QToolButton *m_penWidthBtnOnDrawArrowToolBar;
     //! Status bar label.
     QLabel *m_status;
+    //! Edit menu.
+    QMenu *m_editMenu = nullptr;
     //! Parent.
     MainWindow *m_q;
 }; // class MainWindowPrivate
@@ -578,47 +610,63 @@ MainWindow::MainWindow()
     setWindowTitle(tr("GIF Editor"));
 
     auto file = menuBar()->addMenu(tr("&File"));
-    m_d->m_open = file->addAction(QIcon(QStringLiteral(":/img/document-open.png")),
-                                  tr("Open"),
-                                  tr("Ctrl+O"),
-                                  this,
-                                  &MainWindow::openGif);
+    m_d->m_open = file->addAction(
+        QIcon::fromTheme(QStringLiteral("document-open"), QIcon(QStringLiteral(":/img/document-open.png"))),
+        tr("Open"),
+        tr("Ctrl+O"),
+        this,
+        &MainWindow::openGif);
     file->addSeparator();
-    m_d->m_save = file->addAction(QIcon(QStringLiteral(":/img/document-save.png")),
-                                  tr("Save"),
-                                  tr("Ctrl+S"),
-                                  this,
-                                  &MainWindow::saveGif);
-    m_d->m_saveAs = file->addAction(QIcon(QStringLiteral(":/img/document-save-as.png")),
-                                    tr("Save As"),
-                                    this,
-                                    &MainWindow::saveGifAs);
+    m_d->m_save = file->addAction(
+        QIcon::fromTheme(QStringLiteral("document-save"), QIcon(QStringLiteral(":/img/document-save.png"))),
+        tr("Save"),
+        tr("Ctrl+S"),
+        this,
+        &MainWindow::saveGif);
+    m_d->m_saveAs = file->addAction(
+        QIcon::fromTheme(QStringLiteral("document-save-as"), QIcon(QStringLiteral(":/img/document-save-as.png"))),
+        tr("Save As"),
+        this,
+        &MainWindow::saveGifAs);
     file->addSeparator();
-    m_d->m_quit = file->addAction(QIcon(QStringLiteral(":/img/application-exit.png")),
-                                  tr("Quit"),
-                                  tr("Ctrl+Q"),
-                                  this,
-                                  &MainWindow::quit);
+    m_d->m_quit = file->addAction(
+        QIcon::fromTheme(QStringLiteral("application-exit"), QIcon(QStringLiteral(":/img/application-exit.png"))),
+        tr("Quit"),
+        tr("Ctrl+Q"),
+        this,
+        &MainWindow::quit);
 
-    m_d->m_crop = new QAction(QIcon(QStringLiteral(":/img/transform-crop.png")), tr("Crop"), this);
+    m_d->m_crop = new QAction(
+        QIcon::fromTheme(QStringLiteral("transform-crop"), QIcon(QStringLiteral(":/img/transform-crop.png"))),
+        tr("Crop"),
+        this);
     m_d->m_crop->setShortcut(tr("Ctrl+C"));
     m_d->m_crop->setShortcutContext(Qt::ApplicationShortcut);
     m_d->m_crop->setCheckable(true);
     m_d->m_crop->setChecked(false);
 
-    m_d->m_insertText = new QAction(QIcon(QStringLiteral(":/img/insert-text.png")), tr("Insert text"), this);
+    m_d->m_insertText =
+        new QAction(QIcon::fromTheme(QStringLiteral("insert-text"), QIcon(QStringLiteral(":/img/insert-text.png"))),
+                    tr("Insert text"),
+                    this);
     m_d->m_insertText->setShortcut(tr("Ctrl+T"));
     m_d->m_insertText->setShortcutContext(Qt::ApplicationShortcut);
     m_d->m_insertText->setCheckable(true);
     m_d->m_insertText->setChecked(false);
 
-    m_d->m_drawRect = new QAction(QIcon(QStringLiteral(":/img/draw-rectangle.png")), tr("Draw rectangle"), this);
+    m_d->m_drawRect = new QAction(
+        QIcon::fromTheme(QStringLiteral("draw-rectangle"), QIcon(QStringLiteral(":/img/draw-rectangle.png"))),
+        tr("Draw rectangle"),
+        this);
     m_d->m_drawRect->setShortcut(tr("Ctrl+R"));
     m_d->m_drawRect->setShortcutContext(Qt::ApplicationShortcut);
     m_d->m_drawRect->setCheckable(true);
     m_d->m_drawRect->setChecked(false);
 
-    m_d->m_drawArrow = new QAction(QIcon(QStringLiteral(":/img/draw-path.png")), tr("Draw arrow"), this);
+    m_d->m_drawArrow =
+        new QAction(QIcon::fromTheme(QStringLiteral("draw-path"), QIcon(QStringLiteral(":/img/draw-path.png"))),
+                    tr("Draw arrow"),
+                    this);
     m_d->m_drawArrow->setShortcut(tr("Ctrl+A"));
     m_d->m_drawArrow->setShortcutContext(Qt::ApplicationShortcut);
     m_d->m_drawArrow->setCheckable(true);
@@ -631,7 +679,10 @@ MainWindow::MainWindow()
     actionsGroup->addAction(m_d->m_drawArrow);
     actionsGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
 
-    m_d->m_playStop = new QAction(QIcon(QStringLiteral(":/img/media-playback-start.png")), tr("Play"), this);
+    m_d->m_playStop = new QAction(QIcon::fromTheme(QStringLiteral("media-playback-start"),
+                                                   QIcon(QStringLiteral(":/img/media-playback-start.png"))),
+                                  tr("Play"),
+                                  this);
     m_d->m_playStop->setShortcut(Qt::Key_Space);
     m_d->m_playStop->setShortcutContext(Qt::ApplicationShortcut);
 
@@ -639,12 +690,18 @@ MainWindow::MainWindow()
     m_d->m_applyEdit->setShortcut(Qt::Key_Return);
     m_d->m_applyEdit->setShortcutContext(Qt::ApplicationShortcut);
 
+    m_d->m_cancelTips = new QAction(this);
+    m_d->m_cancelTips->setShortcut(Qt::Key_Escape);
+    m_d->m_cancelTips->setShortcutContext(Qt::ApplicationShortcut);
+    m_d->m_cancelTips->setEnabled(false);
+
     m_d->m_cancelEdit = new QAction(this);
     m_d->m_cancelEdit->setShortcut(Qt::Key_Escape);
     m_d->m_cancelEdit->setShortcutContext(Qt::ApplicationShortcut);
 
     addAction(m_d->m_applyEdit);
     addAction(m_d->m_cancelEdit);
+    addAction(m_d->m_cancelTips);
 
     m_d->m_playTimer = new QTimer(this);
 
@@ -655,14 +712,15 @@ MainWindow::MainWindow()
     connect(m_d->m_playStop, &QAction::triggered, this, &MainWindow::playStop);
     connect(m_d->m_applyEdit, &QAction::triggered, this, &MainWindow::applyEdit);
     connect(m_d->m_cancelEdit, &QAction::triggered, this, &MainWindow::cancelEdit);
+    connect(m_d->m_cancelTips, &QAction::triggered, this, &MainWindow::cancelTips);
     connect(m_d->m_playTimer, &QTimer::timeout, this, &MainWindow::showNextFrame);
     connect(m_d->m_view, &View::applyEdit, this, &MainWindow::applyEdit);
 
-    auto edit = menuBar()->addMenu(tr("&Edit"));
-    edit->addAction(m_d->m_crop);
-    edit->addAction(m_d->m_insertText);
-    edit->addAction(m_d->m_drawRect);
-    edit->addAction(m_d->m_drawArrow);
+    m_d->m_editMenu = menuBar()->addMenu(tr("&Edit"));
+    m_d->m_editMenu->addAction(m_d->m_crop);
+    m_d->m_editMenu->addAction(m_d->m_insertText);
+    m_d->m_editMenu->addAction(m_d->m_drawRect);
+    m_d->m_editMenu->addAction(m_d->m_drawArrow);
 
     m_d->m_editToolBar = new QToolBar(tr("Tools"), this);
     m_d->m_editToolBar->addAction(m_d->m_playStop);
@@ -678,13 +736,34 @@ MainWindow::MainWindow()
 
     m_d->m_textToolBar = new QToolBar(tr("Text"), this);
 
-    m_d->m_boldText = new QAction(QIcon(QStringLiteral(":/img/format-text-bold.png")), tr("Bold text"), this);
-    m_d->m_italicText = new QAction(QIcon(QStringLiteral(":/img/format-text-italic.png")), tr("Italic text"), this);
-    m_d->m_fontLess = new QAction(QIcon(QStringLiteral(":/img/format-font-size-less.png")), tr("Less font size"), this);
-    m_d->m_fontMore = new QAction(QIcon(QStringLiteral(":/img/format-font-size-more.png")), tr("More font size"), this);
-    m_d->m_textColor = new QAction(QIcon(QStringLiteral(":/img/format-text-color.png")), tr("Text color"), this);
-    m_d->m_clearFormat = new QAction(QIcon(QStringLiteral(":/img/edit-clear.png")), tr("Clear format"), this);
-    m_d->m_finishText = new QAction(QIcon(QStringLiteral(":/img/dialog-ok-apply.png")), tr("Finish text"), this);
+    m_d->m_boldText = new QAction(
+        QIcon::fromTheme(QStringLiteral("format-text-bold"), QIcon(QStringLiteral(":/img/format-text-bold.png"))),
+        tr("Bold text"),
+        this);
+    m_d->m_italicText = new QAction(
+        QIcon::fromTheme(QStringLiteral("format-text-italic"), QIcon(QStringLiteral(":/img/format-text-italic.png"))),
+        tr("Italic text"),
+        this);
+    m_d->m_fontLess = new QAction(QIcon::fromTheme(QStringLiteral("format-font-size-less"),
+                                                   QIcon(QStringLiteral(":/img/format-font-size-less.png"))),
+                                  tr("Less font size"),
+                                  this);
+    m_d->m_fontMore = new QAction(QIcon::fromTheme(QStringLiteral("format-font-size-more"),
+                                                   QIcon(QStringLiteral(":/img/format-font-size-more.png"))),
+                                  tr("More font size"),
+                                  this);
+    m_d->m_textColor = new QAction(
+        QIcon::fromTheme(QStringLiteral("format-text-color"), QIcon(QStringLiteral(":/img/format-text-color.png"))),
+        tr("Text color"),
+        this);
+    m_d->m_clearFormat =
+        new QAction(QIcon::fromTheme(QStringLiteral("edit-clear"), QIcon(QStringLiteral(":/img/edit-clear.png"))),
+                    tr("Clear format"),
+                    this);
+    m_d->m_finishText = new QAction(
+        QIcon::fromTheme(QStringLiteral("dialog-ok-apply"), QIcon(QStringLiteral(":/img/dialog-ok-apply.png"))),
+        tr("Finish text"),
+        this);
 
     m_d->m_textToolBar->addAction(m_d->m_boldText);
     m_d->m_textToolBar->addAction(m_d->m_italicText);
@@ -700,9 +779,18 @@ MainWindow::MainWindow()
 
     m_d->m_drawToolBar = new QToolBar(tr("Drawing"), this);
 
-    m_d->m_penColor = new QAction(QIcon(QStringLiteral(":/img/format-stroke-color.png")), tr("Stroke color"), this);
-    m_d->m_brushColor = new QAction(QIcon(QStringLiteral(":/img/fill-color.png")), tr("Fill color"), this);
-    m_d->m_penWidth = new QAction(QIcon(QStringLiteral(":/img/distribute-horizontal-x.png")), tr("Pen width"), this);
+    m_d->m_penColor = new QAction(
+        QIcon::fromTheme(QStringLiteral("format-stroke-color"), QIcon(QStringLiteral(":/img/format-stroke-color.png"))),
+        tr("Stroke color"),
+        this);
+    m_d->m_brushColor =
+        new QAction(QIcon::fromTheme(QStringLiteral("fill-color"), QIcon(QStringLiteral(":/img/fill-color.png"))),
+                    tr("Fill color"),
+                    this);
+    m_d->m_penWidth = new QAction(QIcon::fromTheme(QStringLiteral("distribute-horizontal-x"),
+                                                   QIcon(QStringLiteral(":/img/distribute-horizontal-x.png"))),
+                                  tr("Pen width"),
+                                  this);
     m_d->m_penWidth->setCheckable(true);
     m_d->m_penWidthBtnOnDrawToolBar = new QToolButton(this);
     m_d->m_penWidthBtnOnDrawToolBar->setDefaultAction(m_d->m_penWidth);
@@ -727,7 +815,10 @@ MainWindow::MainWindow()
     m_d->m_drawArrowToolBar->hide();
 
     auto settings = menuBar()->addMenu(tr("&Settings"));
-    settings->addAction(QIcon(QStringLiteral(":/img/configure.png")), tr("Settings"), this, &MainWindow::onSettings);
+    settings->addAction(QIcon::fromTheme(QStringLiteral("configure"), QIcon(QStringLiteral(":/img/configure.png"))),
+                        tr("Settings"),
+                        this,
+                        &MainWindow::onSettings);
 
     auto help = menuBar()->addMenu(tr("&Help"));
     help->addAction(QIcon(QStringLiteral(":/icon/icon_22x22.png")), tr("About"), this, &MainWindow::about);
@@ -735,11 +826,21 @@ MainWindow::MainWindow()
                     tr("About Qt"),
                     this,
                     &MainWindow::aboutQt);
-    help->addAction(QIcon(QStringLiteral(":/img/bookmarks-organize.png")), tr("Licenses"), this, &MainWindow::licenses);
+    help->addAction(
+        QIcon::fromTheme(QStringLiteral("bookmarks-organize"), QIcon(QStringLiteral(":/img/bookmarks-organize.png"))),
+        tr("Licenses"),
+        this,
+        &MainWindow::licenses);
+    m_d->m_tipsAction =
+        help->addAction(QIcon::fromTheme(QStringLiteral("help-hint"), QIcon(QStringLiteral(":/img/help-hint.png"))),
+                        tr("Tips && Tricks"),
+                        this,
+                        &MainWindow::tips);
 
     m_d->m_stack->addWidget(m_d->m_about);
     m_d->m_stack->addWidget(m_d->m_view);
     m_d->m_stack->addWidget(m_d->m_busyPage);
+    m_d->m_stack->addWidget(m_d->m_tips);
 
     setCentralWidget(m_d->m_stack);
 
@@ -1289,12 +1390,14 @@ void MainWindow::playStop()
     if (m_d->m_playing) {
         m_d->m_playTimer->stop();
         m_d->m_playStop->setText(tr("Play"));
-        m_d->m_playStop->setIcon(QIcon(":/img/media-playback-start.png"));
+        m_d->m_playStop->setIcon(
+            QIcon::fromTheme(QStringLiteral("media-playback-start"), QIcon(":/img/media-playback-start.png")));
         m_d->enableActions();
     } else {
         m_d->disableActionsOnPlaying();
         m_d->m_playStop->setText(tr("Stop"));
-        m_d->m_playStop->setIcon(QIcon(":/img/media-playback-stop.png"));
+        m_d->m_playStop->setIcon(
+            QIcon::fromTheme(QStringLiteral("media-playback-stop"), QIcon(":/img/media-playback-stop.png")));
 
         const auto &img = m_d->m_view->tape()->frame(m_d->m_view->tape()->currentFrame()->counter())->image();
         m_d->m_playTimer->start(m_d->m_frames.delay(img.m_pos));
@@ -1462,6 +1565,8 @@ void MainWindow::gifLoaded()
         }
 
         m_d->ready();
+
+        m_d->m_editMenu->setEnabled(true);
     } else {
         m_d->m_busyFlag = false;
 
@@ -1573,4 +1678,45 @@ void MainWindow::onFrameChanged(int)
     m_d->calculateTimings();
 
     onFrameSelected(m_d->m_view->currentFrame()->image().m_pos + 1);
+}
+
+void MainWindow::tips()
+{
+    if (m_d->m_stack->currentWidget() != m_d->m_tips) {
+        m_d->m_currentUiState.m_isEditActionsEnabled = m_d->m_cancelEdit->isEnabled();
+        m_d->m_currentUiState.m_isDrawArrowToolBarShow = m_d->m_drawArrowToolBar->isVisible();
+        m_d->m_currentUiState.m_isDrawToolBarShow = m_d->m_drawToolBar->isVisible();
+        m_d->m_currentUiState.m_isEditToolBarShown = m_d->m_editToolBar->isVisible();
+        m_d->m_currentUiState.m_isTextToolBarShown = m_d->m_textToolBar->isVisible();
+        m_d->m_currentUiState.m_currentStackWidget = m_d->m_stack->currentWidget();
+
+        hidePenWidthSpinBox();
+
+        m_d->m_cancelEdit->setEnabled(false);
+        m_d->m_applyEdit->setEnabled(false);
+        m_d->m_editMenu->setEnabled(false);
+        m_d->m_cancelTips->setEnabled(true);
+
+        m_d->m_drawArrowToolBar->hide();
+        m_d->m_drawToolBar->hide();
+        m_d->m_editToolBar->hide();
+        m_d->m_textToolBar->hide();
+
+        m_d->m_stack->setCurrentWidget(m_d->m_tips);
+    }
+}
+
+void MainWindow::cancelTips()
+{
+    m_d->m_cancelTips->setEnabled(false);
+    m_d->m_cancelEdit->setEnabled(m_d->m_currentUiState.m_isEditActionsEnabled);
+    m_d->m_applyEdit->setEnabled(m_d->m_currentUiState.m_isEditActionsEnabled);
+    m_d->m_editMenu->setEnabled(m_d->m_currentUiState.m_currentStackWidget != m_d->m_about);
+
+    m_d->m_stack->setCurrentWidget(m_d->m_currentUiState.m_currentStackWidget);
+
+    m_d->m_drawArrowToolBar->setVisible(m_d->m_currentUiState.m_isDrawArrowToolBarShow);
+    m_d->m_drawToolBar->setVisible(m_d->m_currentUiState.m_isDrawToolBarShow);
+    m_d->m_editToolBar->setVisible(m_d->m_currentUiState.m_isEditToolBarShown);
+    m_d->m_textToolBar->setVisible(m_d->m_currentUiState.m_isTextToolBarShown);
 }
