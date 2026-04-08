@@ -44,7 +44,8 @@ set(SRC main.cpp
     delay.ui
     tips.hpp
     tips.cpp
-    constants.hpp)
+    constants.hpp
+    constants.cpp)
 
 qt6_add_resources(SRC resources.qrc)
 

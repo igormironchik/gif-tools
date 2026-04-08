@@ -20,6 +20,7 @@ configure_file(version.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/version.hpp)
 
 qt6_add_resources(SRC qt.qrc)
 qt6_add_resources(SRC icon.qrc)
+qt6_add_resources(SRC tr.qrc)
 
 install(FILES "icon/icon_16x16.png" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/16x16/apps/" RENAME "gif-tools.png")
 install(FILES "icon/icon_22x22.png" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/22x22/apps/" RENAME "gif-tools.png")

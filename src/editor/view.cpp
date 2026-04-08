@@ -151,7 +151,7 @@ void View::startCrop()
 {
     if (!m_d->m_crop) {
         m_d->m_crop = new CropFrame(m_d->m_currentFrame);
-        m_d->m_crop->setStartMessage(s_cropHelp);
+        m_d->m_crop->setStartMessage(TranslatedStrings::cropHelp());
         connect(m_d->m_crop, &CropFrame::applyEdit, this, &View::applyEdit);
         m_d->m_crop->setGeometry(QRect(0, 0, m_d->m_currentFrame->width(), m_d->m_currentFrame->height()));
         m_d->m_crop->show();
@@ -173,7 +173,7 @@ void View::startText()
 {
     if (!m_d->m_text) {
         m_d->m_text = new TextFrame(tape(), m_d->m_currentFrame);
-        m_d->m_text->setStartMessage(s_textHelp);
+        m_d->m_text->setStartMessage(TranslatedStrings::textHelp());
         m_d->m_text->setGeometry(QRect(0, 0, m_d->m_currentFrame->width(), m_d->m_currentFrame->height()));
         m_d->m_text->show();
         m_d->m_text->raise();
@@ -215,7 +215,7 @@ void View::startRect()
 {
     if (!m_d->m_rect) {
         m_d->m_rect = new RectFrame(tape(), m_d->m_currentFrame);
-        m_d->m_rect->setStartMessage(s_rectHelp);
+        m_d->m_rect->setStartMessage(TranslatedStrings::rectHelp());
         connect(m_d->m_rect, &RectFrame::applyEdit, this, &View::applyEdit);
         connect(this, &View::doRepaint, m_d->m_rect, qOverload<>(&RectFrame::update));
         m_d->m_rect->setGeometry(QRect(0, 0, m_d->m_currentFrame->width(), m_d->m_currentFrame->height()));
@@ -238,7 +238,7 @@ void View::startArrow()
 {
     if (!m_d->m_arrow) {
         m_d->m_arrow = new ArrowFrame(tape(), m_d->m_currentFrame);
-        m_d->m_arrow->setStartMessage(s_arrowHelp);
+        m_d->m_arrow->setStartMessage(TranslatedStrings::arrowHelp());
         connect(m_d->m_arrow, &ArrowFrame::applyEdit, this, &View::applyEdit);
         connect(this, &View::doRepaint, m_d->m_arrow, qOverload<>(&ArrowFrame::update));
         m_d->m_arrow->setGeometry(QRect(0, 0, m_d->m_currentFrame->width(), m_d->m_currentFrame->height()));

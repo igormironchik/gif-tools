@@ -37,8 +37,8 @@ int main(int argc,
     app.setWindowIcon(appIcon);
 
     QTranslator appTranslator;
-    if (appTranslator.load(QStringLiteral("./tr/gif-editor_") + QLocale::system().name())) {
-        app.installTranslator(&appTranslator);
+    if (appTranslator.load(QLocale::system(), QStringLiteral("gif_"), QString(), QStringLiteral(":/tr/"))) {
+        QApplication::installTranslator(&appTranslator);
     }
 
     QCommandLineParser parser;

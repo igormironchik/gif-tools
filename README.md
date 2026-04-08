@@ -78,3 +78,23 @@ thing to check is how Qt will do screen grabbing from two or more screens at the
 this should be tested on a multi-monitor system (keep in mind that on Linux tests should be done
 on X11, Wayland won't work now, support for Wayland will be in progress when KDE will bump version
 to 6.8.0 and drop X11 support).
+
+# Translating
+
+To translate these applications into your language you need to run
+
+```bash
+lupdate . -ts ../translate/gif_{locale}.ts
+```
+
+from `src` directory.
+
+Make a translation of that file with Qt Linguist and run in `translate` directory
+
+```bash
+lrelease gif_{locale}.ts -qm ../src/shared/tr/gif_{locale}.qm
+```
+
+And put new line into `src/shared/tr.qrc` file with record about new translation.
+
+With these changes you can do a PR into the repository.
