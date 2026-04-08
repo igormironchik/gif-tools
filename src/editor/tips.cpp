@@ -59,10 +59,7 @@ Tips::Tips(QWidget *parent)
                   "</ul>"
                   "</li>"
                   "</ul>")
-                   .arg(s_cropHelp)
-                   .arg(s_textHelp)
-                   .arg(s_rectHelp)
-                   .arg(s_arrowHelp));
+                   .arg(TranslatedStrings::cropHelp(), TranslatedStrings::textHelp(), TranslatedStrings::rectHelp(), TranslatedStrings::arrowHelp()));
 
     setWidget(t);
 }

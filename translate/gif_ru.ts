@@ -497,22 +497,22 @@ Do you want to terminate the application?</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/editor/constants.hpp" line="12"/>
+        <location filename="../src/editor/constants.cpp" line="14"/>
         <source>Select a region for cropping with the mouse, when ready press Enter. Press Escape for cancelling.</source>
         <translation>Выберите мышью область для обрезки, когда будете готовы - нажмите Enter. Нажмите Escape для отмены.</translation>
     </message>
     <message>
-        <location filename="../src/editor/constants.hpp" line="15"/>
+        <location filename="../src/editor/constants.cpp" line="21"/>
         <source>Select a region for text with the mouse, when ready press Enter or use context menu. You can switch between text mode and rectangle selection with context meny at any time. You can choose any frame from the tape to apply text on that frame. Text may be different on each frame. If you clicked on the frame, but don&apos;t want the text to be on it - uncheck this frame on the tape. When ready click &quot;Apply&quot; button on the tool bar. Press Escape for cancelling.</source>
         <translation>Выберите мышью область для текста, когда будете готовы нажмите Enter или используйте контекстное меню. Вы можете переключаться между режимом набора текста и режимом изменения области для текста в любое время с помощью контекстного меню. Вы можете выбрать любой кадр на ленте, чтобы применить текст на нем. Текст может быть разным на разных кадрах. Если вы нажали на кадр, но не хотите, чтобы текст был на этом кадре - снимите галочку на ленте. Когда будете готовы - нажмите конпку &quot;Применить&quot; на панели инструментов. Нажмите Escape для отмены.</translation>
     </message>
     <message>
-        <location filename="../src/editor/constants.hpp" line="23"/>
+        <location filename="../src/editor/constants.cpp" line="33"/>
         <source>Select a region for drawing a rectangle with the mouse, when ready press Enter. You can choose any frame from the tape to apply rectangle on that frame. If you clicked on the frame, but don&apos;t want the rectangle to be on it - uncheck this frame on the tape. Press Escape for cancelling.</source>
         <translation>Выберите мышью область для прямоугольника, когда будете готовы - нажмите Enter. Вы можете выбрать любой кадр на ленте, чтобы применить прямоугольник на нем. Если вы нажали на кадр, но не хотите, чтобы прямоугольник был на нем - снимите галочку с кадра на ленте. Нажмите Escape для отмены.</translation>
     </message>
     <message>
-        <location filename="../src/editor/constants.hpp" line="29"/>
+        <location filename="../src/editor/constants.cpp" line="43"/>
         <source>Select a region for drawing an arrow with the mouse, when ready press Enter. You can choose any frame from the tape to apply arrow on that frame. If you clicked on the frame, but don&apos;t want the arrow to be on it - uncheck this frame on the tape. Press Escape for cancelling.</source>
         <translation>Выберите мышью облать для стрелки, когда будете готовы - нажмите Enter. Вы можете выбрать любой кадр на ленте, чтобы применить срелку на нем. Если вы нажали на кадр, но не хотите, чтобы стрелка была на нем - снимите галочку с кадра на ленте. Нажмите Escape для отмены.</translation>
     </message>
