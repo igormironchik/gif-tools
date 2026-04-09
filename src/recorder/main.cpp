@@ -31,8 +31,12 @@ int main(int argc,
     app.setWindowIcon(appIcon);
 
     QTranslator appTranslator;
-    if (appTranslator.load(QLocale::system(), QStringLiteral("gif_"), QString(), QStringLiteral(":/tr/"))) {
-        QApplication::installTranslator(&appTranslator);
+    const auto locale = QLocale::system();
+
+    if (locale.language() != QLocale::English) {
+        if (appTranslator.load(locale, QStringLiteral("gif_"), QString(), QStringLiteral(":/tr/"))) {
+            QApplication::installTranslator(&appTranslator);
+        }
     }
 
     EventMonitor m;
