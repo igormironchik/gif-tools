@@ -58,7 +58,8 @@ Tips::Tips(QWidget *parent)
                   "</li>"
                   "</ul>"
                   "</li>"
-                  "</ul>")
+                  "</ul>"
+                  "<p><b>Press Escape to exit from this dialog.</b></p>")
                    .arg(TranslatedStrings::cropHelp(),
                         TranslatedStrings::textHelp(),
                         TranslatedStrings::rectHelp(),
