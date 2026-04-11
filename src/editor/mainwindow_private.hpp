@@ -18,6 +18,8 @@
 #include <QLabel>
 #include <QSpinBox>
 #include <QStackedWidget>
+#include <QStateMachine>
+#include <QState>
 #include <QToolBar>
 #include <QToolButton>
 
@@ -192,6 +194,10 @@ public:
     QLabel *m_status = nullptr;
     //! Edit menu.
     QMenu *m_editMenu = nullptr;
+    //! UI state machine.
+    QStateMachine *m_uiState = nullptr;
+    //! Root state.
+    QState *m_rootState = nullptr;
     //! Parent.
     MainWindow *m_q = nullptr;
 }; // class MainWindowPrivate

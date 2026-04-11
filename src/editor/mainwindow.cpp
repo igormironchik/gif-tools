@@ -437,7 +437,18 @@ void MainWindow::initUi()
     statusBar()->addWidget(m_d->m_status);
     statusBar()->hide();
 
+    initStateMachine();
+
     m_d->setActionsToInitialState();
+}
+
+void MainWindow::initStateMachine()
+{
+    m_d->m_uiState = new QStateMachine(this);
+    m_d->m_rootState = new QState(m_d->m_uiState);
+    m_d->m_uiState->setInitialState(m_d->m_rootState);
+
+    m_d->m_uiState->start();
 }
 
 void MainWindow::closeEvent(QCloseEvent *e)

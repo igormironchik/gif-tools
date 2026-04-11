@@ -107,6 +107,7 @@ protected:
 private:
     void gifSaved(bool failed);
     void initUi();
+    void initStateMachine();
 
 private:
     friend class MainWindowPrivate;
