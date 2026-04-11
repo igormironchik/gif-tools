@@ -143,7 +143,7 @@ void MainWindowPrivate::busy()
 
     disableActionsOnPlaying();
 
-    cancelTips(false);
+    //cancelTips(false);
 
     m_quit->setEnabled(false);
 
@@ -152,27 +152,6 @@ void MainWindowPrivate::busy()
     m_drawToolBar->hide();
     m_drawArrowToolBar->hide();
     m_tipsAction->setEnabled(false);
-}
-
-void MainWindowPrivate::cancelTips(bool restoreWidget)
-{
-    if (m_currentUiState.m_currentStackWidget) {
-        m_cancelTips->setEnabled(false);
-        m_cancelEdit->setEnabled(m_currentUiState.m_isEditActionsEnabled);
-        m_applyEdit->setEnabled(m_currentUiState.m_isEditActionsEnabled);
-        m_editMenu->setEnabled(m_currentUiState.m_currentStackWidget != m_about);
-
-        if (restoreWidget) {
-            m_stack->setCurrentWidget(m_currentUiState.m_currentStackWidget);
-        }
-
-        m_drawArrowToolBar->setVisible(m_currentUiState.m_isDrawArrowToolBarShow);
-        m_drawToolBar->setVisible(m_currentUiState.m_isDrawToolBarShow);
-        m_editToolBar->setVisible(m_currentUiState.m_isEditToolBarShown);
-        m_textToolBar->setVisible(m_currentUiState.m_isTextToolBarShown);
-
-        m_currentUiState.m_currentStackWidget = nullptr;
-    }
 }
 
 void MainWindowPrivate::ready()
@@ -219,6 +198,8 @@ int MainWindowPrivate::nextCheckedFrame(int current) const
 
 void MainWindowPrivate::openGif(const QString &fileName)
 {
+    emit m_q->openFileTriggered();
+
     clearView();
 
     setModified(false);

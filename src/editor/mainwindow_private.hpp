@@ -90,22 +90,6 @@ public:
     bool m_playing;
     //! Was show evemt?
     bool m_shownAlready = false;
-
-    //! State of the UI.
-    struct State {
-        bool m_isEditActionsEnabled = false;
-        bool m_isEditToolBarShown = false;
-        bool m_isTextToolBarShown = false;
-        bool m_isDrawToolBarShow = false;
-        bool m_isDrawArrowToolBarShow = false;
-
-        //! Current widget on stack.
-        QWidget *m_currentStackWidget = nullptr;
-    };
-
-    //! Current state of the UI. (Uses for tips only)
-    State m_currentUiState;
-
     //! File name to open after show event.
     QString m_fileNameToOpenAfterShow;
     //! Future watcher.
@@ -196,8 +180,6 @@ public:
     QMenu *m_editMenu = nullptr;
     //! UI state machine.
     QStateMachine *m_uiState = nullptr;
-    //! Root state.
-    QState *m_rootState = nullptr;
     //! Parent.
     MainWindow *m_q = nullptr;
 }; // class MainWindowPrivate

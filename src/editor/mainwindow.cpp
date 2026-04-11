@@ -13,6 +13,7 @@
 #include "settings.hpp"
 #include "tape.hpp"
 #include "text.hpp"
+#include "uistates.hpp"
 #include "version.hpp"
 
 // Qt include.
@@ -24,6 +25,7 @@
 #include <QMessageBox>
 #include <QMetaMethod>
 #include <QPainter>
+#include <QSignalTransition>
 #include <QStandardPaths>
 #include <QStatusBar>
 #include <QTimer>
@@ -288,13 +290,10 @@ void MainWindow::initUi()
     m_d->m_playTimer = new QTimer(this);
 
     connect(m_d->m_crop, &QAction::toggled, this, &MainWindow::crop);
-    connect(m_d->m_insertText, &QAction::toggled, this, &MainWindow::insertText);
     connect(m_d->m_drawRect, &QAction::toggled, this, &MainWindow::drawRect);
     connect(m_d->m_drawArrow, &QAction::toggled, this, &MainWindow::drawArrow);
     connect(m_d->m_playStop, &QAction::triggered, this, &MainWindow::playStop);
     connect(m_d->m_applyEdit, &QAction::triggered, this, &MainWindow::applyEdit);
-    connect(m_d->m_cancelEdit, &QAction::triggered, this, &MainWindow::cancelEdit);
-    connect(m_d->m_cancelTips, &QAction::triggered, this, &MainWindow::cancelTips);
     connect(m_d->m_playTimer, &QTimer::timeout, this, &MainWindow::showNextFrame);
     connect(m_d->m_view, &View::applyEdit, this, &MainWindow::applyEdit);
 
@@ -415,9 +414,7 @@ void MainWindow::initUi()
         &MainWindow::licenses);
     m_d->m_tipsAction =
         help->addAction(QIcon::fromTheme(QStringLiteral("help-hint"), QIcon(QStringLiteral(":/img/help-hint.png"))),
-                        tr("Tips && Tricks"),
-                        this,
-                        &MainWindow::tips);
+                        tr("Tips && Tricks"));
 
     m_d->m_stack->addWidget(m_d->m_about);
     m_d->m_stack->addWidget(m_d->m_view);
@@ -438,15 +435,49 @@ void MainWindow::initUi()
     statusBar()->hide();
 
     initStateMachine();
-
-    m_d->setActionsToInitialState();
 }
 
 void MainWindow::initStateMachine()
 {
     m_d->m_uiState = new QStateMachine(this);
-    m_d->m_rootState = new QState(m_d->m_uiState);
-    m_d->m_uiState->setInitialState(m_d->m_rootState);
+    auto rootState = new QState(m_d->m_uiState);
+    auto aboutState = new AboutState(*m_d, rootState);
+    rootState->setInitialState(aboutState);
+    m_d->m_uiState->setInitialState(rootState);
+
+    auto busyState = new BusyState(*m_d, rootState);
+
+    auto readyState = new ReadyState(*m_d, rootState);
+
+    rootState->addTransition(this, &MainWindow::openFileTriggered, busyState);
+    rootState->addTransition(this, &MainWindow::saveFileTriggered, busyState);
+
+    rootState->addTransition(this, &MainWindow::fileLoadedTriggered, readyState);
+
+    rootState->addTransition(this, &MainWindow::fileLoadingFailed, aboutState);
+    rootState->addTransition(this, &MainWindow::fileSavingFailed, aboutState);
+
+    auto textState = new DrawTextState(*m_d, readyState);
+    auto busyTextState = new BusyState(*m_d, textState);
+
+    auto t1 = readyState->addTransition(m_d->m_insertText, &QAction::triggered, textState);
+    t1->setTransitionType(QAbstractTransition::InternalTransition);
+
+    auto t2 = readyState->addTransition(m_d->m_cancelEdit, &QAction::triggered, readyState);
+    t2->setTransitionType(QAbstractTransition::InternalTransition);
+
+    auto t3 = readyState->addTransition(this, &MainWindow::cancelEditTriggered, readyState);
+    t3->setTransitionType(QAbstractTransition::InternalTransition);
+
+    readyState->addTransition(this, &MainWindow::graphicsAppliedTriggered, readyState);
+
+    auto t4 = textState->addTransition(this, &MainWindow::applyEditTriggered, busyTextState);
+    t4->setTransitionType(QAbstractTransition::InternalTransition);
+
+    readyState->assignProperty(m_d->m_insertText, "checked", false);
+    readyState->assignProperty(m_d->m_drawArrow, "checked", false);
+    readyState->assignProperty(m_d->m_drawRect, "checked", false);
+    readyState->assignProperty(m_d->m_crop, "checked", false);
 
     m_d->m_uiState->start();
 }
@@ -523,8 +554,6 @@ void MainWindow::openFile(const QString &fileName,
             }
         }
 
-        m_d->busy();
-
         m_d->openGif(fileName);
     }
 }
@@ -545,7 +574,7 @@ void MainWindow::openGif()
 void MainWindow::saveGif()
 {
     try {
-        m_d->busy();
+        emit saveFileTriggered();
 
         QStringList toSave;
         QVector<int> delays;
@@ -566,18 +595,14 @@ void MainWindow::saveGif()
             auto future = QtConcurrent::run(writeGIFFunc, m_d->m_busy, toSave, delays, m_d->m_currentGif);
             m_d->m_watcher.setFuture(future);
         } else {
-            m_d->ready();
+            emit fileSavingFailed();
 
             QMessageBox::information(this, tr("Can't save GIF..."), tr("Can't save GIF image with no frames."));
-
-            gifSaved(true);
         }
     } catch (const std::bad_alloc &) {
-        m_d->ready();
+        emit fileSavingFailed();
 
         QMessageBox::critical(this, tr("Failed to save GIF..."), tr("Out of memory."));
-
-        gifSaved(true);
     }
 }
 
@@ -693,42 +718,6 @@ void MainWindow::penWidth(bool on)
     }
 }
 
-void MainWindow::insertText(bool on)
-{
-    if (on) {
-        hidePenWidthSpinBox();
-
-        m_d->enableActionsOnEdit(false);
-
-        m_d->m_editMode = MainWindowPrivate::EditMode::Text;
-
-        m_d->m_view->startText();
-
-        connect(m_d->m_view->textFrame(),
-                &TextFrame::switchToTextEditingMode,
-                this,
-                &MainWindow::onSwitchToTextEditMode);
-        connect(m_d->m_view->textFrame(),
-                &TextFrame::switchToTextSelectionRectMode,
-                this,
-                &MainWindow::onSwitchToTextSelectionRectMode);
-        connect(m_d->m_boldText, &QAction::triggered, m_d->m_view->textFrame(), &TextFrame::boldText);
-        connect(m_d->m_italicText, &QAction::triggered, m_d->m_view->textFrame(), &TextFrame::italicText);
-        connect(m_d->m_fontLess, &QAction::triggered, m_d->m_view->textFrame(), &TextFrame::fontLess);
-        connect(m_d->m_fontMore, &QAction::triggered, m_d->m_view->textFrame(), &TextFrame::fontMore);
-        connect(m_d->m_textColor, &QAction::triggered, m_d->m_view->textFrame(), &TextFrame::textColor);
-        connect(m_d->m_clearFormat, &QAction::triggered, m_d->m_view->textFrame(), &TextFrame::clearFormat);
-        connect(m_d->m_finishText, &QAction::triggered, this, &MainWindow::applyText);
-        connect(m_d->m_view->textFrame(), &TextFrame::started, this, &MainWindow::onRectSelectionStarted);
-    } else {
-        m_d->m_view->stopText();
-
-        m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
-
-        m_d->enableActionsOnEdit();
-    }
-}
-
 void MainWindow::drawRect(bool on)
 {
     if (on) {
@@ -783,46 +772,46 @@ void MainWindow::drawArrow(bool on)
 
 void MainWindow::cancelEdit()
 {
-    m_d->m_view->stopCrop();
-    m_d->m_view->stopText();
-    m_d->m_crop->setEnabled(true);
-    m_d->m_insertText->setEnabled(true);
-    m_d->m_drawRect->setEnabled(true);
-    m_d->m_drawArrow->setEnabled(true);
+    // m_d->m_view->stopCrop();
+    // m_d->m_view->stopText();
+    // m_d->m_crop->setEnabled(true);
+    // m_d->m_insertText->setEnabled(true);
+    // m_d->m_drawRect->setEnabled(true);
+    // m_d->m_drawArrow->setEnabled(true);
 
-    hidePenWidthSpinBox();
+    // hidePenWidthSpinBox();
 
-    m_d->enableActionsOnEdit();
+    // m_d->enableActionsOnEdit();
 
-    switch (m_d->m_editMode) {
-    case MainWindowPrivate::EditMode::Crop: {
-        m_d->m_crop->setChecked(false);
-    } break;
+    // switch (m_d->m_editMode) {
+    // case MainWindowPrivate::EditMode::Crop: {
+    //     m_d->m_crop->setChecked(false);
+    // } break;
 
-    case MainWindowPrivate::EditMode::Text: {
-        m_d->m_textToolBar->hide();
-        m_d->m_insertText->setChecked(false);
-    } break;
+    // case MainWindowPrivate::EditMode::Text: {
+    //     m_d->m_textToolBar->hide();
+    //     m_d->m_insertText->setChecked(false);
+    // } break;
 
-    case MainWindowPrivate::EditMode::Rect: {
-        m_d->m_drawToolBar->hide();
-        m_d->m_drawRect->setChecked(false);
-    } break;
+    // case MainWindowPrivate::EditMode::Rect: {
+    //     m_d->m_drawToolBar->hide();
+    //     m_d->m_drawRect->setChecked(false);
+    // } break;
 
-    case MainWindowPrivate::EditMode::Arrow: {
-        m_d->m_drawArrowToolBar->hide();
-        m_d->m_drawArrow->setChecked(false);
-    } break;
+    // case MainWindowPrivate::EditMode::Arrow: {
+    //     m_d->m_drawArrowToolBar->hide();
+    //     m_d->m_drawArrow->setChecked(false);
+    // } break;
 
-    default:
-        break;
-    }
+    // default:
+    //     break;
+    // }
 
-    for (int i = 1; i <= m_d->m_view->tape()->count(); ++i) {
-        m_d->m_view->tape()->frame(i)->setModified(false);
-    }
+    // for (int i = 1; i <= m_d->m_view->tape()->count(); ++i) {
+    //     m_d->m_view->tape()->frame(i)->setModified(false);
+    // }
 
-    m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
+    // m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
 }
 
 void MainWindow::applyEdit()
@@ -836,7 +825,8 @@ void MainWindow::applyEdit()
         const auto rect = m_d->m_view->selectedRect();
 
         if (!rect.isNull() && rect != m_d->m_view->currentFrame()->imageRect()) {
-            m_d->busy();
+            emit applyEditTriggered();
+
             m_d->m_busyStatusLabel->setText(tr("Cropping GIF..."));
 
             for (int i = 1; i <= m_d->m_view->tape()->count(); ++i) {
@@ -851,7 +841,7 @@ void MainWindow::applyEdit()
             auto future = QtConcurrent::run(cropGIFFunc, m_d->m_busy, &m_d->m_frames, rect);
             m_d->m_watcher.setFuture(future);
         } else {
-            cancelEdit();
+            emit cancelEditTriggered();
         }
     } break;
 
@@ -861,7 +851,7 @@ void MainWindow::applyEdit()
         if (!rect.isNull()) {
             m_d->m_view->startTextEditing();
         } else {
-            cancelEdit();
+            emit cancelEditTriggered();
         }
     } break;
 
@@ -870,7 +860,7 @@ void MainWindow::applyEdit()
         const auto rect = m_d->m_view->selectedRect();
 
         if (!rect.isNull()) {
-            m_d->busy();
+            emit applyEditTriggered();
 
             m_d->m_busy->setShowPercent(true);
 
@@ -913,7 +903,7 @@ void MainWindow::applyEdit()
             }
             }
         } else {
-            cancelEdit();
+            emit cancelEditTriggered();
         }
     } break;
 
@@ -1048,7 +1038,8 @@ void MainWindow::applyText()
     const auto rect = m_d->m_view->selectedRect();
 
     if (!rect.isNull()) {
-        m_d->busy();
+        emit applyEditTriggered();
+
         m_d->m_busyStatusLabel->setText(tr("Drawing text..."));
 
         m_d->m_busy->setShowPercent(true);
@@ -1068,7 +1059,7 @@ void MainWindow::applyText()
                                         m_d->m_unchecked);
         m_d->m_watcher.setFuture(future);
     } else {
-        cancelEdit();
+        emit cancelEditTriggered();
     }
 }
 
@@ -1153,19 +1144,9 @@ void MainWindow::gifLoaded()
             m_d->m_view->scrollTo(1);
         }
 
-        m_d->ready();
-
-        m_d->m_editMenu->setEnabled(true);
+        emit fileLoadedTriggered();
     } else {
-        m_d->m_busyFlag = false;
-
-        m_d->m_stack->setCurrentWidget(m_d->m_about);
-
-        m_d->m_busy->setRunning(false);
-
-        setWindowTitle(tr("GIF Editor"));
-
-        m_d->setActionsToInitialState();
+        emit fileLoadingFailed();
 
         QMessageBox::critical(this,
                               tr("Unable to load GIF..."),
@@ -1175,28 +1156,17 @@ void MainWindow::gifLoaded()
     }
 }
 
-void MainWindow::gifSaved(bool failed)
+void MainWindow::gifSaved()
 {
     disconnect(&m_d->m_watcher, 0, this, 0);
 
     m_d->m_busy->setShowPercent(false);
 
     if (!m_d->m_quitFlag) {
-        if (!failed) {
-            m_d->openGif(m_d->m_currentGif);
-        } else {
-            m_d->ready();
-        }
+        m_d->openGif(m_d->m_currentGif);
     } else {
-        m_d->m_busyFlag = false;
-
         QApplication::quit();
     }
-}
-
-void MainWindow::gifSaved()
-{
-    gifSaved(false);
 }
 
 void MainWindow::gifCropped()
@@ -1246,9 +1216,7 @@ void MainWindow::graphicsApplied()
 
     m_d->setModified(true);
 
-    cancelEdit();
-
-    m_d->ready();
+    emit graphicsAppliedTriggered();
 }
 
 void MainWindow::onFrameSelected(int idx)
@@ -1267,35 +1235,4 @@ void MainWindow::onFrameChanged(int)
     m_d->calculateTimings();
 
     onFrameSelected(m_d->m_view->currentFrame()->image().m_pos + 1);
-}
-
-void MainWindow::tips()
-{
-    if (m_d->m_stack->currentWidget() != m_d->m_tips) {
-        m_d->m_currentUiState.m_isEditActionsEnabled = m_d->m_cancelEdit->isEnabled();
-        m_d->m_currentUiState.m_isDrawArrowToolBarShow = m_d->m_drawArrowToolBar->isVisible();
-        m_d->m_currentUiState.m_isDrawToolBarShow = m_d->m_drawToolBar->isVisible();
-        m_d->m_currentUiState.m_isEditToolBarShown = m_d->m_editToolBar->isVisible();
-        m_d->m_currentUiState.m_isTextToolBarShown = m_d->m_textToolBar->isVisible();
-        m_d->m_currentUiState.m_currentStackWidget = m_d->m_stack->currentWidget();
-
-        hidePenWidthSpinBox();
-
-        m_d->m_cancelEdit->setEnabled(false);
-        m_d->m_applyEdit->setEnabled(false);
-        m_d->m_editMenu->setEnabled(false);
-        m_d->m_cancelTips->setEnabled(true);
-
-        m_d->m_drawArrowToolBar->hide();
-        m_d->m_drawToolBar->hide();
-        m_d->m_editToolBar->hide();
-        m_d->m_textToolBar->hide();
-
-        m_d->m_stack->setCurrentWidget(m_d->m_tips);
-    }
-}
-
-void MainWindow::cancelTips()
-{
-    m_d->cancelTips(true);
 }

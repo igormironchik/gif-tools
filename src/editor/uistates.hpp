@@ -6,7 +6,7 @@
 #pragma once
 
 // Qt include.
-#include <QAbstractState>
+#include <QState>
 
 class MainWindowPrivate;
 
@@ -15,7 +15,7 @@ class MainWindowPrivate;
 //
 
 //! Tips state.
-class TipsState : public QAbstractState
+class TipsState : public QState
 {
 public:
     explicit TipsState(MainWindowPrivate &impl, QState *parent = nullptr);
@@ -27,6 +27,13 @@ protected:
 
 private:
     MainWindowPrivate &m_impl;
+
+    bool m_isEditActionsEnabled = false;
+    bool m_isEditToolBarShown = false;
+    bool m_isTextToolBarShown = false;
+    bool m_isDrawToolBarShow = false;
+    bool m_isDrawArrowToolBarShow = false;
+    QWidget *m_currentStackWidget = nullptr;
 }; // class TipsState
 
 //
@@ -34,7 +41,7 @@ private:
 //
 
 //! Modified state.
-class ModifiedState : public QAbstractState
+class ModifiedState : public QState
 {
 public:
     explicit ModifiedState(MainWindowPrivate &impl, QState *parent = nullptr);
@@ -53,7 +60,7 @@ private:
 //
 
 //! Saved state.
-class SavedState : public QAbstractState
+class SavedState : public QState
 {
 public:
     explicit SavedState(MainWindowPrivate &impl, QState *parent = nullptr);
@@ -72,7 +79,7 @@ private:
 //
 
 //! Busy state.
-class BusyState : public QAbstractState
+class BusyState : public QState
 {
 public:
     explicit BusyState(MainWindowPrivate &impl, QState *parent = nullptr);
@@ -91,7 +98,7 @@ private:
 //
 
 //! Ready state.
-class ReadyState : public QAbstractState
+class ReadyState : public QState
 {
 public:
     explicit ReadyState(MainWindowPrivate &impl, QState *parent = nullptr);
@@ -110,7 +117,7 @@ private:
 //
 
 //! "About" state.
-class AboutState : public QAbstractState
+class AboutState : public QState
 {
 public:
     explicit AboutState(MainWindowPrivate &impl, QState *parent = nullptr);
@@ -129,7 +136,7 @@ private:
 //
 
 //! Playing GIF state.
-class PlayingState : public QAbstractState
+class PlayingState : public QState
 {
 public:
     explicit PlayingState(MainWindowPrivate &impl, QState *parent = nullptr);
@@ -148,7 +155,7 @@ private:
 //
 
 //! Base of all editing states.
-class EditingState : public QAbstractState
+class EditingState : public QState
 {
 public:
     explicit EditingState(MainWindowPrivate &impl, QState *parent = nullptr);
