@@ -5,11 +5,11 @@
 
 // GIF editor include.
 #include "mainwindow.hpp"
-#include "mainwindow_private.hpp"
 #include "crop.hpp"
 #include "drawarrow.hpp"
 #include "drawrect.hpp"
 #include "frameontape.hpp"
+#include "mainwindow_private.hpp"
 #include "settings.hpp"
 #include "tape.hpp"
 #include "text.hpp"

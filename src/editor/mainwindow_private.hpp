@@ -16,8 +16,8 @@
 #include <QDir>
 #include <QFutureWatcher>
 #include <QLabel>
-#include <QStackedWidget>
 #include <QSpinBox>
+#include <QStackedWidget>
 #include <QToolBar>
 #include <QToolButton>
 

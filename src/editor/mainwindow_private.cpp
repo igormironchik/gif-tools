@@ -4,19 +4,20 @@
 */
 
 // GIF editor include.
+#include "mainwindow_private.hpp"
 #include "frameontape.hpp"
 #include "mainwindow.hpp"
-#include "mainwindow_private.hpp"
 #include "tape.hpp"
 
 // Qt include.
 #include <QApplication>
-#include <QVBoxLayout>
-#include <QStatusBar>
 #include <QMenu>
+#include <QStatusBar>
+#include <QVBoxLayout>
 #include <QtConcurrent>
 
-namespace /* anonymous */ {
+namespace /* anonymous */
+{
 
 bool readGIFFunc(QGifLib::Gif *container,
                  const QString &fileName)
