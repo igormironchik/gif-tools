@@ -5,58 +5,30 @@
 
 // GIF editor include.
 #include "mainwindow.hpp"
-#include "about.hpp"
-#include "busyindicator.hpp"
+#include "mainwindow_private.hpp"
 #include "crop.hpp"
 #include "drawarrow.hpp"
 #include "drawrect.hpp"
-#include "frame.hpp"
 #include "frameontape.hpp"
 #include "settings.hpp"
 #include "tape.hpp"
 #include "text.hpp"
-#include "tips.hpp"
 #include "version.hpp"
-#include "view.hpp"
 
 // Qt include.
-#include <QAction>
 #include <QActionGroup>
-#include <QApplication>
 #include <QCloseEvent>
 #include <QColorDialog>
-#include <QDir>
 #include <QFileDialog>
-#include <QFileInfo>
-#include <QFutureWatcher>
-#include <QLabel>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QMetaMethod>
 #include <QPainter>
-#include <QPalette>
-#include <QPromise>
-#include <QResizeEvent>
-#include <QSpinBox>
-#include <QStackedWidget>
 #include <QStandardPaths>
 #include <QStatusBar>
-#include <QTextDocument>
-#include <QThreadPool>
-#include <QTime>
 #include <QTimer>
-#include <QToolBar>
-#include <QToolButton>
-#include <QVector>
-#include <QWidget>
 #include <QWindow>
 #include <QtConcurrent>
-
-// C++ include.
-#include <algorithm>
-#include <cstdlib>
-#include <utility>
-#include <vector>
 
 // gif-widgets include.
 #include "license_dialog.hpp"
@@ -76,12 +48,6 @@ void writeGIFFunc(QPromise<void> &,
     QObject::connect(&gif, &QGifLib::Gif::writeProgress, receiver, &BusyIndicator::setPercent);
 
     gif.write(fileName, files, delays, 0);
-}
-
-bool readGIFFunc(QGifLib::Gif *container,
-                 const QString &fileName)
-{
-    return container->load(fileName);
 }
 
 void cropGIFFunc(QPromise<void> &,
@@ -208,428 +174,20 @@ void applyArrowFunc(QPromise<void> &,
 } /* namespace anonymous */
 
 //
-// MainWindowPrivate
-//
-
-class MainWindowPrivate
-{
-public:
-    MainWindowPrivate(MainWindow *parent)
-        : m_frames(QDir::tempPath() + QDir::separator() + QStringLiteral("gif-editor"))
-        , m_editMode(EditMode::Unknow)
-        , m_busyFlag(false)
-        , m_quitFlag(false)
-        , m_playing(false)
-        , m_stack(new QStackedWidget(parent))
-        , m_busyPage(new QWidget(m_stack))
-        , m_busy(new BusyIndicator(m_busyPage))
-        , m_busyStatusLabel(new QLabel(m_busyPage))
-        , m_view(new View(m_frames,
-                          m_stack))
-        , m_about(new About(parent))
-        , m_tips(new Tips(parent))
-        , m_crop(nullptr)
-        , m_insertText(nullptr)
-        , m_drawRect(nullptr)
-        , m_drawArrow(nullptr)
-        , m_playStop(nullptr)
-        , m_save(nullptr)
-        , m_saveAs(nullptr)
-        , m_open(nullptr)
-        , m_applyEdit(nullptr)
-        , m_cancelEdit(nullptr)
-        , m_cancelTips(nullptr)
-        , m_quit(nullptr)
-        , m_boldText(nullptr)
-        , m_italicText(nullptr)
-        , m_fontLess(nullptr)
-        , m_fontMore(nullptr)
-        , m_textColor(nullptr)
-        , m_clearFormat(nullptr)
-        , m_finishText(nullptr)
-        , m_penColor(nullptr)
-        , m_brushColor(nullptr)
-        , m_penWidth(nullptr)
-        , m_tipsAction(nullptr)
-        , m_editToolBar(nullptr)
-        , m_textToolBar(nullptr)
-        , m_drawToolBar(nullptr)
-        , m_drawArrowToolBar(nullptr)
-        , m_penWidthBox(nullptr)
-        , m_penWidthBtnOnDrawToolBar(nullptr)
-        , m_penWidthBtnOnDrawArrowToolBar(nullptr)
-        , m_status(nullptr)
-        , m_q(parent)
-    {
-        m_busy->setRadius(75);
-        auto f = m_busyStatusLabel->font();
-        f.setPixelSize(35);
-        m_busyStatusLabel->setFont(f);
-        auto p = m_busyStatusLabel->palette();
-        p.setColor(QPalette::WindowText, p.color(QPalette::Highlight));
-        m_busyStatusLabel->setPalette(p);
-
-        auto l = new QVBoxLayout(m_busyPage);
-        l->addItem(new QSpacerItem(10, 0, QSizePolicy::Fixed, QSizePolicy::Expanding));
-        l->addWidget(m_busy);
-        auto h = new QHBoxLayout;
-        h->addItem(new QSpacerItem(0, 10, QSizePolicy::Expanding, QSizePolicy::Fixed));
-        h->addWidget(m_busyStatusLabel);
-        h->addItem(new QSpacerItem(0, 10, QSizePolicy::Expanding, QSizePolicy::Fixed));
-        l->addLayout(h);
-        l->addItem(new QSpacerItem(10, 0, QSizePolicy::Fixed, QSizePolicy::Expanding));
-    }
-
-    //! Edit mode.
-    enum class EditMode {
-        Unknow,
-        Crop,
-        Text,
-        Rect,
-        Arrow
-    }; // enum class EditMode
-
-    //! Clear view.
-    void clearView();
-    //! Enable/disable actions during editing.
-    void enableActionsOnEdit(bool on = true)
-    {
-        m_save->setEnabled(on && m_q->isWindowModified());
-        m_saveAs->setEnabled(on);
-        m_open->setEnabled(on);
-
-        m_applyEdit->setEnabled(!on);
-        m_cancelEdit->setEnabled(!on);
-
-        m_playStop->setEnabled(on);
-    }
-    //! Initialize tape.
-    void initTape()
-    {
-        for (qsizetype i = 0, last = m_frames.count(); i < last; ++i) {
-            m_view->tape()->addFrame({m_frames, i, false});
-
-            QApplication::processEvents();
-        };
-    }
-    //! Set state of "Save" action.
-    void setSaveAction()
-    {
-        if (m_q->isWindowModified()) {
-            m_save->setEnabled(true);
-        } else {
-            m_save->setEnabled(false);
-        }
-    }
-    //! Enable actions.
-    void enableActions()
-    {
-        m_crop->setEnabled(true);
-        m_insertText->setEnabled(true);
-        m_drawRect->setEnabled(true);
-        m_drawArrow->setEnabled(true);
-        m_open->setEnabled(true);
-        m_playStop->setEnabled(true);
-        m_quit->setEnabled(true);
-
-        if (!m_currentGif.isEmpty()) {
-            setSaveAction();
-
-            m_saveAs->setEnabled(true);
-        }
-    }
-    //! Disable actions on playing.
-    void disableActionsOnPlaying()
-    {
-        m_crop->setEnabled(false);
-        m_insertText->setEnabled(false);
-        m_drawRect->setEnabled(false);
-        m_drawArrow->setEnabled(false);
-        m_save->setEnabled(false);
-        m_saveAs->setEnabled(false);
-        m_open->setEnabled(false);
-    }
-    //! Busy state.
-    void busy()
-    {
-        m_q->statusBar()->hide();
-
-        m_busyFlag = true;
-
-        m_stack->setCurrentWidget(m_busyPage);
-
-        m_busy->setRunning(true);
-
-        disableActionsOnPlaying();
-
-        cancelTips(false);
-
-        m_quit->setEnabled(false);
-
-        m_editToolBar->hide();
-        m_textToolBar->hide();
-        m_drawToolBar->hide();
-        m_drawArrowToolBar->hide();
-        m_tipsAction->setEnabled(false);
-    }
-    //! Cancel tips & tricks page if it's.
-    void cancelTips(bool restoreWidget)
-    {
-        if (m_currentUiState.m_currentStackWidget) {
-            m_cancelTips->setEnabled(false);
-            m_cancelEdit->setEnabled(m_currentUiState.m_isEditActionsEnabled);
-            m_applyEdit->setEnabled(m_currentUiState.m_isEditActionsEnabled);
-            m_editMenu->setEnabled(m_currentUiState.m_currentStackWidget != m_about);
-
-            if (restoreWidget) {
-                m_stack->setCurrentWidget(m_currentUiState.m_currentStackWidget);
-            }
-
-            m_drawArrowToolBar->setVisible(m_currentUiState.m_isDrawArrowToolBarShow);
-            m_drawToolBar->setVisible(m_currentUiState.m_isDrawToolBarShow);
-            m_editToolBar->setVisible(m_currentUiState.m_isEditToolBarShown);
-            m_textToolBar->setVisible(m_currentUiState.m_isTextToolBarShown);
-
-            m_currentUiState.m_currentStackWidget = nullptr;
-        }
-    }
-    //! Ready state.
-    void ready()
-    {
-        m_q->statusBar()->show();
-
-        m_busyFlag = false;
-
-        m_busyStatusLabel->clear();
-
-        m_stack->setCurrentWidget(m_view);
-
-        m_busy->setRunning(false);
-
-        enableActions();
-        m_tipsAction->setEnabled(true);
-
-        m_editToolBar->show();
-    }
-    //! Set modified state.
-    void setModified(bool on)
-    {
-        m_q->setWindowModified(on);
-
-        setSaveAction();
-    }
-
-    //! \return Index of the next checked frame.
-    int nextCheckedFrame(int current) const
-    {
-        for (int i = current + 1; i <= m_view->tape()->count(); ++i) {
-            if (m_view->tape()->frame(i)->isChecked()) {
-                return i;
-            }
-        }
-
-        for (int i = 1; i < current; ++i) {
-            if (m_view->tape()->frame(i)->isChecked()) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    void openGif(const QString &fileName)
-    {
-        clearView();
-
-        setModified(false);
-
-        m_currentGif = fileName;
-        m_busyStatusLabel->setText(MainWindow::tr("Loading GIF..."));
-
-        m_q->connect(&m_readWatcher, &QFutureWatcher<bool>::finished, m_q, &MainWindow::gifLoaded);
-        auto future = QtConcurrent::run(readGIFFunc, &m_frames, fileName);
-        m_readWatcher.setFuture(future);
-    }
-
-    void calculateTimings()
-    {
-        m_timings.clear();
-        m_timings.push_back(0);
-
-        int ms = 0;
-        int total = 0;
-
-        for (qsizetype i = 0; i < m_frames.count(); ++i) {
-            ms += m_frames.delay(i);
-
-            if (i != m_frames.count() - 1) {
-                total = ms;
-            }
-
-            m_timings.push_back(ms);
-        }
-
-        m_totalDuration = QTime::fromMSecsSinceStartOfDay(total).toString(QStringLiteral("hh:mm:ss.zzz"));
-    }
-
-    void setActionsToInitialState()
-    {
-        m_save->setEnabled(false);
-        m_saveAs->setEnabled(false);
-        m_crop->setEnabled(false);
-        m_insertText->setEnabled(false);
-        m_drawRect->setEnabled(false);
-        m_drawArrow->setEnabled(false);
-        m_playStop->setEnabled(false);
-        m_applyEdit->setEnabled(false);
-        m_cancelEdit->setEnabled(false);
-
-        m_open->setEnabled(true);
-        m_quit->setEnabled(true);
-        m_tipsAction->setEnabled(true);
-
-        m_editMenu->setEnabled(false);
-    }
-
-    //! Current file name.
-    QString m_currentGif;
-    //! Total duration of the GIF.
-    QString m_totalDuration;
-    //! Frames.
-    QGifLib::Gif m_frames;
-    //! Timings.
-    QVector<int> m_timings;
-    //! Edit mode.
-    EditMode m_editMode;
-    //! Busy flag.
-    bool m_busyFlag;
-    //! Quit flag.
-    bool m_quitFlag;
-    //! Play/stop flag.
-    bool m_playing;
-    //! Was show evemt?
-    bool m_shownAlready = false;
-
-    //! State of the UI.
-    struct State {
-        bool m_isEditActionsEnabled = false;
-        bool m_isEditToolBarShown = false;
-        bool m_isTextToolBarShown = false;
-        bool m_isDrawToolBarShow = false;
-        bool m_isDrawArrowToolBarShow = false;
-
-        //! Current widget on stack.
-        QWidget *m_currentStackWidget = nullptr;
-    };
-
-    //! Current state of the UI. (Uses for tips only)
-    State m_currentUiState;
-
-    //! File name to open after show event.
-    QString m_fileNameToOpenAfterShow;
-    //! Future watcher.
-    QFutureWatcher<void> m_watcher;
-    //! Read GIF future watcher.
-    QFutureWatcher<bool> m_readWatcher;
-    //! Unchecked frames.
-    QVector<qsizetype> m_unchecked;
-    //! Stacked widget.
-    QStackedWidget *m_stack;
-    //! Page with busy animation.
-    QWidget *m_busyPage;
-    //! Busy indicator.
-    BusyIndicator *m_busy;
-    //! Busy status label.
-    QLabel *m_busyStatusLabel;
-    //! View.
-    View *m_view;
-    //! Widget about.
-    About *m_about;
-    //! Tips & tricks widget.
-    Tips *m_tips;
-    //! Crop action.
-    QAction *m_crop;
-    //! Insert text action.
-    QAction *m_insertText;
-    //! Draw rect.
-    QAction *m_drawRect;
-    //! Draw arrow.
-    QAction *m_drawArrow;
-    //! Play/stop action.
-    QAction *m_playStop;
-    //! Save action.
-    QAction *m_save;
-    //! Save as action.
-    QAction *m_saveAs;
-    //! Open action.
-    QAction *m_open;
-    //! Apply edit action.
-    QAction *m_applyEdit;
-    //! Cancel edit action.
-    QAction *m_cancelEdit;
-    //! Cancel tips.
-    QAction *m_cancelTips;
-    //! Quit action.
-    QAction *m_quit;
-    //! Bold text action.
-    QAction *m_boldText;
-    //! Italic text.
-    QAction *m_italicText;
-    //! Font less.
-    QAction *m_fontLess;
-    //! Font more.
-    QAction *m_fontMore;
-    //! Text color.
-    QAction *m_textColor;
-    //! Clear text format.
-    QAction *m_clearFormat;
-    //! Show previous.
-    QAction *m_finishText;
-    //! Pen color.
-    QAction *m_penColor;
-    //! Brush color.
-    QAction *m_brushColor;
-    //! Pen width.
-    QAction *m_penWidth;
-    //! Tips & Tricks action.
-    QAction *m_tipsAction;
-    //! Edit toolbar.
-    QToolBar *m_editToolBar;
-    //! Text toolbar.
-    QToolBar *m_textToolBar;
-    //! Draw toolbar.
-    QToolBar *m_drawToolBar;
-    //! Draw arror toolbar.
-    QToolBar *m_drawArrowToolBar;
-    //! Play timer.
-    QTimer *m_playTimer;
-    //! Pen width box.
-    QSpinBox *m_penWidthBox;
-    //! Pen width tool button on draw tool bar.
-    QToolButton *m_penWidthBtnOnDrawToolBar;
-    //! Pen width tool button on draw arrow tool bar.
-    QToolButton *m_penWidthBtnOnDrawArrowToolBar;
-    //! Status bar label.
-    QLabel *m_status;
-    //! Edit menu.
-    QMenu *m_editMenu = nullptr;
-    //! Parent.
-    MainWindow *m_q;
-}; // class MainWindowPrivate
-
-void MainWindowPrivate::clearView()
-{
-    m_view->currentFrame()->clearImage();
-    m_view->tape()->clear();
-    m_frames.clean();
-}
-
-//
 // MainWindow
 //
 
 MainWindow::MainWindow()
     : m_d(new MainWindowPrivate(this))
+{
+    initUi();
+}
+
+MainWindow::~MainWindow() noexcept
+{
+}
+
+void MainWindow::initUi()
 {
     setWindowTitle(tr("GIF Editor"));
 
@@ -880,10 +438,6 @@ MainWindow::MainWindow()
     statusBar()->hide();
 
     m_d->setActionsToInitialState();
-}
-
-MainWindow::~MainWindow() noexcept
-{
 }
 
 void MainWindow::closeEvent(QCloseEvent *e)

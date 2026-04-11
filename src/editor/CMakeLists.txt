@@ -24,6 +24,8 @@ set(SRC main.cpp
 	frame.hpp
 	frameontape.hpp
 	mainwindow.hpp
+    mainwindow_private.hpp
+    mainwindow_private.cpp
 	tape.hpp
     view.hpp
     rectangle.hpp
