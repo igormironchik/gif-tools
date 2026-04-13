@@ -5,7 +5,6 @@
 
 // GIF editor include.
 #include "mainwindow.hpp"
-#include "crop.hpp"
 #include "drawarrow.hpp"
 #include "drawrect.hpp"
 #include "frameontape.hpp"
@@ -290,7 +289,6 @@ void MainWindow::initUi()
 
     m_d->m_playTimer = new QTimer(this);
 
-    connect(m_d->m_crop, &QAction::toggled, this, &MainWindow::crop);
     connect(m_d->m_drawRect, &QAction::toggled, this, &MainWindow::drawRect);
     connect(m_d->m_drawArrow, &QAction::toggled, this, &MainWindow::drawArrow);
     connect(m_d->m_playStop, &QAction::triggered, this, &MainWindow::playStop);
@@ -486,20 +484,29 @@ void MainWindow::initStateMachine()
     idleEditing->assignProperty(m_d->m_drawRect, "enabled", true);
     idleEditing->assignProperty(m_d->m_crop, "enabled", true);
 
+    {
+        auto t1 = editingState->addTransition(m_d->m_cancelEdit, &QAction::triggered, idleEditing);
+        t1->setTransitionType(QAbstractTransition::InternalTransition);
+
+        auto t2 = editingState->addTransition(this, &MainWindow::cancelEditTriggered, idleEditing);
+        t2->setTransitionType(QAbstractTransition::InternalTransition);
+
+        auto t3 = editingState->addTransition(this, &MainWindow::graphicsAppliedTriggered, idleEditing);
+        t3->setTransitionType(QAbstractTransition::InternalTransition);
+    }
+
     auto textState = new DrawTextState(*m_d, editingState);
 
     {
         auto t1 = editingState->addTransition(m_d->m_insertText, &QAction::triggered, textState);
         t1->setTransitionType(QAbstractTransition::InternalTransition);
+    }
 
-        auto t2 = editingState->addTransition(m_d->m_cancelEdit, &QAction::triggered, idleEditing);
-        t2->setTransitionType(QAbstractTransition::InternalTransition);
+    auto cropState = new CropState(*m_d, editingState);
 
-        auto t3 = editingState->addTransition(this, &MainWindow::cancelEditTriggered, idleEditing);
-        t3->setTransitionType(QAbstractTransition::InternalTransition);
-
-        auto t4 = editingState->addTransition(this, &MainWindow::graphicsAppliedTriggered, idleEditing);
-        t4->setTransitionType(QAbstractTransition::InternalTransition);
+    {
+        auto t1 = editingState->addTransition(m_d->m_crop, &QAction::triggered, cropState);
+        t1->setTransitionType(QAbstractTransition::InternalTransition);
     }
 
     auto tipsModeState = new QState(rootState);
@@ -694,27 +701,6 @@ void MainWindow::frameChecked(int,
                               bool)
 {
     m_d->setModified(true);
-}
-
-void MainWindow::crop(bool on)
-{
-    if (on) {
-        hidePenWidthSpinBox();
-
-        m_d->enableActionsOnEdit(false);
-
-        m_d->m_editMode = MainWindowPrivate::EditMode::Crop;
-
-        m_d->m_view->startCrop();
-
-        connect(m_d->m_view->cropFrame(), &CropFrame::started, this, &MainWindow::onRectSelectionStarted);
-    } else {
-        m_d->m_view->stopCrop();
-
-        m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
-
-        m_d->enableActionsOnEdit();
-    }
 }
 
 void MainWindow::penWidth(bool on)
@@ -1228,9 +1214,7 @@ void MainWindow::gifCropped()
 
     m_d->setModified(true);
 
-    cancelEdit();
-
-    m_d->ready();
+    emit graphicsAppliedTriggered();
 }
 
 void MainWindow::graphicsApplied()

@@ -54,8 +54,6 @@ private slots:
     //! Frame checked/unchecked.
     void frameChecked(int idx,
                       bool on);
-    //! Crop.
-    void crop(bool on);
     //! Change pen width.
     void penWidth(bool on);
     //! Draw rectangle.
@@ -116,6 +114,7 @@ private:
     friend class MainWindowPrivate;
     friend class TipsState;
     friend class DrawTextState;
+    friend class CropState;
 
     Q_DISABLE_COPY(MainWindow)
 

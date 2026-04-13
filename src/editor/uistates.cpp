@@ -4,6 +4,7 @@
 */
 
 // GIF editor include.
+#include "crop.hpp"
 #include "frameontape.hpp"
 #include "mainwindow.hpp"
 #include "mainwindow_private.hpp"
@@ -239,7 +240,13 @@ void EditingState::onEntry(QEvent *)
 
 void EditingState::onExit(QEvent *)
 {
+    m_impl.m_editMode = MainWindowPrivate::EditMode::Unknow;
 
+    for (int i = 1; i <= m_impl.m_view->tape()->count(); ++i) {
+        m_impl.m_view->tape()->frame(i)->setModified(false);
+    }
+
+    m_impl.enableActionsOnEdit();
 }
 
 //
@@ -253,12 +260,22 @@ CropState::CropState(MainWindowPrivate &impl, QState *parent)
 
 void CropState::onEntry(QEvent *)
 {
+    m_impl.m_q->hidePenWidthSpinBox();
 
+    m_impl.enableActionsOnEdit(false);
+
+    m_impl.m_editMode = MainWindowPrivate::EditMode::Crop;
+
+    m_impl.m_view->startCrop();
+
+    connect(m_impl.m_view->cropFrame(), &CropFrame::started, m_impl.m_q, &MainWindow::onRectSelectionStarted);
 }
 
-void CropState::onExit(QEvent *)
+void CropState::onExit(QEvent *e)
 {
+    m_impl.m_view->stopCrop();
 
+    EditingState::onExit(e);
 }
 
 //
@@ -298,19 +315,13 @@ void DrawTextState::onEntry(QEvent *)
     connect(m_impl.m_view->textFrame(), &TextFrame::started, m_impl.m_q, &MainWindow::onRectSelectionStarted);
 }
 
-void DrawTextState::onExit(QEvent *)
+void DrawTextState::onExit(QEvent *e)
 {
     m_impl.m_view->stopText();
 
-    m_impl.m_editMode = MainWindowPrivate::EditMode::Unknow;
-
     m_impl.m_textToolBar->hide();
 
-    for (int i = 1; i <= m_impl.m_view->tape()->count(); ++i) {
-        m_impl.m_view->tape()->frame(i)->setModified(false);
-    }
-
-    m_impl.enableActionsOnEdit();
+    EditingState::onExit(e);
 }
 
 //
