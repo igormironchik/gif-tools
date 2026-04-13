@@ -18,7 +18,8 @@ class MainWindowPrivate;
 class TipsState : public QState
 {
 public:
-    explicit TipsState(MainWindowPrivate &impl, QState *parent = nullptr);
+    explicit TipsState(MainWindowPrivate &impl,
+                       QState *parent = nullptr);
     ~TipsState() override = default;
 
 protected:
@@ -44,7 +45,8 @@ private:
 class BusyState : public QState
 {
 public:
-    explicit BusyState(MainWindowPrivate &impl, QState *parent = nullptr);
+    explicit BusyState(MainWindowPrivate &impl,
+                       QState *parent = nullptr);
     ~BusyState() override = default;
 
 protected:
@@ -63,7 +65,8 @@ private:
 class ReadyState : public QState
 {
 public:
-    explicit ReadyState(MainWindowPrivate &impl, QState *parent = nullptr);
+    explicit ReadyState(MainWindowPrivate &impl,
+                        QState *parent = nullptr);
     ~ReadyState() override = default;
 
 protected:
@@ -82,7 +85,8 @@ private:
 class AboutState : public QState
 {
 public:
-    explicit AboutState(MainWindowPrivate &impl, QState *parent = nullptr);
+    explicit AboutState(MainWindowPrivate &impl,
+                        QState *parent = nullptr);
     ~AboutState() override = default;
 
 protected:
@@ -101,7 +105,9 @@ private:
 class PlayingState : public QState
 {
 public:
-    explicit PlayingState(MainWindowPrivate &impl, QState *parent, QState *stopState);
+    explicit PlayingState(MainWindowPrivate &impl,
+                          QState *parent,
+                          QState *stopState);
     ~PlayingState() override = default;
 
 protected:
@@ -122,7 +128,8 @@ private:
 class EditingState : public QState
 {
 public:
-    explicit EditingState(MainWindowPrivate &impl, QState *parent = nullptr);
+    explicit EditingState(MainWindowPrivate &impl,
+                          QState *parent = nullptr);
     ~EditingState() override = default;
 
 protected:
@@ -141,7 +148,8 @@ protected:
 class CropState : public EditingState
 {
 public:
-    explicit CropState(MainWindowPrivate &impl, QState *parent = nullptr);
+    explicit CropState(MainWindowPrivate &impl,
+                       QState *parent = nullptr);
     ~CropState() override = default;
 
 protected:
@@ -157,7 +165,8 @@ protected:
 class DrawTextState : public EditingState
 {
 public:
-    explicit DrawTextState(MainWindowPrivate &impl, QState *parent = nullptr);
+    explicit DrawTextState(MainWindowPrivate &impl,
+                           QState *parent = nullptr);
     ~DrawTextState() override = default;
 
 protected:
@@ -173,7 +182,8 @@ protected:
 class DrawRectState : public EditingState
 {
 public:
-    explicit DrawRectState(MainWindowPrivate &impl, QState *parent = nullptr);
+    explicit DrawRectState(MainWindowPrivate &impl,
+                           QState *parent = nullptr);
     ~DrawRectState() override = default;
 
 protected:
@@ -189,7 +199,8 @@ protected:
 class DrawArrowState : public EditingState
 {
 public:
-    explicit DrawArrowState(MainWindowPrivate &impl, QState *parent = nullptr);
+    explicit DrawArrowState(MainWindowPrivate &impl,
+                            QState *parent = nullptr);
     ~DrawArrowState() override = default;
 
 protected:

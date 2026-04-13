@@ -18,8 +18,8 @@
 #include <QLabel>
 #include <QSpinBox>
 #include <QStackedWidget>
-#include <QStateMachine>
 #include <QState>
+#include <QStateMachine>
 #include <QToolBar>
 #include <QToolButton>
 

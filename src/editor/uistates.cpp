@@ -4,6 +4,7 @@
 */
 
 // GIF editor include.
+#include "uistates.hpp"
 #include "crop.hpp"
 #include "drawarrow.hpp"
 #include "drawrect.hpp"
@@ -12,7 +13,6 @@
 #include "mainwindow_private.hpp"
 #include "tape.hpp"
 #include "text.hpp"
-#include "uistates.hpp"
 
 // Qt include.
 #include <QMenu>
@@ -24,7 +24,8 @@
 // TipsState
 //
 
-TipsState::TipsState(MainWindowPrivate &impl, QState *parent)
+TipsState::TipsState(MainWindowPrivate &impl,
+                     QState *parent)
     : QState(parent)
     , m_impl(impl)
 {
@@ -79,7 +80,8 @@ void TipsState::onExit(QEvent *)
 // BusyState
 //
 
-BusyState::BusyState(MainWindowPrivate &impl, QState *parent)
+BusyState::BusyState(MainWindowPrivate &impl,
+                     QState *parent)
     : QState(parent)
     , m_impl(impl)
 {
@@ -117,7 +119,8 @@ void BusyState::onExit(QEvent *)
 // ReadyState
 //
 
-ReadyState::ReadyState(MainWindowPrivate &impl, QState *parent)
+ReadyState::ReadyState(MainWindowPrivate &impl,
+                       QState *parent)
     : QState(parent)
     , m_impl(impl)
 {
@@ -140,14 +143,14 @@ void ReadyState::onEntry(QEvent *)
 
 void ReadyState::onExit(QEvent *)
 {
-
 }
 
 //
 // AboutState
 //
 
-AboutState::AboutState(MainWindowPrivate &impl, QState *parent)
+AboutState::AboutState(MainWindowPrivate &impl,
+                       QState *parent)
     : QState(parent)
     , m_impl(impl)
 {
@@ -164,14 +167,15 @@ void AboutState::onEntry(QEvent *)
 
 void AboutState::onExit(QEvent *)
 {
-
 }
 
 //
 // PlayingState
 //
 
-PlayingState::PlayingState(MainWindowPrivate &impl, QState *parent, QState *stopState)
+PlayingState::PlayingState(MainWindowPrivate &impl,
+                           QState *parent,
+                           QState *stopState)
     : QState(parent)
     , m_impl(impl)
     , m_stop(stopState)
@@ -212,7 +216,8 @@ void PlayingState::onExit(QEvent *)
 // EditingState
 //
 
-EditingState::EditingState(MainWindowPrivate &impl, QState *parent)
+EditingState::EditingState(MainWindowPrivate &impl,
+                           QState *parent)
     : QState(parent)
     , m_impl(impl)
 {
@@ -240,8 +245,10 @@ void EditingState::onExit(QEvent *)
 // CropState
 //
 
-CropState::CropState(MainWindowPrivate &impl, QState *parent)
-    : EditingState(impl, parent)
+CropState::CropState(MainWindowPrivate &impl,
+                     QState *parent)
+    : EditingState(impl,
+                   parent)
 {
 }
 
@@ -267,8 +274,10 @@ void CropState::onExit(QEvent *e)
 // DrawTextState
 //
 
-DrawTextState::DrawTextState(MainWindowPrivate &impl, QState *parent)
-    : EditingState(impl, parent)
+DrawTextState::DrawTextState(MainWindowPrivate &impl,
+                             QState *parent)
+    : EditingState(impl,
+                   parent)
 {
 }
 
@@ -311,8 +320,10 @@ void DrawTextState::onExit(QEvent *e)
 // DrawRectState
 //
 
-DrawRectState::DrawRectState(MainWindowPrivate &impl, QState *parent)
-    : EditingState(impl, parent)
+DrawRectState::DrawRectState(MainWindowPrivate &impl,
+                             QState *parent)
+    : EditingState(impl,
+                   parent)
 {
 }
 
@@ -343,8 +354,10 @@ void DrawRectState::onExit(QEvent *e)
 // DrawArrowState
 //
 
-DrawArrowState::DrawArrowState(MainWindowPrivate &impl, QState *parent)
-    : EditingState(impl, parent)
+DrawArrowState::DrawArrowState(MainWindowPrivate &impl,
+                               QState *parent)
+    : EditingState(impl,
+                   parent)
 {
 }
 
