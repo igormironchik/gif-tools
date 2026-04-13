@@ -37,44 +37,6 @@ private:
 }; // class TipsState
 
 //
-// ModifiedState
-//
-
-//! Modified state.
-class ModifiedState : public QState
-{
-public:
-    explicit ModifiedState(MainWindowPrivate &impl, QState *parent = nullptr);
-    ~ModifiedState() override = default;
-
-protected:
-    void onEntry(QEvent *event) override;
-    void onExit(QEvent *event) override;
-
-private:
-    MainWindowPrivate &m_impl;
-}; // class ModifiedState
-
-//
-// SavedState
-//
-
-//! Saved state.
-class SavedState : public QState
-{
-public:
-    explicit SavedState(MainWindowPrivate &impl, QState *parent = nullptr);
-    ~SavedState() override = default;
-
-protected:
-    void onEntry(QEvent *event) override;
-    void onExit(QEvent *event) override;
-
-private:
-    MainWindowPrivate &m_impl;
-}; // class SavedState
-
-//
 // BusyState
 //
 
@@ -139,7 +101,7 @@ private:
 class PlayingState : public QState
 {
 public:
-    explicit PlayingState(MainWindowPrivate &impl, QState *parent = nullptr);
+    explicit PlayingState(MainWindowPrivate &impl, QState *parent, QState *stopState);
     ~PlayingState() override = default;
 
 protected:
@@ -148,6 +110,8 @@ protected:
 
 private:
     MainWindowPrivate &m_impl;
+    QSignalTransition *m_start = nullptr;
+    QState *m_stop = nullptr;
 }; // class PlayingState
 
 //

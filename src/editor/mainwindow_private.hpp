@@ -86,8 +86,6 @@ public:
     bool m_busyFlag;
     //! Quit flag.
     bool m_quitFlag;
-    //! Play/stop flag.
-    bool m_playing;
     //! Was show evemt?
     bool m_shownAlready = false;
     //! File name to open after show event.

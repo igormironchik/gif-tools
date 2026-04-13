@@ -30,6 +30,7 @@ signals:
     void applyEditTriggered();
     void cancelEditTriggered();
     void graphicsAppliedTriggered();
+    void stopPlaying();
 
 public:
     MainWindow();
@@ -64,8 +65,6 @@ private slots:
     void aboutQt();
     //! Licenses.
     void licenses();
-    //! Play/stop.
-    void playStop();
     //! Show next frame.
     void showNextFrame();
     //! Switch to text edit mode.

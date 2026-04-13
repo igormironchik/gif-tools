@@ -289,7 +289,6 @@ void MainWindow::initUi()
 
     m_d->m_playTimer = new QTimer(this);
 
-    connect(m_d->m_playStop, &QAction::triggered, this, &MainWindow::playStop);
     connect(m_d->m_applyEdit, &QAction::triggered, this, &MainWindow::applyEdit);
     connect(m_d->m_playTimer, &QTimer::timeout, this, &MainWindow::showNextFrame);
     connect(m_d->m_view, &View::applyEdit, this, &MainWindow::applyEdit);
@@ -466,6 +465,18 @@ void MainWindow::initStateMachine()
 
         auto t7 = viewState->addTransition(this, &MainWindow::graphicsAppliedTriggered, readyState);
         t7->setTransitionType(QAbstractTransition::InternalTransition);
+    }
+
+    auto playState = new QState(rootState);
+    auto stopPlaying = new QState(playState);
+    playState->setInitialState(stopPlaying);
+
+    auto playingState = new PlayingState(*m_d, playState, stopPlaying);
+    Q_UNUSED(playingState)
+
+    {
+        auto t1 = playState->addTransition(this, &MainWindow::stopPlaying, stopPlaying);
+        t1->setTransitionType(QAbstractTransition::InternalTransition);
     }
 
     auto editingState = new QState(rootState);
@@ -691,9 +702,7 @@ void MainWindow::quit()
                                              tr("GIF was changed. Do you want to save changes?"));
 
             if (btn == QMessageBox::Yes) {
-                if (m_d->m_playing) {
-                    playStop();
-                }
+                emit stopPlaying();
 
                 saveGif();
 
@@ -900,27 +909,6 @@ void MainWindow::resizeEvent(QResizeEvent *e)
     }
 
     e->accept();
-}
-
-void MainWindow::playStop()
-{
-    if (m_d->m_playing) {
-        m_d->m_playTimer->stop();
-        m_d->m_playStop->setText(tr("Play"));
-        m_d->m_playStop->setIcon(
-            QIcon::fromTheme(QStringLiteral("media-playback-start"), QIcon(":/img/media-playback-start.png")));
-        m_d->enableActions();
-    } else {
-        m_d->disableActionsOnPlaying();
-        m_d->m_playStop->setText(tr("Stop"));
-        m_d->m_playStop->setIcon(
-            QIcon::fromTheme(QStringLiteral("media-playback-stop"), QIcon(":/img/media-playback-stop.png")));
-
-        const auto &img = m_d->m_view->tape()->frame(m_d->m_view->tape()->currentFrame()->counter())->image();
-        m_d->m_playTimer->start(m_d->m_frames.delay(img.m_pos));
-    }
-
-    m_d->m_playing = !m_d->m_playing;
 }
 
 void MainWindow::showNextFrame()

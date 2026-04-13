@@ -16,7 +16,9 @@
 
 // Qt include.
 #include <QMenu>
+#include <QSignalTransition>
 #include <QStatusBar>
+#include <QTimer>
 
 //
 // TipsState
@@ -71,46 +73,6 @@ void TipsState::onExit(QEvent *)
     m_impl.m_textToolBar->setVisible(m_isTextToolBarShown);
 
     m_currentStackWidget = nullptr;
-}
-
-//
-// ModifiedState
-//
-
-ModifiedState::ModifiedState(MainWindowPrivate &impl, QState *parent)
-    : QState(parent)
-    , m_impl(impl)
-{
-}
-
-void ModifiedState::onEntry(QEvent *)
-{
-
-}
-
-void ModifiedState::onExit(QEvent *)
-{
-
-}
-
-//
-// SavedState
-//
-
-SavedState::SavedState(MainWindowPrivate &impl, QState *parent)
-    : QState(parent)
-    , m_impl(impl)
-{
-}
-
-void SavedState::onEntry(QEvent *)
-{
-
-}
-
-void SavedState::onExit(QEvent *)
-{
-
 }
 
 //
@@ -209,20 +171,41 @@ void AboutState::onExit(QEvent *)
 // PlayingState
 //
 
-PlayingState::PlayingState(MainWindowPrivate &impl, QState *parent)
+PlayingState::PlayingState(MainWindowPrivate &impl, QState *parent, QState *stopState)
     : QState(parent)
     , m_impl(impl)
+    , m_stop(stopState)
 {
+    m_start = parent->addTransition(m_impl.m_playStop, &QAction::triggered, this);
+    m_start->setTransitionType(QAbstractTransition::InternalTransition);
 }
 
 void PlayingState::onEntry(QEvent *)
 {
+    parentState()->removeTransition(m_start);
+    m_start = parentState()->addTransition(m_impl.m_playStop, &QAction::triggered, m_stop);
+    m_start->setTransitionType(QAbstractTransition::InternalTransition);
 
+    m_impl.disableActionsOnPlaying();
+    m_impl.m_playStop->setText(tr("Stop"));
+    m_impl.m_playStop->setIcon(
+        QIcon::fromTheme(QStringLiteral("media-playback-stop"), QIcon(":/img/media-playback-stop.png")));
+
+    const auto &img = m_impl.m_view->tape()->frame(m_impl.m_view->tape()->currentFrame()->counter())->image();
+    m_impl.m_playTimer->start(m_impl.m_frames.delay(img.m_pos));
 }
 
 void PlayingState::onExit(QEvent *)
 {
+    parentState()->removeTransition(m_start);
+    m_start = parentState()->addTransition(m_impl.m_playStop, &QAction::triggered, this);
+    m_start->setTransitionType(QAbstractTransition::InternalTransition);
 
+    m_impl.m_playTimer->stop();
+    m_impl.m_playStop->setText(tr("Play"));
+    m_impl.m_playStop->setIcon(
+        QIcon::fromTheme(QStringLiteral("media-playback-start"), QIcon(":/img/media-playback-start.png")));
+    m_impl.enableActions();
 }
 
 //
