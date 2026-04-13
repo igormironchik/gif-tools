@@ -55,12 +55,8 @@ public:
     void enableActions();
     //! Disable actions on playing.
     void disableActionsOnPlaying();
-    //! Busy state.
-    void busy();
     //! Cancel tips & tricks page if it's.
     void cancelTips(bool restoreWidget);
-    //! Ready state.
-    void ready();
     //! Set modified state.
     void setModified(bool on);
     //! \return Index of the next checked frame.

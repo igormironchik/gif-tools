@@ -130,47 +130,6 @@ void MainWindowPrivate::disableActionsOnPlaying()
     m_open->setEnabled(false);
 }
 
-void MainWindowPrivate::busy()
-{
-    m_q->statusBar()->hide();
-
-    m_busyFlag = true;
-
-    m_stack->setCurrentWidget(m_busyPage);
-
-    m_busy->setRunning(true);
-
-    disableActionsOnPlaying();
-
-    //cancelTips(false);
-
-    m_quit->setEnabled(false);
-
-    m_editToolBar->hide();
-    m_textToolBar->hide();
-    m_drawToolBar->hide();
-    m_drawArrowToolBar->hide();
-    m_tipsAction->setEnabled(false);
-}
-
-void MainWindowPrivate::ready()
-{
-    m_q->statusBar()->show();
-
-    m_busyFlag = false;
-
-    m_busyStatusLabel->clear();
-
-    m_stack->setCurrentWidget(m_view);
-
-    m_busy->setRunning(false);
-
-    enableActions();
-    m_tipsAction->setEnabled(true);
-
-    m_editToolBar->show();
-}
-
 void MainWindowPrivate::setModified(bool on)
 {
     m_q->setWindowModified(on);
