@@ -289,8 +289,6 @@ void MainWindow::initUi()
 
     m_d->m_playTimer = new QTimer(this);
 
-    connect(m_d->m_drawRect, &QAction::toggled, this, &MainWindow::drawRect);
-    connect(m_d->m_drawArrow, &QAction::toggled, this, &MainWindow::drawArrow);
     connect(m_d->m_playStop, &QAction::triggered, this, &MainWindow::playStop);
     connect(m_d->m_applyEdit, &QAction::triggered, this, &MainWindow::applyEdit);
     connect(m_d->m_playTimer, &QTimer::timeout, this, &MainWindow::showNextFrame);
@@ -506,6 +504,20 @@ void MainWindow::initStateMachine()
 
     {
         auto t1 = editingState->addTransition(m_d->m_crop, &QAction::triggered, cropState);
+        t1->setTransitionType(QAbstractTransition::InternalTransition);
+    }
+
+    auto drawRectState = new DrawRectState(*m_d, editingState);
+
+    {
+        auto t1 = editingState->addTransition(m_d->m_drawRect, &QAction::triggered, drawRectState);
+        t1->setTransitionType(QAbstractTransition::InternalTransition);
+    }
+
+    auto drawArrowState = new DrawArrowState(*m_d, editingState);
+
+    {
+        auto t1 = editingState->addTransition(m_d->m_drawArrow, &QAction::triggered, drawArrowState);
         t1->setTransitionType(QAbstractTransition::InternalTransition);
     }
 
@@ -738,102 +750,6 @@ void MainWindow::penWidth(bool on)
             m_d->m_penWidthBox = nullptr;
         }
     }
-}
-
-void MainWindow::drawRect(bool on)
-{
-    if (on) {
-        hidePenWidthSpinBox();
-
-        m_d->enableActionsOnEdit(false);
-
-        m_d->m_editMode = MainWindowPrivate::EditMode::Rect;
-
-        m_d->m_view->startRect();
-
-        m_d->m_drawToolBar->show();
-
-        connect(m_d->m_view->rectFrame(), &RectFrame::started, this, &MainWindow::onRectSelectionStarted);
-        connect(m_d->m_view->rectFrame(), &RectFrame::clicked, this, &MainWindow::hidePenWidthSpinBox);
-    } else {
-        m_d->m_view->stopRect();
-
-        m_d->m_drawToolBar->hide();
-
-        m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
-
-        m_d->enableActionsOnEdit();
-    }
-}
-
-void MainWindow::drawArrow(bool on)
-{
-    if (on) {
-        hidePenWidthSpinBox();
-
-        m_d->enableActionsOnEdit(false);
-
-        m_d->m_editMode = MainWindowPrivate::EditMode::Arrow;
-
-        m_d->m_view->startArrow();
-
-        m_d->m_drawArrowToolBar->show();
-
-        connect(m_d->m_view->arrowFrame(), &ArrowFrame::started, this, &MainWindow::onRectSelectionStarted);
-        connect(m_d->m_view->arrowFrame(), &ArrowFrame::clicked, this, &MainWindow::hidePenWidthSpinBox);
-    } else {
-        m_d->m_view->stopArrow();
-
-        m_d->m_drawArrowToolBar->hide();
-
-        m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
-
-        m_d->enableActionsOnEdit();
-    }
-}
-
-void MainWindow::cancelEdit()
-{
-    // m_d->m_view->stopCrop();
-    // m_d->m_view->stopText();
-    // m_d->m_crop->setEnabled(true);
-    // m_d->m_insertText->setEnabled(true);
-    // m_d->m_drawRect->setEnabled(true);
-    // m_d->m_drawArrow->setEnabled(true);
-
-    // hidePenWidthSpinBox();
-
-    // m_d->enableActionsOnEdit();
-
-    // switch (m_d->m_editMode) {
-    // case MainWindowPrivate::EditMode::Crop: {
-    //     m_d->m_crop->setChecked(false);
-    // } break;
-
-    // case MainWindowPrivate::EditMode::Text: {
-    //     m_d->m_textToolBar->hide();
-    //     m_d->m_insertText->setChecked(false);
-    // } break;
-
-    // case MainWindowPrivate::EditMode::Rect: {
-    //     m_d->m_drawToolBar->hide();
-    //     m_d->m_drawRect->setChecked(false);
-    // } break;
-
-    // case MainWindowPrivate::EditMode::Arrow: {
-    //     m_d->m_drawArrowToolBar->hide();
-    //     m_d->m_drawArrow->setChecked(false);
-    // } break;
-
-    // default:
-    //     break;
-    // }
-
-    // for (int i = 1; i <= m_d->m_view->tape()->count(); ++i) {
-    //     m_d->m_view->tape()->frame(i)->setModified(false);
-    // }
-
-    // m_d->m_editMode = MainWindowPrivate::EditMode::Unknow;
 }
 
 void MainWindow::applyEdit()

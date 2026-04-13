@@ -56,12 +56,6 @@ private slots:
                       bool on);
     //! Change pen width.
     void penWidth(bool on);
-    //! Draw rectangle.
-    void drawRect(bool on);
-    //! Draw arrow.
-    void drawArrow(bool on);
-    //! Cancel edit.
-    void cancelEdit();
     //! Apply edit.
     void applyEdit();
     //! About dialog
@@ -113,8 +107,11 @@ private:
 private:
     friend class MainWindowPrivate;
     friend class TipsState;
-    friend class DrawTextState;
     friend class CropState;
+    friend class DrawTextState;
+    friend class DrawRectState;
+    friend class EditingState;
+    friend class DrawArrowState;
 
     Q_DISABLE_COPY(MainWindow)
 

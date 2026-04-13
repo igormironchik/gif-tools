@@ -5,6 +5,8 @@
 
 // GIF editor include.
 #include "crop.hpp"
+#include "drawarrow.hpp"
+#include "drawrect.hpp"
 #include "frameontape.hpp"
 #include "mainwindow.hpp"
 #include "mainwindow_private.hpp"
@@ -235,7 +237,9 @@ EditingState::EditingState(MainWindowPrivate &impl, QState *parent)
 
 void EditingState::onEntry(QEvent *)
 {
+    m_impl.m_q->hidePenWidthSpinBox();
 
+    m_impl.enableActionsOnEdit(false);
 }
 
 void EditingState::onExit(QEvent *)
@@ -258,11 +262,9 @@ CropState::CropState(MainWindowPrivate &impl, QState *parent)
 {
 }
 
-void CropState::onEntry(QEvent *)
+void CropState::onEntry(QEvent *e)
 {
-    m_impl.m_q->hidePenWidthSpinBox();
-
-    m_impl.enableActionsOnEdit(false);
+    EditingState::onEntry(e);
 
     m_impl.m_editMode = MainWindowPrivate::EditMode::Crop;
 
@@ -287,11 +289,9 @@ DrawTextState::DrawTextState(MainWindowPrivate &impl, QState *parent)
 {
 }
 
-void DrawTextState::onEntry(QEvent *)
+void DrawTextState::onEntry(QEvent *e)
 {
-    m_impl.m_q->hidePenWidthSpinBox();
-
-    m_impl.enableActionsOnEdit(false);
+    EditingState::onEntry(e);
 
     m_impl.m_editMode = MainWindowPrivate::EditMode::Text;
 
@@ -333,14 +333,27 @@ DrawRectState::DrawRectState(MainWindowPrivate &impl, QState *parent)
 {
 }
 
-void DrawRectState::onEntry(QEvent *)
+void DrawRectState::onEntry(QEvent *e)
 {
+    EditingState::onEntry(e);
 
+    m_impl.m_editMode = MainWindowPrivate::EditMode::Rect;
+
+    m_impl.m_view->startRect();
+
+    m_impl.m_drawToolBar->show();
+
+    connect(m_impl.m_view->rectFrame(), &RectFrame::started, m_impl.m_q, &MainWindow::onRectSelectionStarted);
+    connect(m_impl.m_view->rectFrame(), &RectFrame::clicked, m_impl.m_q, &MainWindow::hidePenWidthSpinBox);
 }
 
-void DrawRectState::onExit(QEvent *)
+void DrawRectState::onExit(QEvent *e)
 {
+    m_impl.m_view->stopRect();
 
+    m_impl.m_drawToolBar->hide();
+
+    EditingState::onExit(e);
 }
 
 //
@@ -352,12 +365,25 @@ DrawArrowState::DrawArrowState(MainWindowPrivate &impl, QState *parent)
 {
 }
 
-void DrawArrowState::onEntry(QEvent *)
+void DrawArrowState::onEntry(QEvent *e)
 {
+    EditingState::onEntry(e);
 
+    m_impl.m_editMode = MainWindowPrivate::EditMode::Arrow;
+
+    m_impl.m_view->startArrow();
+
+    m_impl.m_drawArrowToolBar->show();
+
+    connect(m_impl.m_view->arrowFrame(), &ArrowFrame::started, m_impl.m_q, &MainWindow::onRectSelectionStarted);
+    connect(m_impl.m_view->arrowFrame(), &ArrowFrame::clicked, m_impl.m_q, &MainWindow::hidePenWidthSpinBox);
 }
 
-void DrawArrowState::onExit(QEvent *)
+void DrawArrowState::onExit(QEvent *e)
 {
+    m_impl.m_view->stopArrow();
 
+    m_impl.m_drawArrowToolBar->hide();
+
+    EditingState::onExit(e);
 }
