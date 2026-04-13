@@ -21,6 +21,17 @@ class MainWindow final : public QMainWindow
 {
     Q_OBJECT
 
+signals:
+    void openFileTriggered();
+    void fileLoadedTriggered();
+    void fileLoadingFailed();
+    void saveFileTriggered();
+    void fileSavingFailed();
+    void applyEditTriggered();
+    void cancelEditTriggered();
+    void graphicsAppliedTriggered();
+    void stopPlaying();
+
 public:
     MainWindow();
     ~MainWindow() noexcept override;
@@ -31,6 +42,8 @@ public slots:
                   bool afterShowEvent = false);
 
 private slots:
+    //! Hide pen width spin box.
+    void hidePenWidthSpinBox();
     //! Open GIF.
     void openGif();
     //! Save GIF.
@@ -42,18 +55,8 @@ private slots:
     //! Frame checked/unchecked.
     void frameChecked(int idx,
                       bool on);
-    //! Crop.
-    void crop(bool on);
     //! Change pen width.
     void penWidth(bool on);
-    //! Insert text.
-    void insertText(bool on);
-    //! Draw rectangle.
-    void drawRect(bool on);
-    //! Draw arrow.
-    void drawArrow(bool on);
-    //! Cancel edit.
-    void cancelEdit();
     //! Apply edit.
     void applyEdit();
     //! About dialog
@@ -62,8 +65,6 @@ private slots:
     void aboutQt();
     //! Licenses.
     void licenses();
-    //! Play/stop.
-    void playStop();
     //! Show next frame.
     void showNextFrame();
     //! Switch to text edit mode.
@@ -80,8 +81,6 @@ private slots:
     void penColor();
     //! Change brush color.
     void brushColor();
-    //! Hide pen width spin box.
-    void hidePenWidthSpinBox();
     //! GIF loaded.
     void gifLoaded();
     //! GIF saved.
@@ -94,10 +93,6 @@ private slots:
     void onFrameSelected(int idx);
     //! Frame changed.
     void onFrameChanged(int idx);
-    //! Tips & tricks.
-    void tips();
-    //! Cancel tips & tricks.
-    void cancelTips();
 
 protected:
     void resizeEvent(QResizeEvent *e) override;
@@ -105,10 +100,17 @@ protected:
     void showEvent(QShowEvent *e) override;
 
 private:
-    void gifSaved(bool failed);
+    void initUi();
+    void initStateMachine();
 
 private:
     friend class MainWindowPrivate;
+    friend class TipsState;
+    friend class CropState;
+    friend class DrawTextState;
+    friend class DrawRectState;
+    friend class EditingState;
+    friend class DrawArrowState;
 
     Q_DISABLE_COPY(MainWindow)
 
