@@ -148,17 +148,6 @@ void BusyState::onExit(QEvent *)
     m_impl.m_busyFlag = false;
 }
 
-void makeTipsState(MainWindowPrivate &impl, QState *parent)
-{
-    auto idleState = new QState(parent);
-    auto tipsState = new TipsState(impl, parent);
-
-    parent->setInitialState(idleState);
-
-    idleState->addTransition(impl.m_tipsAction, &QAction::triggered, tipsState);
-    tipsState->addTransition(impl.m_cancelTips, &QAction::triggered, idleState);
-}
-
 //
 // ReadyState
 //
@@ -167,7 +156,6 @@ ReadyState::ReadyState(MainWindowPrivate &impl, QState *parent)
     : QState(parent)
     , m_impl(impl)
 {
-    makeTipsState(impl, this);
 }
 
 void ReadyState::onEntry(QEvent *)
@@ -198,7 +186,6 @@ AboutState::AboutState(MainWindowPrivate &impl, QState *parent)
     : QState(parent)
     , m_impl(impl)
 {
-    makeTipsState(impl, this);
 }
 
 void AboutState::onEntry(QEvent *)
@@ -223,7 +210,6 @@ PlayingState::PlayingState(MainWindowPrivate &impl, QState *parent)
     : QState(parent)
     , m_impl(impl)
 {
-    makeTipsState(impl, this);
 }
 
 void PlayingState::onEntry(QEvent *)
@@ -244,7 +230,6 @@ EditingState::EditingState(MainWindowPrivate &impl, QState *parent)
     : QState(parent)
     , m_impl(impl)
 {
-    makeTipsState(impl, this);
 }
 
 void EditingState::onEntry(QEvent *)

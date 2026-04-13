@@ -21,6 +21,7 @@
 #include <QCloseEvent>
 #include <QColorDialog>
 #include <QFileDialog>
+#include <QFinalState>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QMetaMethod>
@@ -440,44 +441,79 @@ void MainWindow::initUi()
 void MainWindow::initStateMachine()
 {
     m_d->m_uiState = new QStateMachine(this);
-    auto rootState = new QState(m_d->m_uiState);
-    auto aboutState = new AboutState(*m_d, rootState);
-    rootState->setInitialState(aboutState);
+    auto rootState = new QState(QState::ParallelStates, m_d->m_uiState);
     m_d->m_uiState->setInitialState(rootState);
 
-    auto busyState = new BusyState(*m_d, rootState);
+    auto viewState = new QState(rootState);
+    auto aboutState = new AboutState(*m_d, viewState);
+    auto busyState = new BusyState(*m_d, viewState);
+    auto readyState = new ReadyState(*m_d, viewState);
 
-    auto readyState = new ReadyState(*m_d, rootState);
+    viewState->setInitialState(aboutState);
 
-    rootState->addTransition(this, &MainWindow::openFileTriggered, busyState);
-    rootState->addTransition(this, &MainWindow::saveFileTriggered, busyState);
+    {
+        auto t1 = viewState->addTransition(this, &MainWindow::openFileTriggered, busyState);
+        t1->setTransitionType(QAbstractTransition::InternalTransition);
+        auto t2 = viewState->addTransition(this, &MainWindow::saveFileTriggered, busyState);
+        t2->setTransitionType(QAbstractTransition::InternalTransition);
 
-    rootState->addTransition(this, &MainWindow::fileLoadedTriggered, readyState);
+        auto t3 = viewState->addTransition(this, &MainWindow::fileLoadedTriggered, readyState);
+        t3->setTransitionType(QAbstractTransition::InternalTransition);
 
-    rootState->addTransition(this, &MainWindow::fileLoadingFailed, aboutState);
-    rootState->addTransition(this, &MainWindow::fileSavingFailed, aboutState);
+        auto t4 = viewState->addTransition(this, &MainWindow::fileLoadingFailed, aboutState);
+        t4->setTransitionType(QAbstractTransition::InternalTransition);
+        auto t5 = viewState->addTransition(this, &MainWindow::fileSavingFailed, aboutState);
+        t5->setTransitionType(QAbstractTransition::InternalTransition);
 
-    auto textState = new DrawTextState(*m_d, readyState);
-    auto busyTextState = new BusyState(*m_d, textState);
+        auto t6 = viewState->addTransition(this, &MainWindow::applyEditTriggered, busyState);
+        t6->setTransitionType(QAbstractTransition::InternalTransition);
 
-    auto t1 = readyState->addTransition(m_d->m_insertText, &QAction::triggered, textState);
-    t1->setTransitionType(QAbstractTransition::InternalTransition);
+        auto t7 = viewState->addTransition(this, &MainWindow::graphicsAppliedTriggered, readyState);
+        t7->setTransitionType(QAbstractTransition::InternalTransition);
+    }
 
-    auto t2 = readyState->addTransition(m_d->m_cancelEdit, &QAction::triggered, readyState);
-    t2->setTransitionType(QAbstractTransition::InternalTransition);
+    auto editingState = new QState(rootState);
+    auto idleEditing = new QState(editingState);
+    editingState->setInitialState(idleEditing);
 
-    auto t3 = readyState->addTransition(this, &MainWindow::cancelEditTriggered, readyState);
-    t3->setTransitionType(QAbstractTransition::InternalTransition);
+    idleEditing->assignProperty(m_d->m_insertText, "checked", false);
+    idleEditing->assignProperty(m_d->m_drawArrow, "checked", false);
+    idleEditing->assignProperty(m_d->m_drawRect, "checked", false);
+    idleEditing->assignProperty(m_d->m_crop, "checked", false);
 
-    readyState->addTransition(this, &MainWindow::graphicsAppliedTriggered, readyState);
+    idleEditing->assignProperty(m_d->m_insertText, "enabled", true);
+    idleEditing->assignProperty(m_d->m_drawArrow, "enabled", true);
+    idleEditing->assignProperty(m_d->m_drawRect, "enabled", true);
+    idleEditing->assignProperty(m_d->m_crop, "enabled", true);
 
-    auto t4 = textState->addTransition(this, &MainWindow::applyEditTriggered, busyTextState);
-    t4->setTransitionType(QAbstractTransition::InternalTransition);
+    auto textState = new DrawTextState(*m_d, editingState);
 
-    readyState->assignProperty(m_d->m_insertText, "checked", false);
-    readyState->assignProperty(m_d->m_drawArrow, "checked", false);
-    readyState->assignProperty(m_d->m_drawRect, "checked", false);
-    readyState->assignProperty(m_d->m_crop, "checked", false);
+    {
+        auto t1 = editingState->addTransition(m_d->m_insertText, &QAction::triggered, textState);
+        t1->setTransitionType(QAbstractTransition::InternalTransition);
+
+        auto t2 = editingState->addTransition(m_d->m_cancelEdit, &QAction::triggered, idleEditing);
+        t2->setTransitionType(QAbstractTransition::InternalTransition);
+
+        auto t3 = editingState->addTransition(this, &MainWindow::cancelEditTriggered, idleEditing);
+        t3->setTransitionType(QAbstractTransition::InternalTransition);
+
+        auto t4 = editingState->addTransition(this, &MainWindow::graphicsAppliedTriggered, idleEditing);
+        t4->setTransitionType(QAbstractTransition::InternalTransition);
+    }
+
+    auto tipsModeState = new QState(rootState);
+    auto tipsIdleState = new QState(tipsModeState);
+    tipsModeState->setInitialState(tipsIdleState);
+    auto tipsState = new TipsState(*m_d, tipsModeState);
+
+    {
+        auto t1 = tipsModeState->addTransition(m_d->m_tipsAction, &QAction::triggered, tipsState);
+        t1->setTransitionType(QAbstractTransition::InternalTransition);
+
+        auto t2 = tipsModeState->addTransition(m_d->m_cancelTips, &QAction::triggered, tipsIdleState);
+        t2->setTransitionType(QAbstractTransition::InternalTransition);
+    }
 
     m_d->m_uiState->start();
 }
