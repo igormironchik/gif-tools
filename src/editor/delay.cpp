@@ -27,5 +27,5 @@ DelayDlg::~DelayDlg()
 
 int DelayDlg::delay() const
 {
-    return m_ui.m_delay->value();
+    return (m_ui.m_delay->value() + 5) / 10 * 10;
 }
