@@ -7,8 +7,6 @@
 
 // Qt include.
 #include <QDialog>
-#include <QVBoxLayout>
-#include <QWidget>
 
 //
 // LicenseDialog
@@ -29,11 +27,11 @@ public:
     void addLicense(const QString &title,
                     const QString &license);
 
-protected:
-    void showEvent(QShowEvent *event) override;
+private slots:
+    void anchorClicked();
 
 private:
-    QScopedPointer<LicenseDialogPrivate> m_d;
+    QScopedPointer<LicenseDialogPrivate> d;
 
     Q_DISABLE_COPY(LicenseDialog)
 }; // class LicenseDialog

@@ -25,6 +25,10 @@ int main(int argc,
     app.setOrganizationDomain(QStringLiteral("github.com/igormironchik"));
     app.setApplicationName(QStringLiteral("GIF Editor"));
 
+#ifdef Q_OS_WIN
+    app.setStyle(QStyleFactory::create("Breeze"));
+#endif
+
     initSharedResources();
 
     QIcon appIcon(QStringLiteral(":/icon/icon_256x256.png"));
@@ -39,7 +43,7 @@ int main(int argc,
     QTranslator appTranslator;
     const auto locale = QLocale::system();
 
-    if (locale.language() != QLocale::English) {
+    if (!hasEnglish(locale.uiLanguages())) {
         if (appTranslator.load(locale, QStringLiteral("gif_"), QString(), QStringLiteral(":/tr/"))) {
             QApplication::installTranslator(&appTranslator);
         }

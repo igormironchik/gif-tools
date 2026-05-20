@@ -153,6 +153,10 @@ void TitleWidget::licenses()
     msg.addLicense(s_giflibName, s_giflibLicense);
     msg.addLicense(s_qgiflibName, s_qgiflibLicense);
 
+#ifdef Q_OS_WIN
+    msg.addLicense(s_breezeName, s_breezeLicense);
+#endif
+
     msg.exec();
 }
 
