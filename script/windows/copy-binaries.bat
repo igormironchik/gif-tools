@@ -149,12 +149,6 @@ IF %ERRORLEVEL% NEQ 0 (
 	exit /B %ERRORLEVEL%
 )
 
-mkdir installer\packages\mironchik.igor.gif\data\plugins\styles
-
-IF %ERRORLEVEL% NEQ 0 (
-	exit /B %ERRORLEVEL%
-)
-
 xcopy %CD%\..\KDE\lib\plugins\kf6 installer\packages\mironchik.igor.gif\data\plugins\kf6 /S /Y
 
 IF %ERRORLEVEL% NEQ 0 (
@@ -186,12 +180,6 @@ IF %ERRORLEVEL% NEQ 0 (
 )
 
 xcopy ..\Qt\%qt_version%\%qt_arch%\plugins installer\packages\mironchik.igor.gif\data\plugins /S /Y
-
-IF %ERRORLEVEL% NEQ 0 (
-	exit /B %ERRORLEVEL%
-)
-
-xcopy ..\Qt\%qt_version%\%qt_arch%\resources installer\packages\mironchik.igor.gif\data\resources /S /Y
 
 IF %ERRORLEVEL% NEQ 0 (
 	exit /B %ERRORLEVEL%
