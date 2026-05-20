@@ -7,6 +7,10 @@
 #include <QApplication>
 #include <QTranslator>
 
+#ifdef Q_OS_WIN
+#include <QStyleFactory>
+#endif
+
 // GIF recorder include.
 #include "event_monitor.hpp"
 #include "mainwindow.hpp"

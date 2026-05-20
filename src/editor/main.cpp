@@ -9,6 +9,10 @@
 #include <QLocale>
 #include <QTranslator>
 
+#ifdef Q_OS_WIN
+#include <QStyleFactory>
+#endif
+
 // GIF editor include.
 #include "mainwindow.hpp"
 #include "settings.hpp"
