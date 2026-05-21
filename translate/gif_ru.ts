@@ -28,7 +28,7 @@ Copyright (c) 2026 Igor Mironchik.
 <context>
     <name>AboutState</name>
     <message>
-        <location filename="../src/editor/uistates.cpp" line="162"/>
+        <location filename="../src/editor/uistates.cpp" line="165"/>
         <source>GIF Editor</source>
         <translation>Редактор GIF</translation>
     </message>
@@ -44,7 +44,7 @@ Copyright (c) 2026 Igor Mironchik.
 <context>
     <name>CloseButton</name>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="295"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="299"/>
         <source>Close application</source>
         <translation>Закрыть приложение</translation>
     </message>
@@ -70,7 +70,7 @@ Copyright (c) 2026 Igor Mironchik.
         <translation>Задержка после этого кадра</translation>
     </message>
     <message>
-        <location filename="../src/editor/delay.ui" line="36"/>
+        <location filename="../src/editor/delay.ui" line="39"/>
         <source>ms</source>
         <translation>мс</translation>
     </message>
@@ -122,7 +122,7 @@ Copyright (c) 2026 Igor Mironchik.
         <translation>Лицензии</translation>
     </message>
     <message>
-        <location filename="../src/shared/license_dialog.ui" line="95"/>
+        <location filename="../src/shared/license_dialog.ui" line="85"/>
         <source>OK</source>
         <translation>ОК</translation>
     </message>
@@ -135,9 +135,14 @@ Copyright (c) 2026 Igor Mironchik.
         <translation>Загрузка GIF...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="194"/>
+        <location filename="../src/editor/mainwindow_private.cpp" line="216"/>
         <source>GIF Editor</source>
         <translation>Редактор GIF</translation>
+    </message>
+    <message>
+        <location filename="../src/editor/mainwindow_private.cpp" line="222"/>
+        <source>GIF Editor - %1[*] - #%2</source>
+        <translation>Редактор GIF - %1[*] - #%2</translation>
     </message>
     <message>
         <location filename="../src/editor/mainwindow.cpp" line="196"/>
@@ -166,7 +171,7 @@ Copyright (c) 2026 Igor Mironchik.
     </message>
     <message>
         <location filename="../src/editor/mainwindow.cpp" line="212"/>
-        <location filename="../src/recorder/mainwindow.cpp" line="457"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="461"/>
         <source>Save As</source>
         <translation>Сохранить как</translation>
     </message>
@@ -345,7 +350,7 @@ Do you want to terminate the application?</source>
     </message>
     <message>
         <location filename="../src/editor/mainwindow.cpp" line="613"/>
-        <location filename="../src/editor/mainwindow.cpp" line="701"/>
+        <location filename="../src/editor/mainwindow.cpp" line="699"/>
         <source>GIF was changed...</source>
         <translation>GIF был изменен...</translation>
     </message>
@@ -364,7 +369,7 @@ Do you want to save it?</source>
     <message>
         <location filename="../src/editor/mainwindow.cpp" line="635"/>
         <location filename="../src/editor/mainwindow.cpp" line="677"/>
-        <location filename="../src/recorder/mainwindow.cpp" line="457"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="461"/>
         <source>GIF (*.gif)</source>
         <translation>GIF (*.gif)</translation>
     </message>
@@ -399,48 +404,47 @@ Do you want to save it?</source>
         <translation>Выберите имя файла для сохранения...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="688"/>
-        <location filename="../src/editor/mainwindow.cpp" line="1058"/>
+        <location filename="../src/editor/mainwindow_private.cpp" line="224"/>
         <source>GIF Editor - %1[*]</source>
         <translation>Редактор GIF - %1[*]</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="702"/>
+        <location filename="../src/editor/mainwindow.cpp" line="700"/>
         <source>GIF was changed. Do you want to save changes?</source>
         <translation>GIF был изменен. Вы хотите сохранить изменения?</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="777"/>
+        <location filename="../src/editor/mainwindow.cpp" line="775"/>
         <source>Cropping GIF...</source>
         <translation>Обрезка GIF...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="824"/>
+        <location filename="../src/editor/mainwindow.cpp" line="822"/>
         <source>Drawing rectangle...</source>
         <translation>Рисую прямоугольник...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="836"/>
+        <location filename="../src/editor/mainwindow.cpp" line="834"/>
         <source>Drawing arrow...</source>
         <translation>Рисую стрелку...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="865"/>
+        <location filename="../src/editor/mainwindow.cpp" line="863"/>
         <source>About GIF editor</source>
         <translation>О редакторе GIF</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="866"/>
+        <location filename="../src/editor/mainwindow.cpp" line="864"/>
         <source>GIF editor.&lt;br /&gt;&lt;br /&gt;Version: %1&lt;br /&gt;&lt;br /&gt;Author - Igor Mironchik (&lt;a href=&quot;mailto:igor.mironchik@gmail.com&quot;&gt;igor.mironchik at gmail.com&lt;/a&gt;).&lt;br /&gt;&lt;br /&gt;Copyright (c) 2026 Igor Mironchik.&lt;br /&gt;&lt;br /&gt;Licensed under GNU GPL 3.0.</source>
         <translation>Редактор GIF.&lt;br /&gt;&lt;br /&gt;Версия: %1&lt;br /&gt;&lt;br /&gt;Автор - Игорь Мирончик (&lt;a href=&quot;mailto:igor.mironchik@gmail.com&quot;&gt;igor.mironchik at gmail.com&lt;/a&gt;).&lt;br /&gt;&lt;br /&gt;Copyright (c) 2026 Igor Mironchik.&lt;br /&gt;&lt;br /&gt;Лицензировано под GNU GPL 3.0.</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="470"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="474"/>
         <source>Stop</source>
         <translation>Остановить</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="969"/>
+        <location filename="../src/editor/mainwindow.cpp" line="971"/>
         <source>Drawing text...</source>
         <translation>Рисую текст...</translation>
     </message>
@@ -467,32 +471,32 @@ Do you want to save it?</source>
         <translation>&lt;b&gt;Время:&lt;/b&gt; %1 &lt;b&gt;Продолжительность:&lt;/b&gt; %2</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="440"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="444"/>
         <source>Record</source>
         <translation>Записать</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="441"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="445"/>
         <source>Start recording</source>
         <translation>Начать запись</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="471"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="475"/>
         <source>Stop recording</source>
         <translation>Остановить запись</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="801"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="805"/>
         <source>Writing GIF... Please wait.</source>
         <translation>Сохраняю GIF... Пожалуйста подождите.</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="837"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="841"/>
         <source>GIF recorder is busy...</source>
         <translation>GIF рекордер занят...</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="838"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="842"/>
         <source>GIF recorder is busy.
 Do you want to terminate the application?</source>
         <translation>GIF рекордер занят.
@@ -502,12 +506,12 @@ Do you want to terminate the application?</source>
 <context>
     <name>PlayingState</name>
     <message>
-        <location filename="../src/editor/uistates.cpp" line="190"/>
+        <location filename="../src/editor/uistates.cpp" line="194"/>
         <source>Stop</source>
         <translation>Остановить</translation>
     </message>
     <message>
-        <location filename="../src/editor/uistates.cpp" line="205"/>
+        <location filename="../src/editor/uistates.cpp" line="209"/>
         <source>Play</source>
         <translation>Проиграть</translation>
     </message>
@@ -683,7 +687,7 @@ Do you want to terminate the application?</source>
         <translation>GIF recorder.&lt;br /&gt;&lt;br /&gt;Версия: %1&lt;br /&gt;&lt;br /&gt;Автор - Игорь Мирончик (&lt;a href=&quot;mailto:igor.mironchik@gmail.com&quot;&gt;igor.mironchik at gmail.com&lt;/a&gt;).&lt;br /&gt;&lt;br /&gt;Copyright (c) 2026 Igor Mironchik.&lt;br /&gt;&lt;br /&gt;Лицензировано под GNU GPL 3.0.</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="260"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="264"/>
         <source>Resize Grab Area</source>
         <translation>Установить размер области записи</translation>
     </message>
