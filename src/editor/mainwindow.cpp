@@ -191,7 +191,7 @@ MainWindow::~MainWindow() noexcept
 
 void MainWindow::initUi()
 {
-    setWindowTitle(tr("GIF Editor"));
+    m_d->setWindowTitle(-1);
 
     auto file = menuBar()->addMenu(tr("&File"));
     m_d->m_open = file->addAction(
@@ -683,9 +683,7 @@ void MainWindow::saveGifAs()
 
         m_d->m_currentGif = fileName;
 
-        QFileInfo info(fileName);
-
-        setWindowTitle(tr("GIF Editor - %1[*]").arg(info.fileName()));
+        m_d->setWindowTitle(-1);
 
         saveGif();
     }
@@ -1057,9 +1055,7 @@ void MainWindow::gifLoaded()
     disconnect(&m_d->m_readWatcher, 0, this, 0);
 
     if (m_d->m_readWatcher.result()) {
-        QFileInfo info(m_d->m_currentGif);
-
-        setWindowTitle(MainWindow::tr("GIF Editor - %1[*]").arg(info.fileName()));
+        m_d->setWindowTitle(-1);
 
         m_d->m_busyStatusLabel->setText(tr("Preparing tape..."));
 
@@ -1154,6 +1150,8 @@ void MainWindow::onFrameSelected(int idx)
             tr("<b>Time:</b> %1 <b>Total Duration:</b> %2")
                 .arg(QTime::fromMSecsSinceStartOfDay(m_d->m_timings[idx - 1]).toString(QStringLiteral("hh:mm:ss.zzz")),
                      m_d->m_totalDuration));
+
+        m_d->setWindowTitle(idx);
     }
 }
 

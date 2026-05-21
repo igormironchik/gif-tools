@@ -67,6 +67,8 @@ public:
     void calculateTimings();
     //! Set actions to initial state.
     void setActionsToInitialState();
+    //! Update window title.
+    void setWindowTitle(int frameIdx);
 
     //! Current file name.
     QString m_currentGif;

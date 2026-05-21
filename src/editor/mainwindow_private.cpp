@@ -209,3 +209,19 @@ void MainWindowPrivate::setActionsToInitialState()
 
     m_editMenu->setEnabled(false);
 }
+
+void MainWindowPrivate::setWindowTitle(int frameIdx)
+{
+    if (m_currentGif.isEmpty()) {
+        m_q->setWindowTitle(MainWindow::tr("GIF Editor"));
+    } else {
+        QFileInfo info(m_currentGif);
+
+        if (frameIdx > 0) {
+            m_q->setWindowTitle(
+                MainWindow::tr("GIF Editor - %1[*] - #%2").arg(info.fileName()).arg(QString::number(frameIdx)));
+        } else {
+            m_q->setWindowTitle(MainWindow::tr("GIF Editor - %1[*]").arg(info.fileName()));
+        }
+    }
+}
