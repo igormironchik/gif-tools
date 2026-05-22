@@ -1147,9 +1147,10 @@ void MainWindow::onFrameSelected(int idx)
 {
     if (idx) {
         m_d->m_status->setText(
-            tr("<b>Time:</b> %1 <b>Total Duration:</b> %2")
+            tr("<b>Time:</b> %1 <b>Total Duration:</b> %2 <b>Current Frame:</b> #%3")
                 .arg(QTime::fromMSecsSinceStartOfDay(m_d->m_timings[idx - 1]).toString(QStringLiteral("hh:mm:ss.zzz")),
-                     m_d->m_totalDuration));
+                     m_d->m_totalDuration,
+                     QString::number(idx)));
 
         m_d->setWindowTitle(idx);
     }

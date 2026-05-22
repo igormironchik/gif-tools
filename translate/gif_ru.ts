@@ -404,6 +404,11 @@ Do you want to save it?</source>
         <translation>Выберите имя файла для сохранения...</translation>
     </message>
     <message>
+        <location filename="../src/editor/mainwindow.cpp" line="1150"/>
+        <source>&lt;b&gt;Time:&lt;/b&gt; %1 &lt;b&gt;Total Duration:&lt;/b&gt; %2 &lt;b&gt;Current Frame:&lt;/b&gt; #%3</source>
+        <translation>&lt;b&gt;Время:&lt;/b&gt; %1 &lt;b&gt;Общая продолжительность:&lt;/b&gt; %2 &lt;b&gt;Текущий кадр:&lt;/b&gt; #%3</translation>
+    </message>
+    <message>
         <location filename="../src/editor/mainwindow_private.cpp" line="224"/>
         <source>GIF Editor - %1[*]</source>
         <translation>Редактор GIF - %1[*]</translation>
@@ -466,9 +471,8 @@ Do you want to save it?</source>
         <translation>Не удалось загрузить GIF файл. Файл &quot;%1&quot; поврежден.</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="1150"/>
         <source>&lt;b&gt;Time:&lt;/b&gt; %1 &lt;b&gt;Total Duration:&lt;/b&gt; %2</source>
-        <translation>&lt;b&gt;Время:&lt;/b&gt; %1 &lt;b&gt;Продолжительность:&lt;/b&gt; %2</translation>
+        <translation type="vanished">&lt;b&gt;Время:&lt;/b&gt; %1 &lt;b&gt;Продолжительность:&lt;/b&gt; %2</translation>
     </message>
     <message>
         <location filename="../src/recorder/mainwindow.cpp" line="444"/>
