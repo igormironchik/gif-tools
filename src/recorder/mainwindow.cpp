@@ -69,7 +69,7 @@ TitleWidget::TitleWidget(MainWindow *mainWindow,
 {
     auto layout = new QHBoxLayout(this);
     layout->setContentsMargins(5, 5, 5, 5);
-    m_recordButton->setText(tr("Record"));
+    m_recordButton->setText(tr("Record - Ctrl+R"));
     m_recordButton->setToolTip(tr("Start recording"));
     layout->addWidget(m_recordButton);
     layout->addItem(new QSpacerItem(10, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
@@ -358,6 +358,11 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     const auto x = (screenSize.width() - width) / 2;
     const auto y = (screenSize.height() - height) / 2;
 
+    auto startStopAction = new QAction(this);
+    startStopAction->setShortcutContext(Qt::ApplicationShortcut);
+    startStopAction->setShortcut(tr("Ctrl+R"));
+    addAction(startStopAction);
+
     resize(screenSize);
 
     m_rect = QRect(x, y, width, height);
@@ -378,6 +383,7 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     connect(eventMonitor, &EventMonitor::keyReleased, this, &MainWindow::onKeyReleased, Qt::QueuedConnection);
     connect(m_title, &TitleWidget::resizeRequested, this, &MainWindow::onResizeRequested);
     connect(m_title->recordButton(), &QToolButton::clicked, this, &MainWindow::onRecord);
+    connect(startStopAction, &QAction::triggered, this, &MainWindow::onRecord);
     connect(m_title->settingsButton(), &QToolButton::clicked, this, &MainWindow::onSettings);
     connect(m_title->transparentForMouseButton(), &QToolButton::toggled, this, &MainWindow::onTransparentForMouse);
 
@@ -441,7 +447,7 @@ void MainWindow::onRecord()
 {
     if (m_recording) {
         m_skipQuitEvent = false;
-        m_title->recordButton()->setText(tr("Record"));
+        m_title->recordButton()->setText(tr("Record - Ctrl+R"));
         m_title->recordButton()->setToolTip(tr("Start recording"));
         m_title->settingsButton()->setEnabled(true);
         m_title->closeButton()->setEnabled(true);
@@ -471,7 +477,7 @@ void MainWindow::onRecord()
         }
     } else {
         m_skipQuitEvent = true;
-        m_title->recordButton()->setText(tr("Stop"));
+        m_title->recordButton()->setText(tr("Stop - Ctrl+R"));
         m_title->recordButton()->setToolTip(tr("Stop recording"));
         m_title->settingsButton()->setEnabled(false);
         m_title->closeButton()->setEnabled(false);
