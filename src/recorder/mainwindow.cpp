@@ -12,6 +12,9 @@
 // qgiflib include.
 #include <qgiflib.hpp>
 
+// QHotKey include.
+#include <QHotkey/qhotkey.h>
+
 // gif-widgets include.
 #include "license_dialog.hpp"
 #include "utils.hpp"
@@ -358,10 +361,7 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     const auto x = (screenSize.width() - width) / 2;
     const auto y = (screenSize.height() - height) / 2;
 
-    auto startStopAction = new QAction(this);
-    startStopAction->setShortcutContext(Qt::ApplicationShortcut);
-    startStopAction->setShortcut(tr("Ctrl+R"));
-    addAction(startStopAction);
+    auto startStopAction = new QHotkey(tr("Ctrl+R"), true, this);
 
     resize(screenSize);
 
@@ -383,7 +383,7 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     connect(eventMonitor, &EventMonitor::keyReleased, this, &MainWindow::onKeyReleased, Qt::QueuedConnection);
     connect(m_title, &TitleWidget::resizeRequested, this, &MainWindow::onResizeRequested);
     connect(m_title->recordButton(), &QToolButton::clicked, this, &MainWindow::onRecord);
-    connect(startStopAction, &QAction::triggered, this, &MainWindow::onRecord);
+    connect(startStopAction, &QHotkey::activated, this, &MainWindow::onRecord);
     connect(m_title->settingsButton(), &QToolButton::clicked, this, &MainWindow::onSettings);
     connect(m_title->transparentForMouseButton(), &QToolButton::toggled, this, &MainWindow::onTransparentForMouse);
 

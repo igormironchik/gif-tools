@@ -29,11 +29,12 @@ endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../shared
 	${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/qgiflib/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/qgiflib/3rdparty/giflib)
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/qgiflib/3rdparty/giflib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/QHotKey)
 
 add_executable(gif-recorder WIN32 ${SRC})
 
-target_link_libraries(gif-recorder qgiflib gif-widgets Qt6::Concurrent Qt6::Widgets Qt6::Gui Qt6::Core)
+target_link_libraries(gif-recorder qgiflib gif-widgets qhotkey Qt6::Concurrent Qt6::Widgets Qt6::Gui Qt6::Core)
 
 if(UNIX)
     target_link_libraries(gif-recorder Xtst Xfixes X11)

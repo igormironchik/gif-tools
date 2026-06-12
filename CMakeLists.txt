@@ -53,4 +53,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/qgiflib)
 set(BUILD_QGIFLIB_TESTS OFF CACHE INTERNAL "" FORCE)
 add_subdirectory(3rdparty/qgiflib)
 
+set(QHOTKEY_EXAMPLES OFF CACHE INTERNAL "" FORCE)
+set(QHOTKEY_INSTALL OFF CACHE INTERNAL "" FORCE)
+set(QT_DEFAULT_MAJOR_VERSION  6 CACHE INTERNAL "" FORCE)
+add_subdirectory(3rdparty/QHotKey)
+
 add_subdirectory(src)
