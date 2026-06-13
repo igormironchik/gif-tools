@@ -30,7 +30,7 @@ endif()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../shared
 	${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/qgiflib/src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/qgiflib/3rdparty/giflib
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/QHotKey)
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/QHotkey)
 
 add_executable(gif-recorder WIN32 ${SRC})
 

@@ -44,7 +44,7 @@ Copyright (c) 2026 Igor Mironchik.
 <context>
     <name>CloseButton</name>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="299"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="304"/>
         <source>Close application</source>
         <translation>Закрыть приложение</translation>
     </message>
@@ -171,7 +171,7 @@ Copyright (c) 2026 Igor Mironchik.
     </message>
     <message>
         <location filename="../src/editor/mainwindow.cpp" line="212"/>
-        <location filename="../src/recorder/mainwindow.cpp" line="467"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="470"/>
         <source>Save As</source>
         <translation>Сохранить как</translation>
     </message>
@@ -212,7 +212,6 @@ Copyright (c) 2026 Igor Mironchik.
     </message>
     <message>
         <location filename="../src/editor/mainwindow.cpp" line="245"/>
-        <location filename="../src/recorder/mainwindow.cpp" line="363"/>
         <source>Ctrl+R</source>
         <translation>Ctrl+R</translation>
     </message>
@@ -370,7 +369,7 @@ Do you want to save it?</source>
     <message>
         <location filename="../src/editor/mainwindow.cpp" line="635"/>
         <location filename="../src/editor/mainwindow.cpp" line="677"/>
-        <location filename="../src/recorder/mainwindow.cpp" line="467"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="470"/>
         <source>GIF (*.gif)</source>
         <translation>GIF (*.gif)</translation>
     </message>
@@ -479,37 +478,45 @@ Do you want to save it?</source>
         <translation type="vanished">Записать</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="450"/>
         <source>Record - Ctrl+R</source>
-        <translation>Записать - Ctrl+R</translation>
+        <translation type="vanished">Записать - Ctrl+R</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="451"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="454"/>
         <source>Start recording</source>
         <translation>Начать запись</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="480"/>
         <source>Stop - Ctrl+R</source>
-        <translation>Остановить - Ctrl+R</translation>
+        <translation type="vanished">Остановить - Ctrl+R</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="481"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="453"/>
+        <source>Record - %1</source>
+        <translation>Записать - %1</translation>
+    </message>
+    <message>
+        <location filename="../src/recorder/mainwindow.cpp" line="484"/>
+        <source>Stop - %1</source>
+        <translation>Остановить - %1</translation>
+    </message>
+    <message>
+        <location filename="../src/recorder/mainwindow.cpp" line="485"/>
         <source>Stop recording</source>
         <translation>Остановить запись</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="811"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="815"/>
         <source>Writing GIF... Please wait.</source>
         <translation>Сохраняю GIF... Пожалуйста подождите.</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="847"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="851"/>
         <source>GIF recorder is busy...</source>
         <translation>GIF рекордер занят...</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="848"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="852"/>
         <source>GIF recorder is busy.
 Do you want to terminate the application?</source>
         <translation>GIF рекордер занят.
@@ -654,57 +661,61 @@ Do you want to terminate the application?</source>
         <translation type="vanished">Запись</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="72"/>
         <source>Record - Ctrl+R</source>
-        <translation>Записать - Ctrl+R</translation>
+        <translation type="vanished">Записать - Ctrl+R</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="73"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="76"/>
+        <source>Record - %1</source>
+        <translation>Записать - %1</translation>
+    </message>
+    <message>
+        <location filename="../src/recorder/mainwindow.cpp" line="77"/>
         <source>Start recording</source>
         <translation>Начать запись</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="84"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="88"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="85"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="89"/>
         <source>Turn on/off transparency for mouse events</source>
         <translation>Включить/выключить &quot;прозрачность&quot; событий мыши</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="92"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="96"/>
         <source>Help</source>
         <translation>Справка</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="110"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="114"/>
         <source>About</source>
         <translation>О приложении</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="112"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="116"/>
         <source>About Qt</source>
         <translation>О Qt</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="117"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="121"/>
         <source>Licenses</source>
         <translation>Лицензии</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="127"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="131"/>
         <source>About GIF recorder</source>
         <translation>О GIF рекордере</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="128"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="132"/>
         <source>GIF recorder.&lt;br /&gt;&lt;br /&gt;Version: %1&lt;br /&gt;&lt;br /&gt;Author - Igor Mironchik (&lt;a href=&quot;mailto:igor.mironchik@gmail.com&quot;&gt;igor.mironchik at gmail.com&lt;/a&gt;).&lt;br /&gt;&lt;br /&gt;Copyright (c) 2026 Igor Mironchik.&lt;br /&gt;&lt;br /&gt;Licensed under GNU GPL 3.0.</source>
         <translation>GIF recorder.&lt;br /&gt;&lt;br /&gt;Версия: %1&lt;br /&gt;&lt;br /&gt;Автор - Игорь Мирончик (&lt;a href=&quot;mailto:igor.mironchik@gmail.com&quot;&gt;igor.mironchik at gmail.com&lt;/a&gt;).&lt;br /&gt;&lt;br /&gt;Copyright (c) 2026 Igor Mironchik.&lt;br /&gt;&lt;br /&gt;Лицензировано под GNU GPL 3.0.</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="264"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="269"/>
         <source>Resize Grab Area</source>
         <translation>Установить размер области записи</translation>
     </message>

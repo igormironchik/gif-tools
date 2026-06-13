@@ -26,3 +26,9 @@ path = "src/shared/img/Qt-logo-neon-transparent.png"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2023 The Qt Company Ltd and other contributors"
 SPDX-License-Identifier = "LGPL-3.0-or-later"
+
+[[annotations]]
+path = "3rdparty/QHotkey/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2016 Felix Barz"
+SPDX-License-Identifier = "BSD-3-Clause"

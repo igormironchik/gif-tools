@@ -72,7 +72,8 @@ TitleWidget::TitleWidget(MainWindow *mainWindow,
 {
     auto layout = new QHBoxLayout(this);
     layout->setContentsMargins(5, 5, 5, 5);
-    m_recordButton->setText(tr("Record - Ctrl+R"));
+    m_recordButton->setText(
+        tr("Record - %1").arg(QKeySequence(QStringLiteral("Ctrl+0")).toString(QKeySequence::NativeText)));
     m_recordButton->setToolTip(tr("Start recording"));
     layout->addWidget(m_recordButton);
     layout->addItem(new QSpacerItem(10, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
@@ -155,6 +156,7 @@ void TitleWidget::licenses()
     msg.addLicense(s_oxygenName, s_oxygenLicense);
     msg.addLicense(s_giflibName, s_giflibLicense);
     msg.addLicense(s_qgiflibName, s_qgiflibLicense);
+    msg.addLicense(s_qhotkeyName, s_qhotkeyLicense);
 
 #ifdef Q_OS_WIN
     msg.addLicense(s_breezeName, s_breezeLicense);
@@ -361,7 +363,7 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     const auto x = (screenSize.width() - width) / 2;
     const auto y = (screenSize.height() - height) / 2;
 
-    auto startStopAction = new QHotkey(tr("Ctrl+R"), true, this);
+    auto startStopAction = new QHotkey(QStringLiteral("Ctrl+0"), true, this);
 
     resize(screenSize);
 
@@ -447,7 +449,8 @@ void MainWindow::onRecord()
 {
     if (m_recording) {
         m_skipQuitEvent = false;
-        m_title->recordButton()->setText(tr("Record - Ctrl+R"));
+        m_title->recordButton()->setText(
+            tr("Record - %1").arg(QKeySequence(QStringLiteral("Ctrl+0")).toString(QKeySequence::NativeText)));
         m_title->recordButton()->setToolTip(tr("Start recording"));
         m_title->settingsButton()->setEnabled(true);
         m_title->closeButton()->setEnabled(true);
@@ -477,7 +480,8 @@ void MainWindow::onRecord()
         }
     } else {
         m_skipQuitEvent = true;
-        m_title->recordButton()->setText(tr("Stop - Ctrl+R"));
+        m_title->recordButton()->setText(
+            tr("Stop - %1").arg(QKeySequence(QStringLiteral("Ctrl+0")).toString(QKeySequence::NativeText)));
         m_title->recordButton()->setToolTip(tr("Stop recording"));
         m_title->settingsButton()->setEnabled(false);
         m_title->closeButton()->setEnabled(false);
