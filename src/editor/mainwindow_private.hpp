@@ -72,6 +72,8 @@ public:
 
     //! Current file name.
     QString m_currentGif;
+    //! Old file name.
+    QString m_oldGif;
     //! Total duration of the GIF.
     QString m_totalDuration;
     //! Frames.

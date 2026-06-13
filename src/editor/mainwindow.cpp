@@ -457,7 +457,7 @@ void MainWindow::initStateMachine()
 
         auto t4 = viewState->addTransition(this, &MainWindow::fileLoadingFailed, aboutState);
         t4->setTransitionType(QAbstractTransition::InternalTransition);
-        auto t5 = viewState->addTransition(this, &MainWindow::fileSavingFailed, aboutState);
+        auto t5 = viewState->addTransition(this, &MainWindow::fileSavingFailed, readyState);
         t5->setTransitionType(QAbstractTransition::InternalTransition);
 
         auto t6 = viewState->addTransition(this, &MainWindow::applyEditTriggered, busyState);
@@ -661,11 +661,15 @@ void MainWindow::saveGif()
             auto future = QtConcurrent::run(writeGIFFunc, m_d->m_busy, toSave, delays, m_d->m_currentGif);
             m_d->m_watcher.setFuture(future);
         } else {
+            m_d->m_currentGif = m_d->m_oldGif;
+
             emit fileSavingFailed();
 
             QMessageBox::information(this, tr("Can't save GIF..."), tr("Can't save GIF image with no frames."));
         }
     } catch (const std::bad_alloc &) {
+        m_d->m_currentGif = m_d->m_oldGif;
+
         emit fileSavingFailed();
 
         QMessageBox::critical(this, tr("Failed to save GIF..."), tr("Out of memory."));
@@ -681,9 +685,8 @@ void MainWindow::saveGifAs()
             fileName.append(QStringLiteral(".gif"));
         }
 
+        m_d->m_oldGif = m_d->m_currentGif;
         m_d->m_currentGif = fileName;
-
-        m_d->setWindowTitle(-1);
 
         saveGif();
     }
