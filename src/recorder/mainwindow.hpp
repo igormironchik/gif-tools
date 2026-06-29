@@ -204,5 +204,5 @@ private:
     QRegion m_bottom;
     QRegion m_bottomRight;
     QColor m_color;
-    QFutureWatcher<void> m_watcher;
+    QFutureWatcher<bool> m_watcher;
 }; // class MainWindow

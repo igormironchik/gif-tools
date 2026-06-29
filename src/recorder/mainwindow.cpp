@@ -50,9 +50,6 @@
 #include <Windows.h>
 #endif
 
-// C++ include.
-#include <cstdlib>
-
 static const int s_handleRadius = 9;
 
 //
@@ -788,7 +785,7 @@ void MainWindow::makeFrame()
 namespace /* anonymous */
 {
 
-void writeGIF(QPromise<void> &,
+void writeGIF(QPromise<bool> &promise,
               MainWindow *progressReceiver,
               const QStringList &frames,
               const QVector<int> &delays,
@@ -798,7 +795,7 @@ void writeGIF(QPromise<void> &,
 
     QObject::connect(&gif, &QGifLib::Gif::writeProgress, progressReceiver, &MainWindow::onWritePercent);
 
-    if (!gif.write(fileName, frames, delays, 0)) {
+    if (!gif.write(fileName, frames, delays, 0, &promise)) {
         int methodIndex = progressReceiver->metaObject()->indexOfMethod("onWritePercent(int)");
         QMetaMethod method = progressReceiver->metaObject()->method(methodIndex);
         method.invoke(progressReceiver, Qt::QueuedConnection, 100);
@@ -832,6 +829,12 @@ void MainWindow::onGIFSaved()
     m_title->settingsButton()->setEnabled(true);
     m_title->msg()->setText({});
 
+    if (!m_watcher.isCanceled() && !m_watcher.future().result()) {
+        QMessageBox::critical(this,
+                              tr("Unable to save GIF..."),
+                              tr("Error occured during saving GIF, output file is corrupted."));
+    }
+
     clear();
 }
 
@@ -847,15 +850,16 @@ void MainWindow::clear()
 void MainWindow::closeEvent(QCloseEvent *e)
 {
     if (m_busy) {
-        const auto btn = QMessageBox::question(this,
-                                               tr("GIF recorder is busy..."),
-                                               tr("GIF recorder is busy.\nDo you want to terminate the application?"));
+        const auto btn =
+            QMessageBox::question(this,
+                                  tr("GIF recorder is busy..."),
+                                  tr("GIF recorder is writing GIF.\nDo you want to terminate the write process?"));
 
         if (btn == QMessageBox::Yes) {
-            std::quick_exit(0);
-        } else {
-            e->ignore();
+            m_watcher.future().cancel();
         }
+
+        e->ignore();
     } else if (m_skipQuitEvent) {
         e->ignore();
     } else {
