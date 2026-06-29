@@ -444,60 +444,62 @@ void MainWindow::onSettings()
 
 void MainWindow::onRecord()
 {
-    if (m_recording) {
-        m_skipQuitEvent = false;
-        m_title->recordButton()->setText(
-            tr("Record - %1").arg(QKeySequence(QStringLiteral("Ctrl+0")).toString(QKeySequence::NativeText)));
-        m_title->recordButton()->setToolTip(tr("Start recording"));
-        m_title->settingsButton()->setEnabled(true);
-        m_title->closeButton()->setEnabled(true);
+    if (!m_busy) {
+        if (m_recording) {
+            m_skipQuitEvent = false;
+            m_title->recordButton()->setText(
+                tr("Record - %1").arg(QKeySequence(QStringLiteral("Ctrl+0")).toString(QKeySequence::NativeText)));
+            m_title->recordButton()->setToolTip(tr("Start recording"));
+            m_title->settingsButton()->setEnabled(true);
+            m_title->closeButton()->setEnabled(true);
 
-        if (!m_isMouseDisabledByUser) {
-            clearMask();
-            m_title->enableMouse();
-        }
-
-        update();
-
-        m_timer->stop();
-
-        const auto dirs = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
-        const auto defaultDir = dirs.first();
-
-        auto fileName = QFileDialog::getSaveFileName(this, tr("Save As"), defaultDir, tr("GIF (*.gif)"));
-
-        if (!fileName.isEmpty()) {
-            if (!fileName.toLower().endsWith(".gif")) {
-                fileName.append(".gif");
+            if (!m_isMouseDisabledByUser) {
+                clearMask();
+                m_title->enableMouse();
             }
 
-            save(fileName);
+            update();
+
+            m_timer->stop();
+
+            const auto dirs = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation);
+            const auto defaultDir = dirs.first();
+
+            auto fileName = QFileDialog::getSaveFileName(this, tr("Save As"), defaultDir, tr("GIF (*.gif)"));
+
+            if (!fileName.isEmpty()) {
+                if (!fileName.toLower().endsWith(".gif")) {
+                    fileName.append(".gif");
+                }
+
+                save(fileName);
+            } else {
+                clear();
+            }
         } else {
-            clear();
+            m_skipQuitEvent = true;
+            m_title->recordButton()->setText(
+                tr("Stop - %1").arg(QKeySequence(QStringLiteral("Ctrl+0")).toString(QKeySequence::NativeText)));
+            m_title->recordButton()->setToolTip(tr("Stop recording"));
+            m_title->settingsButton()->setEnabled(false);
+            m_title->closeButton()->setEnabled(false);
+
+            if (!m_isMouseDisabledByUser) {
+                restoreCursor(Unknown);
+                makeAndSetMask();
+                m_title->disableMouse();
+            }
+
+            update();
+
+            m_timer->start(1000 / m_fps);
+            m_dir = QTemporaryDir(QDir::tempPath() + QDir::separator() + QStringLiteral("gif-recorder"));
+            m_elapsed.start();
+            makeFrame();
         }
-    } else {
-        m_skipQuitEvent = true;
-        m_title->recordButton()->setText(
-            tr("Stop - %1").arg(QKeySequence(QStringLiteral("Ctrl+0")).toString(QKeySequence::NativeText)));
-        m_title->recordButton()->setToolTip(tr("Stop recording"));
-        m_title->settingsButton()->setEnabled(false);
-        m_title->closeButton()->setEnabled(false);
 
-        if (!m_isMouseDisabledByUser) {
-            restoreCursor(Unknown);
-            makeAndSetMask();
-            m_title->disableMouse();
-        }
-
-        update();
-
-        m_timer->start(1000 / m_fps);
-        m_dir = QTemporaryDir(QDir::tempPath() + QDir::separator() + QStringLiteral("gif-recorder"));
-        m_elapsed.start();
-        makeFrame();
+        m_recording = !m_recording;
     }
-
-    m_recording = !m_recording;
 }
 
 void MainWindow::onTimer()
