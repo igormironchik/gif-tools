@@ -10,6 +10,7 @@
 #include "ui_settings.h"
 
 // Qt include.
+#include <QDateTime>
 #include <QDialog>
 
 //
@@ -49,6 +50,18 @@ public:
     int penWidth() const;
     //! Set pen width.
     void setPenWidth(int w);
+    //! \return Date & time of the last check for updates.
+    const QDateTime &lastCheckForUpdates() const;
+    //! Set date & time of the last check for updates.
+    void setLastCheckForUpdates(const QDateTime &dt);
+    //! \return Tag name of the available update.
+    const QString &updatesAvailable() const;
+    //! Set tag name of the vailable update.
+    void setUpdatesAvailable(const QString &u);
+    //! \return Update release page URL.
+    const QString &updatesUrl() const;
+    //! Set update release page URL.
+    void setUpdatesUrl(const QString &u);
 
 private:
     void readCfg();
@@ -67,6 +80,12 @@ private:
     QColor m_brushColor = Qt::transparent;
     //! Pen widht.
     int m_penWidth = 2;
+    //! Date & time of the last check for updates.
+    QDateTime m_lastCheckForUpdates;
+    //! Tag name of the available update.
+    QString m_updatesAvailable;
+    //! URL to release page.
+    QString m_updatesUrl;
 }; // class Settings
 
 //

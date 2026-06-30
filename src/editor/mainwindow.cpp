@@ -36,6 +36,9 @@
 #include "license_dialog.hpp"
 #include "utils.hpp"
 
+// github-release include.
+#include <github.h>
+
 namespace /* anonymous */
 {
 
@@ -593,6 +596,8 @@ void MainWindow::showEvent(QShowEvent *e)
                 this->openFile(this->m_d->m_fileNameToOpenAfterShow);
             });
         }
+
+        onCheckForUpdates();
     }
 
     e->accept();
@@ -1165,4 +1170,61 @@ void MainWindow::onFrameChanged(int)
     m_d->calculateTimings();
 
     onFrameSelected(m_d->m_view->currentFrame()->image().m_pos + 1);
+}
+
+void checkForUpdates(QPromise<Update> &promise,
+                     const QString &currentVersion)
+{
+    Update info;
+    info.m_available = GHRelease::isUpdateAvailable(QStringLiteral("igormironchik"),
+                                                    QStringLiteral("gif-tools"),
+                                                    currentVersion,
+                                                    GHRelease::majorMinorPatchCompare,
+                                                    info.m_url,
+                                                    info.m_tag);
+
+    promise.addResult(info);
+}
+
+void MainWindow::onCheckForUpdates()
+{
+    if (QDateTime::currentDateTime() - Settings::instance().lastCheckForUpdates()
+            > std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::hours(1))
+        && !GHRelease::majorMinorPatchCompare(c_version, Settings::instance().updatesAvailable())) {
+        auto future = QtConcurrent::run(checkForUpdates, c_version);
+        m_d->m_updateWatcher->setFuture(future);
+    } else {
+        onAddUpdatesButton();
+    }
+}
+
+void MainWindow::onCheckForUpdatesFinished()
+{
+    const auto update = m_d->m_updateWatcher->result();
+    Settings::instance().setLastCheckForUpdates(QDateTime::currentDateTime());
+
+    if (update.m_available) {
+        Settings::instance().setUpdatesAvailable(update.m_tag);
+        Settings::instance().setUpdatesUrl(update.m_url);
+    } else {
+        Settings::instance().setUpdatesAvailable(QString());
+        Settings::instance().setUpdatesUrl(QString());
+    }
+
+    onAddUpdatesButton();
+}
+
+void MainWindow::onAddUpdatesButton()
+{
+    if (!Settings::instance().updatesAvailable().isEmpty()
+        && !Settings::instance().updatesUrl().isEmpty()
+        && GHRelease::majorMinorPatchCompare(c_version, Settings::instance().updatesAvailable())) {
+        auto btn = new GHRelease::NewVersionAvailableButton(Settings::instance().updatesUrl(),
+                                                            GHRelease::NewVersionAvailableButton::OpenUrlOnClick,
+                                                            statusBar());
+        btn->setMinimumHeight(m_d->m_status->height());
+        btn->setMaximumHeight(m_d->m_status->height());
+        statusBar()->addPermanentWidget(m_d->makeSeparator());
+        statusBar()->addPermanentWidget(btn);
+    }
 }

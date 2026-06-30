@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.19)
 
 project(gif-tools)
 
-set(GIF_TOOLS_VERSION_NUMBER "1.1.7")
+set(GIF_TOOLS_VERSION_NUMBER "1.1.8")
 set(HomeDir "@HomeDir@")
 string(TIMESTAMP GIF_CURRENT_DATE "%Y-%m-%d")
 
@@ -57,5 +57,7 @@ set(QHOTKEY_EXAMPLES OFF CACHE INTERNAL "" FORCE)
 set(QHOTKEY_INSTALL OFF CACHE INTERNAL "" FORCE)
 set(QT_DEFAULT_MAJOR_VERSION  6 CACHE INTERNAL "" FORCE)
 add_subdirectory(3rdparty/QHotkey)
+
+add_subdirectory(3rdparty/github-release)
 
 add_subdirectory(src)

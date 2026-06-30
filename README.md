@@ -84,7 +84,7 @@ to 6.8.0 and drop X11 support).
 To translate these applications into your language you need to run
 
 ```bash
-lupdate . -ts ../translate/gif_{locale}.ts
+lupdate6 . ../3rdparty/github-release/src -ts ../translate/gif_{locale}.ts
 ```
 
 from `src` directory.
@@ -92,7 +92,7 @@ from `src` directory.
 Make a translation of that file with Qt Linguist and run in `translate` directory
 
 ```bash
-lrelease gif_{locale}.ts -qm ../src/shared/tr/gif_{locale}.qm
+lrelease6 gif_{locale}.ts -qm ../src/shared/tr/gif_{locale}.qm
 ```
 
 And put new line into `src/shared/tr.qrc` file with record about new translation.

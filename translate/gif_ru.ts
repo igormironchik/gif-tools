@@ -115,6 +115,14 @@ Copyright (c) 2026 Igor Mironchik.
     </message>
 </context>
 <context>
+    <name>GHRelease::NewVersionAvailableButton</name>
+    <message>
+        <location filename="../3rdparty/github-release/src/github.cpp" line="107"/>
+        <source>Update</source>
+        <translation>Обновить</translation>
+    </message>
+</context>
+<context>
     <name>LicenseDialog</name>
     <message>
         <location filename="../src/shared/license_dialog.ui" line="18"/>
@@ -130,316 +138,316 @@ Copyright (c) 2026 Igor Mironchik.
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../src/editor/mainwindow_private.cpp" line="166"/>
+        <location filename="../src/editor/mainwindow_private.cpp" line="169"/>
         <source>Loading GIF...</source>
         <translation>Загрузка GIF...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow_private.cpp" line="216"/>
+        <location filename="../src/editor/mainwindow_private.cpp" line="219"/>
         <source>GIF Editor</source>
         <translation>Редактор GIF</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow_private.cpp" line="222"/>
+        <location filename="../src/editor/mainwindow_private.cpp" line="225"/>
         <source>GIF Editor - %1[*] - #%2</source>
         <translation>Редактор GIF - %1[*] - #%2</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="196"/>
+        <location filename="../src/editor/mainwindow.cpp" line="199"/>
         <source>&amp;File</source>
         <translation>&amp;Файл</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="199"/>
+        <location filename="../src/editor/mainwindow.cpp" line="202"/>
         <source>Open</source>
         <translation>Открыть</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="200"/>
+        <location filename="../src/editor/mainwindow.cpp" line="203"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="206"/>
+        <location filename="../src/editor/mainwindow.cpp" line="209"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="207"/>
+        <location filename="../src/editor/mainwindow.cpp" line="210"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="212"/>
-        <location filename="../src/recorder/mainwindow.cpp" line="467"/>
+        <location filename="../src/editor/mainwindow.cpp" line="215"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="468"/>
         <source>Save As</source>
         <translation>Сохранить как</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="218"/>
+        <location filename="../src/editor/mainwindow.cpp" line="221"/>
         <source>Quit</source>
         <translation>Выход</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="219"/>
+        <location filename="../src/editor/mainwindow.cpp" line="222"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="225"/>
+        <location filename="../src/editor/mainwindow.cpp" line="228"/>
         <source>Crop</source>
         <translation>Обрезать</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="227"/>
+        <location filename="../src/editor/mainwindow.cpp" line="230"/>
         <source>Ctrl+C</source>
         <translation>Ctrl+C</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="234"/>
+        <location filename="../src/editor/mainwindow.cpp" line="237"/>
         <source>Insert text</source>
         <translation>Вставить текст</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="236"/>
+        <location filename="../src/editor/mainwindow.cpp" line="239"/>
         <source>Ctrl+T</source>
         <translation>Ctrl+T</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="243"/>
+        <location filename="../src/editor/mainwindow.cpp" line="246"/>
         <source>Draw rectangle</source>
         <translation>Нарисовать прямоугольник</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="245"/>
+        <location filename="../src/editor/mainwindow.cpp" line="248"/>
         <source>Ctrl+R</source>
         <translation>Ctrl+R</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="252"/>
+        <location filename="../src/editor/mainwindow.cpp" line="255"/>
         <source>Draw arrow</source>
         <translation>Нарисовать стрелку</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="254"/>
+        <location filename="../src/editor/mainwindow.cpp" line="257"/>
         <source>Ctrl+A</source>
         <translation>Ctrl+A</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="268"/>
+        <location filename="../src/editor/mainwindow.cpp" line="271"/>
         <source>Play</source>
         <translation>Проиграть</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="296"/>
+        <location filename="../src/editor/mainwindow.cpp" line="299"/>
         <source>&amp;Edit</source>
         <translation>&amp;Редактирование</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="302"/>
+        <location filename="../src/editor/mainwindow.cpp" line="305"/>
         <source>Tools</source>
         <translation>Инструменты</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="314"/>
+        <location filename="../src/editor/mainwindow.cpp" line="317"/>
         <source>Text</source>
         <translation>Текст</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="318"/>
+        <location filename="../src/editor/mainwindow.cpp" line="321"/>
         <source>Bold text</source>
         <translation>Жирный шрифт</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="322"/>
+        <location filename="../src/editor/mainwindow.cpp" line="325"/>
         <source>Italic text</source>
         <translation>Курсив</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="326"/>
+        <location filename="../src/editor/mainwindow.cpp" line="329"/>
         <source>Less font size</source>
         <translation>Уменьшить размер шрифта</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="330"/>
+        <location filename="../src/editor/mainwindow.cpp" line="333"/>
         <source>More font size</source>
         <translation>Увеличить размер шрифта</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="334"/>
+        <location filename="../src/editor/mainwindow.cpp" line="337"/>
         <source>Text color</source>
         <translation>Цвет текста</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="338"/>
+        <location filename="../src/editor/mainwindow.cpp" line="341"/>
         <source>Clear format</source>
         <translation>Очистить форматирование</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="342"/>
+        <location filename="../src/editor/mainwindow.cpp" line="345"/>
         <source>Finish text</source>
         <translation>Завершить текст</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="357"/>
-        <location filename="../src/editor/mainwindow.cpp" line="383"/>
+        <location filename="../src/editor/mainwindow.cpp" line="360"/>
+        <location filename="../src/editor/mainwindow.cpp" line="386"/>
         <source>Drawing</source>
         <translation>Рисование</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="361"/>
+        <location filename="../src/editor/mainwindow.cpp" line="364"/>
         <source>Stroke color</source>
         <translation>Цвет линии</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="365"/>
+        <location filename="../src/editor/mainwindow.cpp" line="368"/>
         <source>Fill color</source>
         <translation>Цвет заливки</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="369"/>
+        <location filename="../src/editor/mainwindow.cpp" line="372"/>
         <source>Pen width</source>
         <translation>Толщина линии</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="394"/>
+        <location filename="../src/editor/mainwindow.cpp" line="397"/>
         <source>&amp;Settings</source>
         <translation>&amp;Настройки</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="396"/>
+        <location filename="../src/editor/mainwindow.cpp" line="399"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="400"/>
+        <location filename="../src/editor/mainwindow.cpp" line="403"/>
         <source>&amp;Help</source>
         <translation>&amp;Справка</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="401"/>
+        <location filename="../src/editor/mainwindow.cpp" line="404"/>
         <source>About</source>
         <translation>О приложении</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="403"/>
+        <location filename="../src/editor/mainwindow.cpp" line="406"/>
         <source>About Qt</source>
         <translation>О Qt</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="408"/>
+        <location filename="../src/editor/mainwindow.cpp" line="411"/>
         <source>Licenses</source>
         <translation>Лицензии</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="413"/>
+        <location filename="../src/editor/mainwindow.cpp" line="416"/>
         <source>Tips &amp;&amp; Tricks</source>
         <translation>Советы &amp;&amp; рекомендации</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="558"/>
+        <location filename="../src/editor/mainwindow.cpp" line="561"/>
         <source>GIF editor is busy...</source>
         <translation>Редактор GIF занят...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="559"/>
+        <location filename="../src/editor/mainwindow.cpp" line="562"/>
         <source>GIF editor is busy.
 Do you want to terminate the application?</source>
         <translation>Редактор GIF занят.
 Вы хотите прервать приложение?</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="613"/>
-        <location filename="../src/editor/mainwindow.cpp" line="702"/>
+        <location filename="../src/editor/mainwindow.cpp" line="618"/>
+        <location filename="../src/editor/mainwindow.cpp" line="707"/>
         <source>GIF was changed...</source>
         <translation>GIF был изменен...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="614"/>
+        <location filename="../src/editor/mainwindow.cpp" line="619"/>
         <source>&quot;%1&quot; was changed.
 Do you want to save it?</source>
         <translation>&quot;%1&quot; был изменен.
 Вы хотите сохранить его?</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="633"/>
+        <location filename="../src/editor/mainwindow.cpp" line="638"/>
         <source>Open GIF...</source>
         <translation>Открыть GIF...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="635"/>
-        <location filename="../src/editor/mainwindow.cpp" line="681"/>
-        <location filename="../src/recorder/mainwindow.cpp" line="467"/>
+        <location filename="../src/editor/mainwindow.cpp" line="640"/>
+        <location filename="../src/editor/mainwindow.cpp" line="686"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="468"/>
         <source>GIF (*.gif)</source>
         <translation>GIF (*.gif)</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="658"/>
+        <location filename="../src/editor/mainwindow.cpp" line="663"/>
         <source>Saving GIF...</source>
         <translation>Сохранение GIF...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="668"/>
+        <location filename="../src/editor/mainwindow.cpp" line="673"/>
         <source>Can&apos;t save GIF...</source>
         <translation>Не удалось сохранить GIF...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="668"/>
+        <location filename="../src/editor/mainwindow.cpp" line="673"/>
         <source>Can&apos;t save GIF image with no frames.</source>
         <translation>Не удалось сохранить GIF без кадров.</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="675"/>
+        <location filename="../src/editor/mainwindow.cpp" line="680"/>
         <source>Failed to save GIF...</source>
         <translation>Ошибка сохранения GIF...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="675"/>
+        <location filename="../src/editor/mainwindow.cpp" line="680"/>
         <source>Out of memory.</source>
         <translation>Память израсходована.</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="681"/>
+        <location filename="../src/editor/mainwindow.cpp" line="686"/>
         <source>Choose file to save to...</source>
         <translation>Выберите имя файла для сохранения...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="1153"/>
+        <location filename="../src/editor/mainwindow.cpp" line="1158"/>
         <source>&lt;b&gt;Time:&lt;/b&gt; %1 &lt;b&gt;Total Duration:&lt;/b&gt; %2 &lt;b&gt;Current Frame:&lt;/b&gt; #%3</source>
         <translation>&lt;b&gt;Время:&lt;/b&gt; %1 &lt;b&gt;Общая продолжительность:&lt;/b&gt; %2 &lt;b&gt;Текущий кадр:&lt;/b&gt; #%3</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow_private.cpp" line="224"/>
+        <location filename="../src/editor/mainwindow_private.cpp" line="227"/>
         <source>GIF Editor - %1[*]</source>
         <translation>Редактор GIF - %1[*]</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="703"/>
+        <location filename="../src/editor/mainwindow.cpp" line="708"/>
         <source>GIF was changed. Do you want to save changes?</source>
         <translation>GIF был изменен. Вы хотите сохранить изменения?</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="778"/>
+        <location filename="../src/editor/mainwindow.cpp" line="783"/>
         <source>Cropping GIF...</source>
         <translation>Обрезка GIF...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="825"/>
+        <location filename="../src/editor/mainwindow.cpp" line="830"/>
         <source>Drawing rectangle...</source>
         <translation>Рисую прямоугольник...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="837"/>
+        <location filename="../src/editor/mainwindow.cpp" line="842"/>
         <source>Drawing arrow...</source>
         <translation>Рисую стрелку...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="866"/>
+        <location filename="../src/editor/mainwindow.cpp" line="871"/>
         <source>About GIF editor</source>
         <translation>О редакторе GIF</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="867"/>
+        <location filename="../src/editor/mainwindow.cpp" line="872"/>
         <source>GIF editor.&lt;br /&gt;&lt;br /&gt;Version: %1&lt;br /&gt;&lt;br /&gt;Author - Igor Mironchik (&lt;a href=&quot;mailto:igor.mironchik@gmail.com&quot;&gt;igor.mironchik at gmail.com&lt;/a&gt;).&lt;br /&gt;&lt;br /&gt;Copyright (c) 2026 Igor Mironchik.&lt;br /&gt;&lt;br /&gt;Licensed under GNU GPL 3.0.</source>
         <translation>Редактор GIF.&lt;br /&gt;&lt;br /&gt;Версия: %1&lt;br /&gt;&lt;br /&gt;Автор - Игорь Мирончик (&lt;a href=&quot;mailto:igor.mironchik@gmail.com&quot;&gt;igor.mironchik at gmail.com&lt;/a&gt;).&lt;br /&gt;&lt;br /&gt;Copyright (c) 2026 Igor Mironchik.&lt;br /&gt;&lt;br /&gt;Лицензировано под GNU GPL 3.0.</translation>
     </message>
@@ -448,24 +456,24 @@ Do you want to save it?</source>
         <translation type="vanished">Остановить</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="974"/>
+        <location filename="../src/editor/mainwindow.cpp" line="979"/>
         <source>Drawing text...</source>
         <translation>Рисую текст...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="1063"/>
-        <location filename="../src/editor/mainwindow.cpp" line="1107"/>
-        <location filename="../src/editor/mainwindow.cpp" line="1133"/>
+        <location filename="../src/editor/mainwindow.cpp" line="1068"/>
+        <location filename="../src/editor/mainwindow.cpp" line="1112"/>
+        <location filename="../src/editor/mainwindow.cpp" line="1138"/>
         <source>Preparing tape...</source>
         <translation>Подготовка ленты кадров...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="1081"/>
+        <location filename="../src/editor/mainwindow.cpp" line="1086"/>
         <source>Unable to load GIF...</source>
         <translation>Не удалось загрузить GIF...</translation>
     </message>
     <message>
-        <location filename="../src/editor/mainwindow.cpp" line="1082"/>
+        <location filename="../src/editor/mainwindow.cpp" line="1087"/>
         <source>Unable to load GIF file. File &quot;%1&quot; is corrupted.</source>
         <translation>Не удалось загрузить GIF файл. Файл &quot;%1&quot; поврежден.</translation>
     </message>
@@ -482,7 +490,7 @@ Do you want to save it?</source>
         <translation type="vanished">Записать - Ctrl+R</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="451"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="452"/>
         <source>Start recording</source>
         <translation>Начать запись</translation>
     </message>
@@ -491,42 +499,42 @@ Do you want to save it?</source>
         <translation type="vanished">Остановить - Ctrl+R</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="450"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="451"/>
         <source>Record - %1</source>
         <translation>Записать - %1</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="481"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="482"/>
         <source>Stop - %1</source>
         <translation>Остановить - %1</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="482"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="483"/>
         <source>Stop recording</source>
         <translation>Остановить запись</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="812"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="814"/>
         <source>Writing GIF... Please wait.</source>
         <translation>Сохраняю GIF... Пожалуйста подождите.</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="834"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="836"/>
         <source>Unable to save GIF...</source>
         <translation>Не удалось сохранить GIF...</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="835"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="837"/>
         <source>Error occured during saving GIF, output file is corrupted.</source>
         <translation>Во время сохранения GIF возникла ошибка, выходной файл поврежден.</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="855"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="857"/>
         <source>GIF recorder is busy...</source>
         <translation>GIF рекордер занят...</translation>
     </message>
     <message>
-        <location filename="../src/recorder/mainwindow.cpp" line="856"/>
+        <location filename="../src/recorder/mainwindow.cpp" line="858"/>
         <source>GIF recorder is writing GIF.
 Do you want to terminate the write process?</source>
         <translation>GIF рекордер записывает GIF.

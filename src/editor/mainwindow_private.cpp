@@ -45,6 +45,7 @@ MainWindowPrivate::MainWindowPrivate(MainWindow *parent)
     , m_about(new About(parent))
     , m_tips(new Tips(parent))
     , m_q(parent)
+    , m_updateWatcher(new QFutureWatcher<Update>(m_q))
 {
     m_busy->setRadius(75);
     auto f = m_busyStatusLabel->font();
@@ -63,6 +64,8 @@ MainWindowPrivate::MainWindowPrivate(MainWindow *parent)
     h->addItem(new QSpacerItem(0, 10, QSizePolicy::Expanding, QSizePolicy::Fixed));
     l->addLayout(h);
     l->addItem(new QSpacerItem(10, 0, QSizePolicy::Fixed, QSizePolicy::Expanding));
+
+    QObject::connect(m_updateWatcher, &QFutureWatcher<Update>::finished, m_q, &MainWindow::onCheckForUpdatesFinished);
 }
 
 void MainWindowPrivate::clearView()
@@ -224,4 +227,13 @@ void MainWindowPrivate::setWindowTitle(int frameIdx)
             m_q->setWindowTitle(MainWindow::tr("GIF Editor - %1[*]").arg(info.fileName()));
         }
     }
+}
+
+QFrame *MainWindowPrivate::makeSeparator() const
+{
+    auto separator = new QFrame(m_q->statusBar());
+    separator->setFrameShape(QFrame::VLine);
+    separator->setFrameShadow(QFrame::Sunken);
+
+    return separator;
 }

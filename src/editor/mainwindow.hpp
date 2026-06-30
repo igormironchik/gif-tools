@@ -93,6 +93,12 @@ private slots:
     void onFrameSelected(int idx);
     //! Frame changed.
     void onFrameChanged(int idx);
+    //! Check for updates.
+    void onCheckForUpdates();
+    //! Check for updates finished.
+    void onCheckForUpdatesFinished();
+    //! Add "Update" button.
+    void onAddUpdatesButton();
 
 protected:
     void resizeEvent(QResizeEvent *e) override;

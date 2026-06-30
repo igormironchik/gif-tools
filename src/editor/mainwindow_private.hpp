@@ -26,6 +26,17 @@
 class MainWindow;
 
 //
+// Update
+//
+
+//! Information about update.
+struct Update {
+    QString m_url;
+    QString m_tag;
+    bool m_available = false;
+}; // struct Update
+
+//
 // MainWindowPrivate
 //
 
@@ -69,6 +80,8 @@ public:
     void setActionsToInitialState();
     //! Update window title.
     void setWindowTitle(int frameIdx);
+    //! \return Separator for status bar.
+    QFrame *makeSeparator() const;
 
     //! Current file name.
     QString m_currentGif;
@@ -180,4 +193,6 @@ public:
     QStateMachine *m_uiState = nullptr;
     //! Parent.
     MainWindow *m_q = nullptr;
+    //! Future watcher of update thread.
+    QFutureWatcher<Update> *m_updateWatcher = nullptr;
 }; // class MainWindowPrivate

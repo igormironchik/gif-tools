@@ -7,7 +7,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui Concurrent StateMachine)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui Concurrent StateMachine Network)
 
 set(SRC main.cpp
 	about.cpp
@@ -59,10 +59,12 @@ endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../shared
 	${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/qgiflib/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/qgiflib/3rdparty/giflib)
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/qgiflib/3rdparty/giflib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../3rdparty/github-release/src)
 
 add_executable(gif-editor WIN32 ${SRC})
 
-target_link_libraries(gif-editor qgiflib gif-widgets Qt6::Concurrent Qt6::StateMachine Qt6::Widgets Qt6::Gui Qt6::Core)
+target_link_libraries(gif-editor qgiflib gif-widgets github-release Qt6::Concurrent Qt6::StateMachine Qt6::Network
+    Qt6::Widgets Qt6::Gui Qt6::Core)
 
 install(TARGETS gif-editor)

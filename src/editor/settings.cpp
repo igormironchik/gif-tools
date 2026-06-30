@@ -96,6 +96,42 @@ void Settings::setPenWidth(int w)
     saveCfg();
 }
 
+const QDateTime &Settings::lastCheckForUpdates() const
+{
+    return m_lastCheckForUpdates;
+}
+
+void Settings::setLastCheckForUpdates(const QDateTime &dt)
+{
+    m_lastCheckForUpdates = dt;
+
+    saveCfg();
+}
+
+const QString &Settings::updatesAvailable() const
+{
+    return m_updatesAvailable;
+}
+
+void Settings::setUpdatesAvailable(const QString &u)
+{
+    m_updatesAvailable = u;
+
+    saveCfg();
+}
+
+const QString &Settings::updatesUrl() const
+{
+    return m_updatesUrl;
+}
+
+void Settings::setUpdatesUrl(const QString &u)
+{
+    m_updatesUrl = u;
+
+    saveCfg();
+}
+
 void Settings::setAppWinMaximized(bool on)
 {
     m_isAppWinMaximized = on;
@@ -115,6 +151,10 @@ static const QString s_drawing = QStringLiteral("drawing");
 static const QString s_penColor = QStringLiteral("penColor");
 static const QString s_brushColor = QStringLiteral("brushColor");
 static const QString s_penWidth = QStringLiteral("penWidth");
+static const QString s_lastCheckForUpdates = QStringLiteral("lastCheckForUpdates");
+static const QString s_updatesAvailable = QStringLiteral("updatesAvailable");
+static const QString s_updates = QStringLiteral("updates");
+static const QString s_updatesUrl = QStringLiteral("updatesUrl");
 
 void Settings::readCfg()
 {
@@ -142,6 +182,15 @@ void Settings::readCfg()
     m_brushColor = QColor(s.value(s_brushColor, QColor(Qt::transparent).name(QColor::HexArgb)).toString());
     m_penWidth = s.value(s_penWidth, 2).toInt();
 
+    s.endGroup();
+
+    s.beginGroup(s_updates);
+    m_lastCheckForUpdates = s.value(s_lastCheckForUpdates,
+                                    QDateTime::currentDateTime()
+                                        - std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::hours(2)))
+                                .toDateTime();
+    m_updatesAvailable = s.value(s_updatesAvailable, QString()).toString();
+    m_updatesUrl = s.value(s_updatesUrl, QString()).toString();
     s.endGroup();
 }
 
@@ -171,6 +220,12 @@ void Settings::saveCfg()
     s.setValue(s_brushColor, m_brushColor.name(QColor::HexArgb));
     s.setValue(s_penWidth, m_penWidth);
 
+    s.endGroup();
+
+    s.beginGroup(s_updates);
+    s.setValue(s_lastCheckForUpdates, m_lastCheckForUpdates);
+    s.setValue(s_updatesAvailable, m_updatesAvailable);
+    s.setValue(s_updatesUrl, m_updatesUrl);
     s.endGroup();
 }
 
