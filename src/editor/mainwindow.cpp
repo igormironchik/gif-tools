@@ -1224,7 +1224,6 @@ void MainWindow::onAddUpdatesButton()
                                                             statusBar());
         btn->setMinimumHeight(m_d->m_status->height());
         btn->setMaximumHeight(m_d->m_status->height());
-        statusBar()->addPermanentWidget(m_d->makeSeparator());
         statusBar()->addPermanentWidget(btn);
     }
 }
