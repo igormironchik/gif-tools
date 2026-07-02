@@ -467,6 +467,7 @@ void RectangleSelection::paintEvent(QPaintEvent *)
         p.drawPath(path);
     } else if (Settings::instance().showHelpMsg() && !m_d->m_msg.isEmpty()) {
         p.drawRect(rect());
+        p.save();
         QTextOption opt;
         opt.setAlignment(Qt::AlignCenter);
         opt.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
@@ -474,7 +475,9 @@ void RectangleSelection::paintEvent(QPaintEvent *)
         f.setPointSize(16);
         f.setBold(true);
         p.setFont(f);
+        p.setPen(palette().color(QPalette::WindowText));
         p.drawText(rect().toRectF(), m_d->m_msg, opt);
+        p.restore();
     }
 
     if (m_d->m_mouseEnabled) {
