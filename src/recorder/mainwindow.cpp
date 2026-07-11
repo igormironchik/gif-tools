@@ -39,6 +39,8 @@
 #include <QScreen>
 #include <QSpacerItem>
 #include <QStandardPaths>
+#include <QStyle>
+#include <QStyleHints>
 #include <QtConcurrent>
 
 #ifdef Q_OS_LINUX
@@ -101,7 +103,19 @@ TitleWidget::TitleWidget(MainWindow *mainWindow,
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setMouseTracking(true);
 
+#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+    m_themeAction = settings->addAction(
+        isDark ? QIcon::fromTheme(QStringLiteral("weather-clear"), QIcon(QStringLiteral(":/res/img/weather-clear.png")))
+               : QIcon::fromTheme(QStringLiteral("weather-clear-night"),
+                                  QIcon(QStringLiteral(":/res/img/weather-clear-night.png"))),
+        isDark ? MainWindow::tr("Light Mode") : MainWindow::tr("Dark Mode"),
+        m_mainWindow,
+        &MainWindow::onChangeTheme);
+    connect(m_themeAction, &QAction::triggered, m_mainWindow, &MainWindow::onChangeTheme);
+#endif
+
     connect(m_help, &QToolButton::clicked, this, &TitleWidget::onMenu);
+    connect(m_settingsButton, &QToolButton::clicked, this, &TitleWidget::onSettingsMenu);
 }
 
 void TitleWidget::onMenu()
@@ -120,6 +134,23 @@ void TitleWidget::onMenu()
         &TitleWidget::licenses);
 
     menu.exec(mapToGlobal(m_help->pos() + QPoint(m_help->width(), m_help->height())));
+}
+
+void TitleWidget::onSettingsMenu()
+{
+    QMenu menu;
+
+#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+    menu.addAction(m_themeAction);
+    menu.addSeparator();
+#endif
+
+    menu.addAction(QIcon::fromTheme(QStringLiteral("applications-system"), QIcon(":/img/applications-system.png")),
+                   tr("Settings"),
+                   m_mainWindow,
+                   &MainWindow::onSettings);
+
+    menu.exec(mapToGlobal(m_settingsButton->pos() + QPoint(m_settingsButton->width(), m_settingsButton->height())));
 }
 
 void TitleWidget::about()
@@ -155,7 +186,7 @@ void TitleWidget::licenses()
     msg.addLicense(s_qgiflibName, s_qgiflibLicense);
     msg.addLicense(s_qhotkeyName, s_qhotkeyLicense);
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) && defined(MD_BREEZE)
     msg.addLicense(s_breezeName, s_breezeLicense);
 #endif
 
@@ -196,6 +227,13 @@ bool TitleWidget::isMouseEnabled() const
 {
     return m_mouseEnabled;
 }
+
+#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+QAction *TitleWidget::themeAction() const
+{
+    return m_themeAction;
+}
+#endif
 
 void TitleWidget::disableMouse()
 {
@@ -383,7 +421,6 @@ MainWindow::MainWindow(EventMonitor *eventMonitor)
     connect(m_title, &TitleWidget::resizeRequested, this, &MainWindow::onResizeRequested);
     connect(m_title->recordButton(), &QToolButton::clicked, this, &MainWindow::onRecord);
     connect(startStopAction, &QHotkey::activated, this, &MainWindow::onRecord);
-    connect(m_title->settingsButton(), &QToolButton::clicked, this, &MainWindow::onSettings);
     connect(m_title->transparentForMouseButton(), &QToolButton::toggled, this, &MainWindow::onTransparentForMouse);
 
     auto mask = QBitmap(s_handleRadius * 2, s_handleRadius * 2);
@@ -1149,4 +1186,41 @@ void MainWindow::onWritePercent(int percent)
     if (percent == 100) {
         m_title->progressBar()->hide();
     }
+}
+
+#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+
+void MainWindow::onChangeTheme()
+{
+    const auto isDark = (qApp->styleHints()->colorScheme() == Qt::ColorScheme::Dark);
+
+    if (isDark) {
+        m_title->themeAction()->setText(tr("Dark Mode"));
+        m_title->themeAction()->setIcon(QIcon::fromTheme(QStringLiteral("weather-clear-night"),
+                                                         QIcon(QStringLiteral(":/img/weather-clear-night.png"))));
+    } else {
+        m_title->themeAction()->setText(tr("Light Mode"));
+        m_title->themeAction()->setIcon(
+            QIcon::fromTheme(QStringLiteral("weather-clear"), QIcon(QStringLiteral(":/img/weather-clear.png"))));
+    }
+
+    applyTheme(qApp->style()->name(), !isDark);
+}
+
+#endif
+
+bool MainWindow::event(QEvent *event)
+{
+    switch (event->type()) {
+    case QEvent::ThemeChange: {
+#ifndef Q_OS_WIN
+        applyTheme(qApp->style()->name(), (qApp->styleHints()->colorScheme() == Qt::ColorScheme::Dark));
+#endif
+    } break;
+
+    default:
+        break;
+    }
+
+    return QWidget::event(event);
 }

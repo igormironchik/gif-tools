@@ -29,5 +29,7 @@
         <file>img/media-playback-stop.png</file>
         <file>img/distribute-horizontal-x.png</file>
         <file>img/help-hint.png</file>
+        <file>img/weather-clear.png</file>
+        <file>img/weather-clear-night.png</file>
     </qresource>
 </RCC>

@@ -5,5 +5,7 @@
         <file>img/applications-system.png</file>
         <file>img/edit-select.png</file>
         <file>img/bookmarks-organize.png</file>
+        <file>img/weather-clear.png</file>
+        <file>img/weather-clear-night.png</file>
     </qresource>
 </RCC>

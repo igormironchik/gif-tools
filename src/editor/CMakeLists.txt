@@ -8,6 +8,9 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui Concurrent StateMachine Network)
+find_package(KF${KF_MAJOR_VERSION} ${KF_MIN_VERSION} COMPONENTS
+    IconThemes ColorScheme Config
+)
 
 set(SRC main.cpp
 	about.cpp
@@ -64,7 +67,15 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../shared
 
 add_executable(gif-editor WIN32 ${SRC})
 
-target_link_libraries(gif-editor qgiflib gif-widgets github-release Qt6::Concurrent Qt6::StateMachine Qt6::Network
+if(KF${KF_MAJOR_VERSION}IconThemes_FOUND AND KF${KF_MAJOR_VERSION}ColorScheme_FOUND
+    AND KF${KF_MAJOR_VERSION}Config_FOUND)
+    list(APPEND ADDITIONAL_TARGETS KF${KF_MAJOR_VERSION}::ConfigCore
+        KF${KF_MAJOR_VERSION}::IconThemes KF${KF_MAJOR_VERSION}::ColorScheme)
+    target_compile_definitions(gif-editor PRIVATE MD_BREEZE)
+endif()
+
+target_link_libraries(gif-editor qgiflib gif-widgets github-release ${ADDITIONAL_TARGETS}
+    Qt6::Concurrent Qt6::StateMachine Qt6::Network
     Qt6::Widgets Qt6::Gui Qt6::Core)
 
 install(TARGETS gif-editor)

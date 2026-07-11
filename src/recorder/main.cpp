@@ -18,18 +18,23 @@
 // gif-widgets include.
 #include "utils.hpp"
 
+#ifdef MD_BREEZE
+#include <KIconTheme>
+#endif
+
 int main(int argc,
          char **argv)
 {
+#ifdef MD_BREEZE
+    KIconTheme::initTheme();
+#endif
     QApplication app(argc, argv);
 
     app.setOrganizationName(QStringLiteral("Igor Mironchik"));
     app.setOrganizationDomain(QStringLiteral("github.com/igormironchik"));
     app.setApplicationName(QStringLiteral("GIF Recorder"));
 
-#ifdef Q_OS_WIN
-    app.setStyle(QStyleFactory::create("Breeze"));
-#endif
+    initTheme(app);
 
     initSharedResources();
 
