@@ -71,6 +71,12 @@ IF %ERRORLEVEL% NEQ 0 (
 	exit /B %ERRORLEVEL%
 )
 
+mkdir installer\packages\mironchik.igor.gif\data\bin\styles
+
+IF %ERRORLEVEL% NEQ 0 (
+	exit /B %ERRORLEVEL%
+)
+
 xcopy %CD%\..\KDE\lib\plugins\kf6 installer\packages\mironchik.igor.gif\data\bin\plugins\kf6 /S /Y
 
 IF %ERRORLEVEL% NEQ 0 (
@@ -89,7 +95,7 @@ IF %ERRORLEVEL% NEQ 0 (
 	exit /B %ERRORLEVEL%
 )
 
-xcopy %CD%\..\KDE\lib\plugins\styles installer\packages\mironchik.igor.gif\data\bin\plugins\styles /S /Y
+xcopy %CD%\..\KDE\lib\plugins\styles installer\packages\mironchik.igor.gif\data\bin\styles /S /Y
 
 IF %ERRORLEVEL% NEQ 0 (
 	exit /B %ERRORLEVEL%
