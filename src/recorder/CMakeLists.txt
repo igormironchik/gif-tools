@@ -44,8 +44,12 @@ if(KF${KF_MAJOR_VERSION}IconThemes_FOUND AND KF${KF_MAJOR_VERSION}ColorScheme_FO
     target_compile_definitions(gif-recorder PRIVATE MD_BREEZE)
 endif()
 
+if(WIN32)
+    set(WIN_LIBS "Dwmapi")
+endif()
+
 target_link_libraries(gif-recorder qgiflib gif-widgets qhotkey ${ADDITIONAL_TARGETS}
-    Qt6::Concurrent Qt6::Widgets Qt6::Gui Qt6::Core)
+    Qt6::Concurrent Qt6::Widgets Qt6::Gui Qt6::Core ${WIN_LIBS})
 
 if(UNIX)
     target_link_libraries(gif-recorder Xtst Xfixes X11)

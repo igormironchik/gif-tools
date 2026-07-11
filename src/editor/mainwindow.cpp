@@ -42,6 +42,10 @@
 // github-release include.
 #include <github.h>
 
+#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+#include <KColorSchemeManager>
+#endif
+
 namespace /* anonymous */
 {
 
@@ -399,12 +403,14 @@ void MainWindow::initUi()
 
     auto settings = menuBar()->addMenu(tr("&Settings"));
 #if defined(Q_OS_WIN) && defined(MD_BREEZE)
-    m_themeAction = settings->addAction(
+    const auto isDark = KColorSchemeManager::instance()->activeSchemeId().toLower().endsWith(QStringLiteral("dark"));
+
+    m_d->m_themeAction = settings->addAction(
         isDark ? QIcon::fromTheme(QStringLiteral("weather-clear"), QIcon(QStringLiteral(":/res/img/weather-clear.png")))
                : QIcon::fromTheme(QStringLiteral("weather-clear-night"),
                                   QIcon(QStringLiteral(":/res/img/weather-clear-night.png"))),
         isDark ? tr("Light Mode") : tr("Dark Mode"),
-        m_q,
+        m_d->m_q,
         &MainWindow::onChangeTheme);
 
     settings->addSeparator();

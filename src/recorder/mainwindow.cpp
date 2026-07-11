@@ -52,6 +52,10 @@
 #include <Windows.h>
 #endif
 
+#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+#include <KColorSchemeManager>
+#endif
+
 static const int s_handleRadius = 9;
 
 //
@@ -104,13 +108,14 @@ TitleWidget::TitleWidget(MainWindow *mainWindow,
     setMouseTracking(true);
 
 #if defined(Q_OS_WIN) && defined(MD_BREEZE)
-    m_themeAction = settings->addAction(
+    const auto isDark = KColorSchemeManager::instance()->activeSchemeId().toLower().endsWith(QStringLiteral("dark"));
+
+    m_themeAction = new QAction(
         isDark ? QIcon::fromTheme(QStringLiteral("weather-clear"), QIcon(QStringLiteral(":/res/img/weather-clear.png")))
                : QIcon::fromTheme(QStringLiteral("weather-clear-night"),
                                   QIcon(QStringLiteral(":/res/img/weather-clear-night.png"))),
         isDark ? MainWindow::tr("Light Mode") : MainWindow::tr("Dark Mode"),
-        m_mainWindow,
-        &MainWindow::onChangeTheme);
+        m_mainWindow);
     connect(m_themeAction, &QAction::triggered, m_mainWindow, &MainWindow::onChangeTheme);
 #endif
 

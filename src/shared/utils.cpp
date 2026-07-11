@@ -42,8 +42,6 @@ void initTheme(QApplication &app)
 #if defined(MD_BREEZE) && defined(Q_OS_WIN)
     const auto isDark = KColorSchemeManager::instance()->activeSchemeId().toLower().endsWith(QStringLiteral("dark"));
 
-    setFallbackPathForIcons(isDark);
-
     if (isDark) {
         app.styleHints()->setColorScheme(Qt::ColorScheme::Dark);
     } else {
