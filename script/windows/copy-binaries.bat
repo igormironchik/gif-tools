@@ -35,37 +35,37 @@ IF %ERRORLEVEL% NEQ 0 (
 	exit /B %ERRORLEVEL%
 )
 
-mkdir installer\packages\mironchik.igor.gif\data\bin\plugins\kf6
+mkdir installer\packages\mironchik.igor.gif\data\bin\kf6
 
 IF %ERRORLEVEL% NEQ 0 (
 	exit /B %ERRORLEVEL%
 )
 
-mkdir installer\packages\mironchik.igor.gif\data\bin\plugins\kf6\kio
+mkdir installer\packages\mironchik.igor.gif\data\bin\kf6\kio
 
 IF %ERRORLEVEL% NEQ 0 (
 	exit /B %ERRORLEVEL%
 )
 
-mkdir installer\packages\mironchik.igor.gif\data\bin\plugins\kf6\kio_dnd
+mkdir installer\packages\mironchik.igor.gif\data\bin\kf6\kio_dnd
 
 IF %ERRORLEVEL% NEQ 0 (
 	exit /B %ERRORLEVEL%
 )
 
-mkdir installer\packages\mironchik.igor.gif\data\bin\plugins\kf6\urifilters
+mkdir installer\packages\mironchik.igor.gif\data\bin\kf6\urifilters
 
 IF %ERRORLEVEL% NEQ 0 (
 	exit /B %ERRORLEVEL%
 )
 
-mkdir installer\packages\mironchik.igor.gif\data\bin\plugins\kiconthemes6
+mkdir installer\packages\mironchik.igor.gif\data\bin\kiconthemes6
 
 IF %ERRORLEVEL% NEQ 0 (
 	exit /B %ERRORLEVEL%
 )
 
-mkdir installer\packages\mironchik.igor.gif\data\bin\plugins\kiconthemes6\iconengines
+mkdir installer\packages\mironchik.igor.gif\data\bin\kiconthemes6\iconengines
 
 IF %ERRORLEVEL% NEQ 0 (
 	exit /B %ERRORLEVEL%
@@ -77,7 +77,7 @@ IF %ERRORLEVEL% NEQ 0 (
 	exit /B %ERRORLEVEL%
 )
 
-xcopy %CD%\..\KDE\lib\plugins\kf6 installer\packages\mironchik.igor.gif\data\bin\plugins\kf6 /S /Y
+xcopy %CD%\..\KDE\lib\plugins\kf6 installer\packages\mironchik.igor.gif\data\bin\kf6 /S /Y
 
 IF %ERRORLEVEL% NEQ 0 (
 	exit /B %ERRORLEVEL%
@@ -89,7 +89,7 @@ IF %ERRORLEVEL% NEQ 0 (
 	exit /B %ERRORLEVEL%
 )
 
-xcopy %CD%\..\KDE\lib\plugins\kiconthemes6 installer\packages\mironchik.igor.gif\data\bin\plugins\kiconthemes6 /S /Y
+xcopy %CD%\..\KDE\lib\plugins\kiconthemes6 installer\packages\mironchik.igor.gif\data\bin\kiconthemes6 /S /Y
 
 IF %ERRORLEVEL% NEQ 0 (
 	exit /B %ERRORLEVEL%
