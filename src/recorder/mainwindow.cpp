@@ -1219,7 +1219,7 @@ bool MainWindow::event(QEvent *event)
     switch (event->type()) {
     case QEvent::ThemeChange: {
 #ifndef Q_OS_WIN
-        const auto ret = QMainWindow::event(event);
+        const auto ret = QWidget::event(event);
         applyTheme(qApp->style()->name(), (qApp->styleHints()->colorScheme() == Qt::ColorScheme::Dark));
         return ret;
 #endif
