@@ -17,6 +17,7 @@
 
 // Qt include.
 #include <QActionGroup>
+#include <QApplication>
 #include <QCloseEvent>
 #include <QColorDialog>
 #include <QFileDialog>
@@ -28,6 +29,8 @@
 #include <QSignalTransition>
 #include <QStandardPaths>
 #include <QStatusBar>
+#include <QStyle>
+#include <QStyleHints>
 #include <QTimer>
 #include <QWindow>
 #include <QtConcurrent>
@@ -38,6 +41,10 @@
 
 // github-release include.
 #include <github.h>
+
+#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+#include <KColorSchemeManager>
+#endif
 
 namespace /* anonymous */
 {
@@ -395,6 +402,19 @@ void MainWindow::initUi()
     m_d->m_drawArrowToolBar->hide();
 
     auto settings = menuBar()->addMenu(tr("&Settings"));
+#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+    const auto isDark = KColorSchemeManager::instance()->activeSchemeId().toLower().endsWith(QStringLiteral("dark"));
+
+    m_d->m_themeAction = settings->addAction(
+        isDark ? QIcon::fromTheme(QStringLiteral("weather-clear"), QIcon(QStringLiteral(":/res/img/weather-clear.png")))
+               : QIcon::fromTheme(QStringLiteral("weather-clear-night"),
+                                  QIcon(QStringLiteral(":/res/img/weather-clear-night.png"))),
+        isDark ? tr("Light Mode") : tr("Dark Mode"),
+        m_d->m_q,
+        &MainWindow::onChangeTheme);
+
+    settings->addSeparator();
+#endif
     settings->addAction(QIcon::fromTheme(QStringLiteral("configure"), QIcon(QStringLiteral(":/img/configure.png"))),
                         tr("Settings"),
                         this,
@@ -1226,4 +1246,41 @@ void MainWindow::onAddUpdatesButton()
         btn->setMaximumHeight(m_d->m_status->height());
         statusBar()->addPermanentWidget(btn);
     }
+}
+
+#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+
+void MainWindow::onChangeTheme()
+{
+    const auto isDark = (qApp->styleHints()->colorScheme() == Qt::ColorScheme::Dark);
+
+    if (isDark) {
+        m_d->m_themeAction->setText(tr("Dark Mode"));
+        m_d->m_themeAction->setIcon(QIcon::fromTheme(QStringLiteral("weather-clear-night"),
+                                                     QIcon(QStringLiteral(":/img/weather-clear-night.png"))));
+    } else {
+        m_d->m_themeAction->setText(tr("Light Mode"));
+        m_d->m_themeAction->setIcon(
+            QIcon::fromTheme(QStringLiteral("weather-clear"), QIcon(QStringLiteral(":/img/weather-clear.png"))));
+    }
+
+    applyTheme(qApp->style()->name(), !isDark);
+}
+
+#endif
+
+bool MainWindow::event(QEvent *event)
+{
+    switch (event->type()) {
+    case QEvent::ThemeChange: {
+#ifndef Q_OS_WIN
+        applyTheme(qApp->style()->name(), (qApp->styleHints()->colorScheme() == Qt::ColorScheme::Dark));
+#endif
+    } break;
+
+    default:
+        break;
+    }
+
+    return QMainWindow::event(event);
 }

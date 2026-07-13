@@ -6,7 +6,15 @@
 #pragma once
 
 // Qt include.
+#include <QApplication>
 #include <QString>
+
+//! Init theme.
+void initTheme(QApplication &app);
+
+//! Apply theme.
+void applyTheme(const QString &name,
+                bool isDark);
 
 void initSharedResources();
 

@@ -99,11 +99,15 @@ private slots:
     void onCheckForUpdatesFinished();
     //! Add "Update" button.
     void onAddUpdatesButton();
+#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+    void onChangeTheme();
+#endif
 
 protected:
     void resizeEvent(QResizeEvent *e) override;
     void closeEvent(QCloseEvent *e) override;
     void showEvent(QShowEvent *e) override;
+    bool event(QEvent *e) override;
 
 private:
     void initUi();

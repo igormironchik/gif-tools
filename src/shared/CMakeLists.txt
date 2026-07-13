@@ -7,8 +7,10 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6Core REQUIRED)
-find_package(Qt6Widgets REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+find_package(KF${KF_MAJOR_VERSION} ${KF_MIN_VERSION} COMPONENTS
+    IconThemes ColorScheme Config
+)
 
 set(SRC license_dialog.hpp
 	license_dialog.cpp
@@ -35,5 +37,12 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(gif-widgets STATIC ${SRC})
 
-target_link_libraries(gif-widgets Qt6::Widgets Qt6::Core)
+if(KF${KF_MAJOR_VERSION}IconThemes_FOUND AND KF${KF_MAJOR_VERSION}ColorScheme_FOUND
+    AND KF${KF_MAJOR_VERSION}Config_FOUND)
+    list(APPEND ADDITIONAL_TARGETS KF${KF_MAJOR_VERSION}::ConfigCore
+        KF${KF_MAJOR_VERSION}::IconThemes KF${KF_MAJOR_VERSION}::ColorScheme)
+    target_compile_definitions(gif-widgets PRIVATE MD_BREEZE)
+endif()
+
+target_link_libraries(gif-widgets ${ADDITIONAL_TARGETS} Qt6::Widgets Qt6::Core)
 target_include_directories(gif-widgets INTERFACE ${CMAKE_CURRENT_BINARY_DIR})

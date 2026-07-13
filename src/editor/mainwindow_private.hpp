@@ -169,6 +169,8 @@ public:
     QAction *m_penWidth = nullptr;
     //! Tips & Tricks action.
     QAction *m_tipsAction = nullptr;
+    //! Light/dark theme switch action.
+    QAction *m_themeAction = nullptr;
     //! Edit toolbar.
     QToolBar *m_editToolBar = nullptr;
     //! Text toolbar.

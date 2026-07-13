@@ -47,12 +47,17 @@ public:
 
     bool isMouseEnabled() const;
 
+#ifdef Q_OS_WIN
+    QAction *themeAction() const;
+#endif
+
 public slots:
     void disableMouse();
     void enableMouse();
 
 private slots:
     void onMenu();
+    void onSettingsMenu();
     void about();
     void aboutQt();
     void licenses();
@@ -74,6 +79,9 @@ private:
     QToolButton *m_settingsButton = nullptr;
     QToolButton *m_transparentForMouseButton = nullptr;
     QToolButton *m_help = nullptr;
+#ifdef Q_OS_WIN
+    QAction *m_themeAction = nullptr;
+#endif
     CloseButton *m_closeButton = nullptr;
     QLabel *m_msg = nullptr;
     QProgressBar *m_progress = nullptr;
@@ -148,6 +156,7 @@ protected:
     void mousePressEvent(QMouseEvent *e) override;
     void mouseMoveEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
+    bool event(QEvent *e) override;
 
 private slots:
     void onSettings();
@@ -160,6 +169,9 @@ private slots:
     void onResizeRequested();
     void onTransparentForMouse(bool checked);
     void onGIFSaved();
+#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+    void onChangeTheme();
+#endif
 
 private:
     void makeFrame();
@@ -171,6 +183,8 @@ private:
     void clear();
 
 private:
+    friend class TitleWidget;
+
     Q_DISABLE_COPY(MainWindow)
 
     TitleWidget *m_title = nullptr;
