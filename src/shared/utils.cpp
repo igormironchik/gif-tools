@@ -17,19 +17,19 @@
 #include <QWindow>
 #include <QtResource>
 
-#ifdef MD_BREEZE
+#if defined(MD_BREEZE) && defined(Q_OS_WIN)
 #include <KColorSchemeManager>
 #include <KConfigGroup>
 #include <KIconEngine>
 #include <KIconLoader>
 #include <KIconTheme>
 #include <KSharedConfig>
-#endif // MD_BREEZE
 
-#ifdef Q_OS_WIN
 #include <Windows.h>
 #include <dwmapi.h>
 
+#include <QMainWindow>
+#include <QMenuBar>
 #include <QStyleFactory>
 #endif
 
@@ -48,26 +48,6 @@ void initTheme(QApplication &app)
         app.styleHints()->setColorScheme(Qt::ColorScheme::Light);
     }
 #endif
-}
-
-void refreshStyleRecursively(QWidget *widget,
-                             const QPalette &p)
-{
-    if (!widget) {
-        return;
-    }
-
-    widget->setPalette(p);
-    widget->style()->unpolish(widget);
-    widget->style()->polish(widget);
-
-    for (QObject *child : std::as_const(widget->children())) {
-        if (QWidget *childWidget = qobject_cast<QWidget *>(child)) {
-            refreshStyleRecursively(childWidget, p);
-        }
-    }
-
-    widget->repaint();
 }
 
 void applyTheme(const QString &name,
@@ -91,15 +71,17 @@ void applyTheme(const QString &name,
         QPixmapCache::clear();
         KColorSchemeManager::instance()->activateScheme(idx);
     }
-#endif
 
     const auto windows = QApplication::topLevelWidgets();
 
     for (const auto &w : windows) {
         if (w) {
-            refreshStyleRecursively(w, qApp->palette());
+            auto mw = dynamic_cast<QMainWindow *>(w);
 
-#ifdef Q_OS_WIN
+            if (mw && mw->menuBar()) {
+                mw->menuBar()->setPalette(qApp->palette());
+            }
+
             if (w->winId()) {
                 HWND hwnd = reinterpret_cast<HWND>(w->winId());
                 BOOL useDarkMode = isDark;
@@ -108,9 +90,9 @@ void applyTheme(const QString &name,
                 SendMessage(hwnd, WM_NCACTIVATE, FALSE, 0);
                 SendMessage(hwnd, WM_NCACTIVATE, TRUE, 0);
             }
-#endif
         }
     }
+#endif
 }
 
 void initSharedResources()
