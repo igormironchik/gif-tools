@@ -72,6 +72,9 @@ void applyTheme(const QString &name,
         KColorSchemeManager::instance()->activateScheme(idx);
     }
 
+    QEvent themeChange(QEvent::ThemeChange);
+    QApplication::sendEvent(qApp, &themeChange);
+
     const auto windows = QApplication::topLevelWidgets();
 
     for (const auto &w : windows) {
