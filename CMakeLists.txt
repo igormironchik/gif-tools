@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.19)
 project(gif-tools)
 
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "" FORCE)
-set(GIF_TOOLS_VERSION_NUMBER "1.1.13")
+set(GIF_TOOLS_VERSION_NUMBER "1.1.14")
 set(HomeDir "@HomeDir@")
 string(TIMESTAMP GIF_CURRENT_DATE "%Y-%m-%d")
 
