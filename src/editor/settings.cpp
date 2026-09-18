@@ -158,7 +158,7 @@ static const QString s_updatesUrl = QStringLiteral("updatesUrl");
 
 void Settings::readCfg()
 {
-    QSettings s;
+    QSettings s(QStringLiteral("Igor Mironchik"), QStringLiteral("GIF Editor"));
 
     s.beginGroup(s_ui);
 
@@ -196,7 +196,7 @@ void Settings::readCfg()
 
 void Settings::saveCfg()
 {
-    QSettings s;
+    QSettings s(QStringLiteral("Igor Mironchik"), QStringLiteral("GIF Editor"));
 
     s.beginGroup(s_ui);
 

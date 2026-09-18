@@ -38,10 +38,6 @@ int main(int argc,
 
     if (platform == "xcb") {
 #endif
-        app.setOrganizationName(QStringLiteral("Igor Mironchik"));
-        app.setOrganizationDomain(QStringLiteral("github.com/igormironchik"));
-        app.setApplicationName(QStringLiteral("GIF Recorder"));
-
         initTheme(app);
 
         initSharedResources();
