@@ -10,9 +10,11 @@ IF EXIST "..\Qt\Tools\QtInstallerFramework" (
   )
 )
 
+set /P app_version=<%CD%\..\builds\build-gif-tools\src\shared\version.number
+
 echo "Creating installer..."
 
-..\Qt\Tools\QtInstallerFramework\4.7\bin\binarycreator.exe -c installer\config\config.xml -p installer\packages GIF_Windows_x64.Installer.exe
+..\Qt\Tools\QtInstallerFramework\4.7\bin\binarycreator.exe -c installer\config\config.xml -p installer\packages GIF_Windows_x64.Installer.%app_version%.exe
 
 IF %ERRORLEVEL% NEQ 0 (
 	exit /B %ERRORLEVEL%

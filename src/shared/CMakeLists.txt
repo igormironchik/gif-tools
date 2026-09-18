@@ -19,6 +19,7 @@ set(SRC license_dialog.hpp
     utils.cpp)
     
 configure_file(version.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/version.hpp)
+configure_file(version.number.in ${CMAKE_CURRENT_BINARY_DIR}/version.number)
 
 qt6_add_resources(SRC qt.qrc)
 qt6_add_resources(SRC icon.qrc)
