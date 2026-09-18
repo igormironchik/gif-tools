@@ -20,14 +20,14 @@
 // gif-widgets include.
 #include "utils.hpp"
 
-#ifdef MD_BREEZE
+#ifdef GIF_BREEZE
 #include <KIconTheme>
 #endif
 
 int main(int argc,
          char **argv)
 {
-#ifdef MD_BREEZE
+#ifdef GIF_BREEZE
     KIconTheme::initTheme();
 #endif
 

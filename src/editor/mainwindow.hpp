@@ -99,7 +99,7 @@ private slots:
     void onCheckForUpdatesFinished();
     //! Add "Update" button.
     void onAddUpdatesButton();
-#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+#if defined(Q_OS_WIN) && defined(GIF_BREEZE)
     void onChangeTheme();
 #endif
 

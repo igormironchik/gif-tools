@@ -71,7 +71,7 @@ if(KF${KF_MAJOR_VERSION}IconThemes_FOUND AND KF${KF_MAJOR_VERSION}ColorScheme_FO
     AND KF${KF_MAJOR_VERSION}Config_FOUND)
     list(APPEND ADDITIONAL_TARGETS KF${KF_MAJOR_VERSION}::ConfigCore
         KF${KF_MAJOR_VERSION}::IconThemes KF${KF_MAJOR_VERSION}::ColorScheme)
-    target_compile_definitions(gif-editor PRIVATE MD_BREEZE)
+    target_compile_definitions(gif-editor PRIVATE GIF_BREEZE)
 endif()
 
 if(WIN32)

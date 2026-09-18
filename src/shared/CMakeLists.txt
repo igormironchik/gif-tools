@@ -41,7 +41,7 @@ if(KF${KF_MAJOR_VERSION}IconThemes_FOUND AND KF${KF_MAJOR_VERSION}ColorScheme_FO
     AND KF${KF_MAJOR_VERSION}Config_FOUND)
     list(APPEND ADDITIONAL_TARGETS KF${KF_MAJOR_VERSION}::ConfigCore
         KF${KF_MAJOR_VERSION}::IconThemes KF${KF_MAJOR_VERSION}::ColorScheme)
-    target_compile_definitions(gif-widgets PRIVATE MD_BREEZE)
+    target_compile_definitions(gif-widgets PRIVATE GIF_BREEZE)
 endif()
 
 target_link_libraries(gif-widgets ${ADDITIONAL_TARGETS} Qt6::Widgets Qt6::Core)

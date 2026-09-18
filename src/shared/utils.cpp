@@ -17,7 +17,7 @@
 #include <QWindow>
 #include <QtResource>
 
-#if defined(MD_BREEZE) && defined(Q_OS_WIN)
+#if defined(GIF_BREEZE) && defined(Q_OS_WIN)
 #include <KColorSchemeManager>
 #include <KConfigGroup>
 #include <KIconEngine>
@@ -39,7 +39,7 @@ void initTheme(QApplication &app)
     app.setStyle(QStyleFactory::create("Breeze"));
 #endif
 
-#if defined(MD_BREEZE) && defined(Q_OS_WIN)
+#if defined(GIF_BREEZE) && defined(Q_OS_WIN)
     const auto isDark = KColorSchemeManager::instance()->activeSchemeId().toLower().endsWith(QStringLiteral("dark"));
 
     if (isDark) {
@@ -53,7 +53,7 @@ void initTheme(QApplication &app)
 void applyTheme(const QString &name,
                 bool isDark)
 {
-#if defined(MD_BREEZE) && defined(Q_OS_WIN)
+#if defined(GIF_BREEZE) && defined(Q_OS_WIN)
     auto upper = name;
     upper[0] = upper[0].toUpper();
     const auto scheme = upper + (isDark ? QStringLiteral("Dark") : QStringLiteral("Light"));

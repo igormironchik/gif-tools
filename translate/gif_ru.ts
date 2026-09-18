@@ -598,6 +598,20 @@ Do you want to terminate the application?</source>
         <source>Select a region for drawing an arrow with the mouse, when ready press Enter. You can choose any frame from the tape to apply arrow on that frame. If you clicked on the frame, but don&apos;t want the arrow to be on it - uncheck this frame on the tape. Press Escape for cancelling.</source>
         <translation>Выберите мышью облать для стрелки, когда будете готовы - нажмите Enter. Вы можете выбрать любой кадр на ленте, чтобы применить срелку на нем. Если вы нажали на кадр, но не хотите, чтобы стрелка была на нем - снимите галочку с кадра на ленте. Нажмите Escape для отмены.</translation>
     </message>
+    <message>
+        <location filename="../src/recorder/main.cpp" line="83"/>
+        <source>Unable to start application</source>
+        <translation>Не удалось запустить приложение</translation>
+    </message>
+    <message>
+        <location filename="../src/recorder/main.cpp" line="84"/>
+        <source>This application can work under X11 only, Wayland is not supported.</source>
+        <translation>Это приложение может работать только в сессии X11, Wayland не поддерживается.</translation>
+    </message>
+    <message>
+        <source>This application can work under X11 only, wayland is not supported.</source>
+        <translation type="vanished">Это приложение может работать только в сессии X11,</translation>
+    </message>
 </context>
 <context>
     <name>RectFrame</name>

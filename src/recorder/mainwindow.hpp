@@ -169,7 +169,7 @@ private slots:
     void onResizeRequested();
     void onTransparentForMouse(bool checked);
     void onGIFSaved();
-#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+#if defined(Q_OS_WIN) && defined(GIF_BREEZE)
     void onChangeTheme();
 #endif
 

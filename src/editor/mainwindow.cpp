@@ -42,7 +42,7 @@
 // github-release include.
 #include <github.h>
 
-#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+#if defined(Q_OS_WIN) && defined(GIF_BREEZE)
 #include <KColorSchemeManager>
 #endif
 
@@ -402,7 +402,7 @@ void MainWindow::initUi()
     m_d->m_drawArrowToolBar->hide();
 
     auto settings = menuBar()->addMenu(tr("&Settings"));
-#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+#if defined(Q_OS_WIN) && defined(GIF_BREEZE)
     const auto isDark = KColorSchemeManager::instance()->activeSchemeId().toLower().endsWith(QStringLiteral("dark"));
 
     m_d->m_themeAction = settings->addAction(
@@ -1248,7 +1248,7 @@ void MainWindow::onAddUpdatesButton()
     }
 }
 
-#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+#if defined(Q_OS_WIN) && defined(GIF_BREEZE)
 
 void MainWindow::onChangeTheme()
 {

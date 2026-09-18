@@ -52,7 +52,7 @@
 #include <Windows.h>
 #endif
 
-#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+#if defined(Q_OS_WIN) && defined(GIF_BREEZE)
 #include <KColorSchemeManager>
 #endif
 
@@ -107,7 +107,7 @@ TitleWidget::TitleWidget(MainWindow *mainWindow,
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setMouseTracking(true);
 
-#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+#if defined(Q_OS_WIN) && defined(GIF_BREEZE)
     const auto isDark = KColorSchemeManager::instance()->activeSchemeId().toLower().endsWith(QStringLiteral("dark"));
 
     m_themeAction = new QAction(
@@ -145,7 +145,7 @@ void TitleWidget::onSettingsMenu()
 {
     QMenu menu;
 
-#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+#if defined(Q_OS_WIN) && defined(GIF_BREEZE)
     menu.addAction(m_themeAction);
     menu.addSeparator();
 #endif
@@ -191,7 +191,7 @@ void TitleWidget::licenses()
     msg.addLicense(s_qgiflibName, s_qgiflibLicense);
     msg.addLicense(s_qhotkeyName, s_qhotkeyLicense);
 
-#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+#if defined(Q_OS_WIN) && defined(GIF_BREEZE)
     msg.addLicense(s_breezeName, s_breezeLicense);
 #endif
 
@@ -233,7 +233,7 @@ bool TitleWidget::isMouseEnabled() const
     return m_mouseEnabled;
 }
 
-#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+#if defined(Q_OS_WIN) && defined(GIF_BREEZE)
 QAction *TitleWidget::themeAction() const
 {
     return m_themeAction;
@@ -1193,7 +1193,7 @@ void MainWindow::onWritePercent(int percent)
     }
 }
 
-#if defined(Q_OS_WIN) && defined(MD_BREEZE)
+#if defined(Q_OS_WIN) && defined(GIF_BREEZE)
 
 void MainWindow::onChangeTheme()
 {
