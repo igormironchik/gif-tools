@@ -21,9 +21,9 @@
 #include <QState>
 #include <QStateMachine>
 #include <QToolBar>
-#include <QToolButton>
 
 class MainWindow;
+class ActionWithSpinbox;
 
 //
 // Update
@@ -181,12 +181,10 @@ public:
     QToolBar *m_drawArrowToolBar = nullptr;
     //! Play timer.
     QTimer *m_playTimer = nullptr;
-    //! Pen width box.
-    QSpinBox *m_penWidthBox = nullptr;
-    //! Pen width tool button on draw tool bar.
-    QToolButton *m_penWidthBtnOnDrawToolBar = nullptr;
-    //! Pen width tool button on draw arrow tool bar.
-    QToolButton *m_penWidthBtnOnDrawArrowToolBar = nullptr;
+    //! Pen width spin box 1.
+    QSpinBox *m_penWidthSpin1 = nullptr;
+    //! Pen width spin box 2.
+    QSpinBox *m_penWidthSpin2 = nullptr;
     //! Status bar label.
     QLabel *m_status = nullptr;
     //! Edit menu.

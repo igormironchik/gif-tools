@@ -52,7 +52,9 @@ set(SRC main.cpp
     constants.hpp
     constants.cpp
     uistates.hpp
-    uistates.cpp)
+    uistates.cpp
+    toolbar.cpp
+    toolbar.hpp)
 
 qt6_add_resources(SRC resources.qrc)
 

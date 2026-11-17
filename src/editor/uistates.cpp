@@ -40,8 +40,6 @@ void TipsState::onEntry(QEvent *)
     m_isTextToolBarShown = m_impl.m_textToolBar->isVisible();
     m_currentStackWidget = m_impl.m_stack->currentWidget();
 
-    m_impl.m_q->hidePenWidthSpinBox();
-
     m_impl.m_cancelEdit->setEnabled(false);
     m_impl.m_applyEdit->setEnabled(false);
     m_impl.m_editMenu->setEnabled(false);
@@ -225,8 +223,6 @@ EditingState::EditingState(MainWindowPrivate &impl,
 
 void EditingState::onEntry(QEvent *)
 {
-    m_impl.m_q->hidePenWidthSpinBox();
-
     m_impl.enableActionsOnEdit(false);
 }
 
@@ -338,7 +334,6 @@ void DrawRectState::onEntry(QEvent *e)
     m_impl.m_drawToolBar->show();
 
     connect(m_impl.m_view->rectFrame(), &RectFrame::started, m_impl.m_q, &MainWindow::onRectSelectionStarted);
-    connect(m_impl.m_view->rectFrame(), &RectFrame::clicked, m_impl.m_q, &MainWindow::hidePenWidthSpinBox);
 }
 
 void DrawRectState::onExit(QEvent *e)
@@ -372,7 +367,6 @@ void DrawArrowState::onEntry(QEvent *e)
     m_impl.m_drawArrowToolBar->show();
 
     connect(m_impl.m_view->arrowFrame(), &ArrowFrame::started, m_impl.m_q, &MainWindow::onRectSelectionStarted);
-    connect(m_impl.m_view->arrowFrame(), &ArrowFrame::clicked, m_impl.m_q, &MainWindow::hidePenWidthSpinBox);
 }
 
 void DrawArrowState::onExit(QEvent *e)

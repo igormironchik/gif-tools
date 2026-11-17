@@ -42,8 +42,6 @@ public slots:
                   bool afterShowEvent = false);
 
 private slots:
-    //! Hide pen width spin box.
-    void hidePenWidthSpinBox();
     //! Open GIF.
     void openGif();
     //! Save GIF.
@@ -55,8 +53,6 @@ private slots:
     //! Frame checked/unchecked.
     void frameChecked(int idx,
                       bool on);
-    //! Change pen width.
-    void penWidth(bool on);
     //! Apply edit.
     void applyEdit();
     //! About dialog
@@ -99,6 +95,8 @@ private slots:
     void onCheckForUpdatesFinished();
     //! Add "Update" button.
     void onAddUpdatesButton();
+    //! Pen width changed.
+    void onPenWidthChanged(int v);
 #if defined(Q_OS_WIN) && defined(GIF_BREEZE)
     void onChangeTheme();
 #endif
