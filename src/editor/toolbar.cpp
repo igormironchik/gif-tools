@@ -26,6 +26,7 @@ public:
     {
         m_l->setContentsMargins(0, 0, 0, 0);
         m_l->setSpacing(3);
+        m_l->setSizeConstraint(QLayout::SetFixedSize);
     }
 
     //! Parent.
@@ -171,6 +172,14 @@ void ToolBar::setQToolBar(QToolBar *bar)
 
 void ToolBar::onOrientationChanged(Qt::Orientation o)
 {
+    if (o == Qt::Horizontal) {
+        setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    } else {
+        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    }
+
+    setUpdatesEnabled(false);
+
     QLayoutItem *child;
     while ((child = m_d->m_l->takeAt(0)) != nullptr) {
         delete child;
@@ -179,14 +188,23 @@ void ToolBar::onOrientationChanged(Qt::Orientation o)
     for (auto it = m_d->m_widgets.begin(), last = m_d->m_widgets.end(); it != last; ++it) {
         switch (it->m_type) {
         case Type::Widget: {
-            addWidgets(m_d->m_l, it->m_widget, m_d->m_bar->orientation(), it->m_auxWidget);
+            addWidgets(m_d->m_l, it->m_widget, o, it->m_auxWidget);
         } break;
 
         case Type::Line: {
+            it->m_widget->hide();
+            it->m_widget->setParent(nullptr);
             it->m_widget->deleteLater();
             it->m_widget = nullptr;
-            addSeparatorImpl(*it, m_d->m_bar->orientation(), this, m_d->m_l);
+            addSeparatorImpl(*it, o, this, m_d->m_l);
         }
         }
     }
+
+    m_d->m_l->activate();
+    updateGeometry();
+    m_d->m_bar->updateGeometry();
+    adjustSize();
+    m_d->m_bar->adjustSize();
+    setUpdatesEnabled(true);
 }
