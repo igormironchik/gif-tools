@@ -619,10 +619,15 @@ void RectangleSelection::enterEvent(QEnterEvent *e)
             m_d->m_hovered = true;
 
             if (!m_d->m_menu) {
-                QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+                if (!QApplication::overrideCursor()) {
+                    QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+                }
             } else {
                 m_d->m_menu = false;
-                QApplication::changeOverrideCursor(m_d->m_cursor);
+
+                if (QApplication::overrideCursor()) {
+                    QApplication::changeOverrideCursor(m_d->m_cursor);
+                }
             }
 
             e->accept();
@@ -640,10 +645,10 @@ void RectangleSelection::leaveEvent(QEvent *e)
         if (m_d->m_started) {
             m_d->m_hovered = false;
 
-            if (!m_d->m_menu) {
-                QApplication::restoreOverrideCursor();
-            } else {
-                if (QApplication::overrideCursor()) {
+            if (QApplication::overrideCursor()) {
+                if (!m_d->m_menu) {
+                    QApplication::restoreOverrideCursor();
+                } else {
                     m_d->m_cursor = QApplication::overrideCursor()->shape();
                     QApplication::changeOverrideCursor(Qt::ArrowCursor);
                 }
