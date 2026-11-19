@@ -147,6 +147,21 @@ QRect View::selectedRect() const
     }
 }
 
+qreal View::scale() const
+{
+    if (m_d->m_crop) {
+        return (qreal) m_d->m_crop->cropRect().width() / (qreal) m_d->m_crop->selectionRectScaled().width();
+    } else if (m_d->m_text) {
+        return (qreal) m_d->m_text->selectionRect().width() / (qreal) m_d->m_text->selectionRectScaled().width();
+    } else if (m_d->m_rect) {
+        return (qreal) m_d->m_rect->selectionRect().width() / (qreal) m_d->m_rect->selectionRectScaled().width();
+    } else if (m_d->m_arrow) {
+        return (qreal) m_d->m_arrow->selectionRect().width() / (qreal) m_d->m_arrow->selectionRectScaled().width();
+    } else {
+        return 1.0;
+    }
+}
+
 void View::startCrop()
 {
     if (!m_d->m_crop) {

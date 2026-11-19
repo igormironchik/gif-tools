@@ -89,6 +89,7 @@ void applyTextFunc(QPromise<void> &,
                    BusyIndicator *receiver,
                    QGifLib::Gif *container,
                    const QRect &rect,
+                   qreal scale,
                    const TextFrame::Documents &docs,
                    const QVector<qsizetype> &unchecked)
 {
@@ -106,9 +107,10 @@ void applyTextFunc(QPromise<void> &,
             QImage img(fileNames.at(idx));
             QPainter p(&img);
             QTextDocument *doc = docs[idx]->clone();
-            doc->setPageSize(rect.size().toSizeF());
-            doc->setTextWidth(rect.width());
+            doc->setPageSize(rect.size().toSizeF() / scale);
+            doc->setTextWidth(rect.width() / scale);
             p.translate(rect.topLeft());
+            p.scale(scale, scale);
             doc->drawContents(&p);
             doc->deleteLater();
             img.save(fileNames.at(idx));
@@ -1064,6 +1066,7 @@ void MainWindow::applyText()
                                         m_d->m_busy,
                                         &m_d->m_frames,
                                         rect,
+                                        m_d->m_view->scale(),
                                         m_d->m_view->textFrame()->text(),
                                         m_d->m_unchecked);
         m_d->m_watcher.setFuture(future);

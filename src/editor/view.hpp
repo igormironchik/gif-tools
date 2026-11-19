@@ -51,6 +51,8 @@ public:
 
     //! \return Crop rectangle.
     QRect selectedRect() const;
+    //! \return Scale of selected rect to what drawn.
+    qreal scale() const;
 
     //! \return Text frame widget.
     TextFrame *textFrame() const;
