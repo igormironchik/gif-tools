@@ -82,6 +82,7 @@ void TextFrame::startTextEditing()
 
     enableMouse(false);
     frameResized();
+    m_editor->setEnabled(true);
     m_editor->show();
     m_editor->raise();
     m_editor->setFocus();
@@ -108,6 +109,7 @@ void TextFrame::clear()
 void TextFrame::switchToSelectMode()
 {
     m_editor->hide();
+    m_editor->setEnabled(false);
     QApplication::processEvents();
     enableMouse(true);
 
