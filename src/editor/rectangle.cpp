@@ -453,6 +453,8 @@ void RectangleSelection::paintEvent(QPaintEvent *)
     p.setBrush(dark);
 
     if (isSomethingSelected()) {
+        paint(&p);
+
         QPainterPath path;
         path.addRect(QRectF(m_d->m_available).adjusted(0, 0, -1, -1));
 
@@ -659,4 +661,8 @@ void RectangleSelection::leaveEvent(QEvent *e)
 void RectangleSelection::contextMenuEvent(QContextMenuEvent *e)
 {
     e->ignore();
+}
+
+void RectangleSelection::paint(QPainter *)
+{
 }

@@ -163,6 +163,9 @@ protected:
     void contextMenuEvent(QContextMenuEvent *e) override;
 
 protected:
+    virtual void paint(QPainter *p);
+
+protected:
     QScopedPointer<RectangleSelectionPrivate> m_d;
 
 private:

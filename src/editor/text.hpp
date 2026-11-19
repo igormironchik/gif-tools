@@ -65,6 +65,7 @@ private slots:
 
 protected:
     void contextMenuEvent(QContextMenuEvent *e) override;
+    void paint(QPainter *p) override;
 
 private:
     Q_DISABLE_COPY(TextFrame)

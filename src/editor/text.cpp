@@ -16,6 +16,7 @@
 #include <QColorDialog>
 #include <QContextMenuEvent>
 #include <QMenu>
+#include <QPainter>
 
 //
 // TextFrame
@@ -132,6 +133,21 @@ void TextFrame::contextMenuEvent(QContextMenuEvent *e)
     }
 
     e->accept();
+}
+
+void TextFrame::paint(QPainter *p)
+{
+    if (m_editor) {
+        p->save();
+        const auto r = selectionRectScaled();
+        p->translate(r.topLeft());
+        auto doc = m_editor->document()->clone(this);
+        doc->setPageSize(r.size().toSizeF());
+        doc->setTextWidth(r.width());
+        doc->drawContents(p);
+        doc->deleteLater();
+        p->restore();
+    }
 }
 
 void TextFrame::boldText()
